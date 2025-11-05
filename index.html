@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Uma Run Randomizer — Generador de sets para Uma Musume</title>
+  <meta name="description" content="Generador de retos / sets randomizados para Uma Musume (train & supports)." />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <div class="max-w-4xl mx-auto p-6">
+    <header class="mb-6">
+      <h1 class="text-3xl font-extrabold">Uma Challenge Randomizer</h1>
+      <p class="text-sm text-gray-600">Genera retos y composiciones de cartas de soporte para una run aleatoria (no ligado al juego original).</p>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <section class="lg:col-span-1 bg-white p-4 rounded-2xl shadow">
+        <h2 class="font-semibold mb-2">Opciones</h2>
+
+        <label class="block text-xs text-gray-600">Número de cartas de soporte</label>
+        <div class="flex items-center gap-2 mb-3">
+          <input id="supportCount" type="range" min="1" max="6" value="6" class="w-full" />
+          <span id="supportCountLabel" class="w-8 text-right">6</span>
+        </div>
+
+        <label class="block text-xs text-gray-600">Modo</label>
+        <select id="mode" class="w-full mb-3 p-2 border rounded">
+          <option value="simple">Simple (aleatorio puro)</option>
+          <option value="weighted">Ponderado (más probabilidad a Speed/Power)</option>
+          <option value="challenge">Challenge (añade restricciones)</option>
+        </select>
+
+        <label class="block text-xs text-gray-600">Tipo de distribución</label>
+        <select id="distribution" class="w-full mb-3 p-2 border rounded">
+          <option value="free">Libre (cualquier combinación)</option>
+          <option value="balanced">Balanceada (intenta cubrir atributos)</option>
+          <option value="focused">Focussed (prioriza 1-2 atributos)</option>
+        </select>
+
+        <div class="mb-3">
+          <label class="inline-flex items-center">
+            <input id="allowSR" type="checkbox" checked class="form-checkbox" />
+            <span class="ml-2 text-sm text-gray-600">Permitir SR/SSR en la selección (solo para flavour)</span>
+          </label>
+        </div>
+
+        <div class="flex gap-2 mb-3">
+          <button id="generateBtn" class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Generar</button>
+          <button id="randomUmaBtn" class="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300">Reroll Uma</button>
+        </div>
+
+        <!-- Bloque visual de selección de Umas -->
+        <hr class="my-3" />
+        <div>
+          <label class="block text-xs text-gray-600 mb-2">Bloquear Umas</label>
+            <div class="flex gap-2 mb-2">
+            <button id="showUmaSelector" class="flex-1 bg-pink-500 text-white py-2 rounded hover:bg-pink-600">Mostrar lista de Umas</button>
+            <button id="toggleAllUmas" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400">Seleccionar/Deseleccionar todas</button>
+          </div>
+          <small class="text-xs text-gray-500">Haz click en las imágenes para bloquear/desbloquear (gris = bloqueada).</small>
+
+          <div id="umaSelector" class="hidden mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 max-h-96 overflow-y-auto border p-2 rounded bg-gray-50"></div>
+        </div>
+
+
+      </section>
+
+      <section class="lg:col-span-2 bg-white p-6 rounded-2xl shadow">
+        <div class="flex items-start justify-between">
+          <div>
+            <h2 id="resultTitle" class="text-2xl font-bold">Resultado</h2>
+            <p id="resultSubtitle" class="text-sm text-gray-600">Presiona <strong>Generar</strong> para crear una run nueva.</p>
+          </div>
+          <div class="flex gap-2">
+            <button id="copyBtn" class="px-3 py-2 border rounded">Copiar</button>
+            <button id="exportBtn" class="px-3 py-2 bg-green-600 text-white rounded">Exportar JSON</button>
+          </div>
+        </div>
+
+        <div id="resultCard" class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
+          <div class="flex items-center gap-4">
+            <img id="umaImage" src="" alt="Uma Image" class="w-24 h-24 rounded-lg object-cover bg-gray-200" />
+            <div>
+              <h3 id="umaName" class="text-xl font-semibold">-</h3>
+              <p id="umaRole" class="text-sm text-gray-600">Tipo: -</p>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <h4 class="font-semibold">Composición de soportes</h4>
+            <div id="supportsList" class="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2 text-sm"></div>
+          </div>
+
+          <div class="mt-4">
+            <h4 class="font-semibold">Restricciones / Reto</h4>
+            <p id="challengeText" class="text-sm text-gray-700">—</p>
+          </div>
+
+          <div class="mt-4">
+            <h4 class="font-semibold">Notas</h4>
+            <ul id="notesList" class="list-disc pl-5 text-sm text-gray-700"></ul>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <footer class="mt-6 text-center text-xs text-gray-500">
+      Hecho con ❤️ — puedes descargar el HTML y usarlo localmente.
+    </footer>
+  </div>
+
+  <script>
+    // === Datos de Umas ===
+    const UMAS = [
+      {name: 'Special Week [Special Dreamer]', role: 'All-round', img: 'https://img.game8.co/4215100/ccdae6e32950d689004ae06d0d12b7fb.png/show'},
+      {name: 'Tokai Teio [Peak Joy]', role: 'Speed', img: 'https://img.game8.co/4215117/a32a700acf40156c4a14e5628d4528c2.png/show'},
+      {name: 'Mejiro McQueen [Frontline Elegance]', role: 'Stamina', img: 'https://img.game8.co/4215096/d1b0fba85e39f8388349b0d7eb51e94e.png/show'},
+      {name: 'Gold Ship [Red Strife]', role: 'Power', img: 'https://img.game8.co/4215126/f865ae8805e1a047c197b41dcf629128.png/show'},
+      {name: 'Narita Taishin [Nevertheless]', role: 'Speed', img: 'https://img.game8.co/4215638/c9a9a3352015b98b96bcf5adc58a3c71.png/show'},
+      {name: 'Symboli Rudolf [Emperor´s Path]', role: 'Power', img: 'https://img.game8.co/4215094/cfe21be4d0eaa0f7fd7bfca081137cf6.png/show'},
+      {name: 'Silence Suzuka [Innocent Silence]', role: 'Speed', img: 'https://img.game8.co/4215102/de7844318b232ff98575cd731da5da5b.png/show'},
+      {name: 'T.M. Opera O [O Sole Suo!]', role: 'Stamina', img: 'https://img.game8.co/4215118/01614857f603e325d89d2672ff7be956.png/show'},
+      {name: 'Oguri Cap [Starlight Beat]', role: 'Speed', img: 'https://img.game8.co/4215120/b88f532cf2ad5d92e2cba38d4e3e1967.png/show'},
+      {name: 'Rice Shower [Rosy Dreams]', role: 'Stamina', img: 'https://img.game8.co/4215101/df3fdc1f11bff2145a1e0580f00d6233.png/show'},
+      {name: 'Maruzensky [Formula R]', role: 'Speed', img: 'https://img.game8.co/4215129/d710f507283c55a35b5a5ca256380ef3.png/show'},
+      {name: 'Taiki Shuttle [Wild Frontier]', role: 'Speed', img: 'https://img.game8.co/4215092/2c86727fc3e27a1455f765b1be6aaf9b.png/show'},
+      {name: 'Mihono Bourbon [MB-19890425]', role: 'Speed', img: 'https://img.game8.co/4215103/c8daf8408a496ca99f2f409141480ee3.png/show'},
+      {name: 'Biwa Hayahide [pf. Winning Equation...]', role: 'Stamina', img: 'https://img.game8.co/4215620/d57362dcb3e68fba4902f89e08f59ad5.png/show'},
+      {name: 'Mejiro McQueen [End of the Skies]', role: 'Stamina', img: 'https://img.game8.co/4218714/60a1167b86af10045042a3bb142c22df.png/show'},
+      {name: 'Tokai Teio [Beyond the Horizon]', role: 'Speed', img: 'https://img.game8.co/4218713/54e61e6ffef143af6ee086fb5773fbaf.png/show'},
+      {name: 'Curren Chan [Fille Éclair]', role: 'Speed', img: 'https://img.game8.co/4246626/af30ce09d65c0e609c8dc4355f5d323d.png/show'},
+      {name: 'Smart Falcon [LOVE☆4EVER]', role: 'Speed', img: 'https://img.game8.co/4215631/337c5bf43c5719926207ba459d43bec9.png/show'},
+      {name: 'Narita Brian [Maverick]', role: 'Power', img: 'https://img.game8.co/4237874/b48663f39c85e997a057e14ccc6fd9ea.png/show'},
+      {name: 'Mayano Top Gun [Sunlight Bouquet]', role: 'Stamina', img: 'https://img.game8.co/4238069/bbdc765c2d8a16c29c109e79e8a4d11b.png/show'},
+      {name: 'Air Groove [Quercus Civilis]', role: 'Stamina', img: 'https://img.game8.co/4238068/3120a85fb8c9bc3ca8abaaf5d2523a78.png/show'},
+      {name: 'Seiun Sky [Reeling in the Big One]', role: 'Speed', img: 'https://img.game8.co/4215637/0186eb67d34e69743cb30de78de05eff.png/show'},
+      {name: 'Hishi Amazon [Azure Amazon]', role: 'Power', img: 'https://img.game8.co/4215630/680022e0ffec85a5fa151ca1120ea64e.png/show'},
+      {name: 'El Condor Pasa [Kukulkan Warrior]', role: 'Power', img: 'https://img.game8.co/4265082/6b379764f113de4136df307ecd70de13.png/show'},
+      {name: 'Grass Wonder [Saintly Jade Cleric]', role: 'Stamina', img: 'https://img.game8.co/4265083/8e9012e1b49d070ef82dd2949938cd96.png/show'},
+      {name: 'Fuji Kiseki [Shooting Star Revue]', role: 'Speed', img: 'https://img.game8.co/4215639/8a19fa7cf442bea3d45a84273946c8f7.png/show'},
+      {name: 'Gold City [Authentic / 1928]', role: 'Speed', img: 'https://img.game8.co/4215622/13a954122fa56c982abf91a2f3c655d7.png/show'},
+      {name: 'Special Week [Hopp\'n♪Happy Heart]', role: 'Stamina', img: 'https://img.game8.co/4292908/648e53b547019ed8388f7dc88720bb74.png/show'},
+      {name: 'Maruzensky [Hot☆Summer Night]', role: 'Speed', img: 'https://img.game8.co/4292909/dfa724321de6577126deae310ef24d04.png/show'},
+      {name: 'Meisho Doto [Turbulent Blue]', role: 'Stamina', img: 'https://img.game8.co/4215619/df6d6e2bad11c267eabab8effa9a56dd.png/show'},
+      {name: 'Eishin Flash [Meisterschaft]', role: 'Stamina', img: 'https://img.game8.co/4215629/9f8605d49f3289e1b48dd470a8a44872.png/show'},
+      {name: 'Vodka [Wild Top Gear]', role: 'Speed', img: 'https://img.game8.co/4215123/8c3ddeb9090b518a35fd5265ce3b0e1f.png/show'},
+      {name: 'Daiwa Scarlet [Peak Blue]', role: 'Speed', img: 'https://img.game8.co/4215127/849b6a25d5a9115a17ba0dd9484d4632.png/show'},
+      {name: 'Grass Wonder [Stone-Piercing Blue]', role: 'Stamina', img: 'https://img.game8.co/4215106/abb5535583d439297e38fd88351acb0f.png/show'},
+      {name: 'El Condor Pasa [El Numero 1]', role: 'Power', img: 'https://img.game8.co/4215091/71f519fcd85bcc88940cb05a06aa5fad.png/show'},
+      {name: 'Air Groove [Empress Road]', role: 'Stamina', img: 'https://img.game8.co/4215095/7ae933e5523e8b0be50e79481aa74d64.png/show'},
+      {name: 'Mayano Top Gun [Scramble Zone]', role: 'Speed', img: 'https://img.game8.co/4215107/10b354aa6881ac931850fdfdd65e4bfa.png/show'},
+      {name: 'Super Creek [Murmuring Stream]', role: 'Stamina', img: 'https://img.game8.co/4215105/0fef6616422e8cafe011db3f4297d458.png/show'},
+      {name: 'Mejiro Ryan [Down the Line]', role: 'Power', img: 'https://img.game8.co/4215093/cf29dcafa459fe6526ae63511010b6c6.png/show'},
+      {name: 'Agnes Tachyon [Tach-nology]', role: 'Speed', img: 'https://img.game8.co/4215119/866e3174290a1db9f1b5e9b0707022fd.png/show'},
+      {name: 'Winning Ticket [Get to Winning!]', role: 'Stamina', img: 'https://img.game8.co/4215097/f315789918074a13bde91667b52ef450.png/show'},
+      {name: 'Sakura Bakushin O [Blossom in Learning]', role: 'Speed', img: 'https://img.game8.co/4215124/b43daef3029d668d934a74fc6dedc106.png/show'},
+      {name: 'Haru Urara [Bestest Prize]', role: 'Guts', img: 'https://img.game8.co/4215125/8a0d5987ff05baa4e52b7b75dd8db0ac.png/show'},
+      {name: 'Makitanefukukitaru [Rising Fortune]', role: 'Wisdom', img: 'https://img.game8.co/4215098/fd1cc3813dbc2b350ca86dda01754f61.png/show'},
+      {name: 'Nice Nature [Poinsettia Ribbon]', role: 'Stamina', img: 'https://img.game8.co/4215099/f427b728c8fff6a14b9db7b1c88edab0.png/show'},
+      {name: 'King Halo [King of Emeralds]', role: 'Speed', img: 'https://img.game8.co/4215104/6c6a894d4249705341fc8e8f3729c2c1.png/show'}
+    ];
+
+    const SUPPORT_TYPES = ['Speed','Stamina','Power','Guts','Wisdom','Friend'];
+    let blockedUmas = new Set();
+    const $ = id => document.getElementById(id);
+
+    function pickRandom(array) { return array[Math.floor(Math.random()*array.length)]; }
+
+    // === Selector visual de Umas ===
+    const umaSelector = $('umaSelector');
+    const showUmaSelectorBtn = $('showUmaSelector');
+    showUmaSelectorBtn.addEventListener('click', () => {
+      umaSelector.classList.toggle('hidden');
+      if (!umaSelector.classList.contains('hidden') && umaSelector.childElementCount === 0) {
+        UMAS.forEach(u => {
+          const div = document.createElement('div');
+          div.className = 'relative cursor-pointer group';
+          div.innerHTML = `
+            <img src="${u.img}" alt="${u.name}" title="${u.name}" class="w-full h-24 object-cover rounded transition filter group-hover:brightness-90">
+            <p class="text-[10px] text-center mt-1 truncate">${u.name.split('[')[0].trim()}</p>
+          `;
+          div.addEventListener('click', () => {
+            const img = div.querySelector('img');
+            if (blockedUmas.has(u.name)) {
+              blockedUmas.delete(u.name);
+              img.classList.remove('grayscale');
+            } else {
+              blockedUmas.add(u.name);
+              img.classList.add('grayscale');
+            }
+          });
+          umaSelector.appendChild(div);
+        });
+      }
+    });
+
+    const toggleAllBtn = $('toggleAllUmas');
+toggleAllBtn.addEventListener('click', () => {
+  const imgs = umaSelector.querySelectorAll('img');
+  // Si hay alguna desbloqueada → bloquear todas
+  const anyUnlocked = Array.from(imgs).some(img => !img.classList.contains('grayscale'));
+  imgs.forEach((img, index) => {
+    const u = UMAS[index];
+    if (anyUnlocked) {
+      blockedUmas.add(u.name);
+      img.classList.add('grayscale');
+    } else {
+      blockedUmas.delete(u.name);
+      img.classList.remove('grayscale');
+    }
+  });
+});
+
+
+    // === Soportes ===
+    function distributeSupports(count, mode, distribution, umaRole) {
+      const out = {}; SUPPORT_TYPES.forEach(s => out[s]=0);
+      if (mode === 'simple' || distribution === 'free') {
+        for (let i=0;i<count;i++) out[pickRandom(SUPPORT_TYPES)]++;
+        return out;
+      }
+      if (mode === 'weighted') {
+        const weighted = [];
+        for (const t of SUPPORT_TYPES) {
+          const weight = (t==='Speed'||t==='Power')?3:1;
+          for (let i=0;i<weight;i++) weighted.push(t);
+        }
+        for (let i=0;i<count;i++) out[pickRandom(weighted)]++;
+        return out;
+      }
+      if (distribution === 'focused') {
+        let focus = [];
+        if (umaRole.toLowerCase().includes('speed')) focus = ['Speed','Wisdom'];
+        else if (umaRole.toLowerCase().includes('stamina')) focus = ['Stamina','Wisdom'];
+        else if (umaRole.toLowerCase().includes('power')) focus = ['Power','Guts'];
+        else focus = ['Speed','Stamina'];
+        const focusCount = Math.max(1, Math.round(count*0.6));
+        for (let i=0;i<focusCount;i++) out[pickRandom(focus)]++;
+        for (let i=focusCount;i<count;i++) out[pickRandom(SUPPORT_TYPES)]++;
+        return out;
+      }
+      if (distribution === 'balanced') {
+        let i=0; const types = [...SUPPORT_TYPES];
+        while (i<count) { out[types[i % types.length]]++; i++; }
+        return out;
+      }
+      for (let i=0;i<count;i++) out[pickRandom(SUPPORT_TYPES)]++;
+      return out;
+    }
+
+    function generateChallenge(mode) {
+      const challenges = [
+        'No usar SR/SSR en la run (solo R/Normal allowed).',
+        'Entrenar prioritariamente Guts durante las primeras 6 semanas.',
+        'No usar items de recuperación hasta la mitad del training camp.',
+        'Equipar al final una skill de recuperación obligatoria.',
+        'Ganar URA Finals con A Rank mínimo (objetivo).',
+        'Solo supports de tipo Speed y Wisdom permitidos.'
+      ];
+      if (mode === 'challenge') return pickRandom(challenges);
+      return Math.random()<0.25?pickRandom(challenges):'Sin restricciones especiales.';
+    }
+
+    const supportCountEl = $('supportCount');
+    const supportCountLabel = $('supportCountLabel');
+    supportCountEl.addEventListener('input', ()=> supportCountLabel.textContent = supportCountEl.value);
+
+    // === Generar Run ===
+    $('generateBtn').addEventListener('click', () => {
+      const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
+      const lockedUmaName = $('lockUmaInput')?.value?.trim();
+      let uma = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
+      if (lockedUmaName) {
+        const found = UMAS.find(u => u.name.toLowerCase() === lockedUmaName.toLowerCase());
+        if (found) uma = found;
+      }
+
+      const count = parseInt(supportCountEl.value,10);
+      const mode = $('mode').value;
+      const distribution = $('distribution').value;
+      const supports = distributeSupports(count, mode, distribution, uma.role);
+
+      const notes = [];
+      if (!$('allowSR').checked) notes.push('Restricción: evita usar SR/SSR en la selección de support cards.');
+      if (mode==='weighted') notes.push('Modo ponderado: mayor probabilidad de Speed/Power.');
+      if (distribution==='focused') notes.push('Distribución: enfoque en atributos relacionados con la Uma.');
+      const challenge = generateChallenge(mode);
+
+      $('umaName').textContent = uma.name;
+      $('umaRole').textContent = `Tipo: ${uma.role}`;
+      $('umaImage').src = uma.img || '';
+
+      const supportsList = $('supportsList'); supportsList.innerHTML='';
+      Object.entries(supports).forEach(([k,v])=>{
+        if(v>0){
+          const node=document.createElement('div');
+          node.className='p-2 border rounded text-center bg-white';
+          node.innerHTML=`<strong>${k}</strong><div class="text-sm text-gray-600">${v}</div>`;
+          supportsList.appendChild(node);
+        }
+      });
+
+      $('challengeText').textContent = challenge;
+      const notesList = $('notesList'); notesList.innerHTML='';
+      notes.forEach(n=>{
+        const li = document.createElement('li');
+        li.textContent = n;
+        notesList.appendChild(li);
+      });
+
+      const result = {uma,supports,challenge,notes,generatedAt:new Date().toISOString()};
+      $('exportBtn').dataset.payload = JSON.stringify(result);
+      $('copyBtn').dataset.payload = JSON.stringify(result);
+    });
+
+    // === Reroll Uma ===
+    $('randomUmaBtn').addEventListener('click', ()=> {
+      const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
+      const u = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
+      $('umaName').textContent = u.name;
+      $('umaRole').textContent = `Tipo: ${u.role}`;
+      $('umaImage').src = u.img;
+    });
+
+    // === Copiar / Exportar JSON ===
+    $('copyBtn').addEventListener('click', async ()=>{
+      const payload=$('copyBtn').dataset.payload;
+      if(!payload) return alert('Genera primero un resultado.');
+      await navigator.clipboard.writeText(payload);
+      alert('JSON copiado al portapapeles.');
+    });
+    $('exportBtn').addEventListener('click', ()=>{
+      const payload=$('exportBtn').dataset.payload;
+      if(!payload) return alert('Genera primero un resultado.');
+      const blob=new Blob([payload],{type:'application/json'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;a.download='uma-run-challenge.json';
+      document.body.appendChild(a);a.click();a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    // === Inicializar pantalla ===
+    (function(){
+      const u=pickRandom(UMAS);
+      $('umaName').textContent = u.name; 
+      $('umaRole').textContent = `Tipo: ${u.role}`; 
+      $('umaImage').src = u.img;
+    })();
+  </script>
+</body>
+</html>
