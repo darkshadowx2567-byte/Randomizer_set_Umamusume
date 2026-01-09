@@ -12,6 +12,7 @@
     <header class="mb-6">
       <h1 class="text-3xl font-extrabold">Uma Challenge Randomizer</h1>
       <p class="text-sm text-gray-600">Genera retos y composiciones de cartas de soporte para una run aleatoria (no ligado al juego original).</p>
+      <button id="darkModeToggle">🌙 Modo Oscuro</button>
     </header>
 
     <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -362,9 +363,61 @@ toggleAllBtn.addEventListener('click', () => {
       $('umaRole').textContent = `Tipo: ${u.role}`; 
       $('umaImage').src = u.img;
     })();
+
+    /* ---- Estilo general del botón ---- */
+#darkModeToggle {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #444;
+  color: white;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+#darkModeToggle:hover {
+  background: #666;
+}
+
+/* ---- Modo oscuro activado ---- */
+.dark-mode {
+  background-color: #121212;
+  color: #e5e5e5;
+}
+
+/* Si tus contenedores tienen fondo, añade esto */
+.dark-mode .card,
+.dark-mode .box,
+.dark-mode .panel,
+.dark-mode .container {
+  background-color: #1e1e1e !important;
+  color: #f2f2f2 !important;
+  border-color: #333 !important;
+}
+
+/* Imágenes: opcional añadir un pequeño brillo */
+.dark-mode img {
+  filter: brightness(0.9);
+}
+
+    const toggleBtn = document.getElementById("darkModeToggle");
+
+toggleBtn.addEventListener("click", () => {
+  document.body.classList.toggle("dark-mode");
+
+  // Cambiar texto del botón
+  if (document.body.classList.contains("dark-mode")) {
+    toggleBtn.textContent = "☀️ Modo Claro";
+  } else {
+    toggleBtn.textContent = "🌙 Modo Oscuro";
+  }
+});
+
   </script>
 </body>
 </html>
+
 
 
 
