@@ -18,7 +18,6 @@
           <button id="generateBtn" class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"> Generar
           </button>
         </div>
-
         <!-- Bloque visual de selección de Umas -->
         <hr class="my-3" />
         <div>
@@ -28,11 +27,9 @@
             <button id="toggleAllUmas" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400">Seleccionar/Deseleccionar todas</button>
           </div>
           <small class="text-xs text-gray-500">Haz click en las imágenes para bloquear/desbloquear (gris = bloqueada).</small>
-
           <div id="umaSelector" class="hidden mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 max-h-96 overflow-y-auto border p-2 rounded bg-gray-50"></div>
         </div>
       </section>
-
       <section class="lg:col-span-2 bg-white p-6 rounded-2xl shadow">
         <div class="flex items-start justify-between">
           <div>
@@ -40,15 +37,14 @@
             <p id="resultSubtitle" class="text-sm text-gray-600">Presiona <strong>Generar</strong> para crear una run nueva.</p>
           </div>
         </div>
-
         <div id="resultCard" class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
           <div class="flex items-center gap-4">
             <img id="umaImage" src="" alt="Uma Image" class="w-24 h-24 rounded-lg object-cover bg-gray-200" />
             <div>
               <h3 id="umaName" class="text-xl font-semibold">-</h3>
+              <p id="umaRole" class="text-sm text-gray-600">Tipo: -</p>
             </div>
           </div>
-
           <div class="mt-4">
             <h4 class="font-semibold">Composición de soportes</h4>
             <div id="supportsList" class="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2 text-sm"></div>
@@ -56,7 +52,6 @@
       </section>
     </main>
   </div>
-
   <script>
     // === Datos de Umas ===
     const UMAS = [
@@ -148,186 +143,166 @@
       {name: 'Yaeno Muteki [Blazed Head, Covered Fists]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1072_107201.png'},
       {name: 'Mejiro Bright [Brunissage Line]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1074_107401.png'},
     ];
-
-    const SUPPORT_TYPES = ['Speed','Stamina','Power','Guts','Wit','Pal','Group'];
-
-let blockedUmas = new Set();
-
-const $ = id => document.getElementById(id);
-
-function pickRandom(array) {
-  return array[Math.floor(Math.random() * array.length)];
-}
-
-// ==========================
-// Selector visual de Umas
-// ==========================
-
-const umaSelector = $('umaSelector');
-const showUmaSelectorBtn = $('showUmaSelector');
-
-showUmaSelectorBtn.addEventListener('click', () => {
-
-  umaSelector.classList.toggle('hidden');
-
-  if (
-    !umaSelector.classList.contains('hidden') &&
-    umaSelector.childElementCount === 0
-  ) {
-
-    UMAS.forEach(u => {
-
-      const div = document.createElement('div');
-
-      div.className = 'relative cursor-pointer group';
-
-      div.innerHTML = `
-        <img
-          src="${u.img}"
-          alt="${u.name}"
-          title="${u.name}"
-          class="w-full h-24 object-cover rounded transition filter group-hover:brightness-90"
-        >
-
-        <p class="text-[10px] text-center mt-1 truncate">
-          ${u.name.split('[')[0].trim()}
-        </p>
-      `;
-
-      div.addEventListener('click', () => {
-
-        const img = div.querySelector('img');
-
-        if (blockedUmas.has(u.name)) {
-
-          blockedUmas.delete(u.name);
-          img.classList.remove('grayscale');
-
-        } else {
-
-          blockedUmas.add(u.name);
-          img.classList.add('grayscale');
-        }
-      });
-
-      umaSelector.appendChild(div);
+    const SUPPORT_TYPES = ['Speed','Stamina','Power','Guts','Wit','Pal', 'Group'];
+    let blockedUmas = new Set();
+    const $ = id => document.getElementById(id);
+    function pickRandom(array) { return array[Math.floor(Math.random()*array.length)]; }
+    // === Selector visual de Umas ===
+    const umaSelector = $('umaSelector');
+    const showUmaSelectorBtn = $('showUmaSelector');
+    showUmaSelectorBtn.addEventListener('click', () => {
+      umaSelector.classList.toggle('hidden');
+      if (!umaSelector.classList.contains('hidden') && umaSelector.childElementCount === 0) {
+        UMAS.forEach(u => {
+          const div = document.createElement('div');
+          div.className = 'relative cursor-pointer group';
+          div.innerHTML = `
+            <img src="${u.img}" alt="${u.name}" title="${u.name}" class="w-full h-24 object-cover rounded transition filter group-hover:brightness-90">
+            <p class="text-[10px] text-center mt-1 truncate">${u.name.split('[')[0].trim()}</p>
+          `;
+          div.addEventListener('click', () => {
+            const img = div.querySelector('img');
+            if (blockedUmas.has(u.name)) {
+              blockedUmas.delete(u.name);
+              img.classList.remove('grayscale');
+            } else {
+              blockedUmas.add(u.name);
+              img.classList.add('grayscale');
+            }
+          });
+          umaSelector.appendChild(div);
+        });
+      }
     });
-  }
-});
-
-// ==========================
-// Seleccionar / Deseleccionar todas
-// ==========================
-
-$('toggleAllUmas').addEventListener('click', () => {
-
+    const toggleAllBtn = $('toggleAllUmas');
+toggleAllBtn.addEventListener('click', () => {
   const imgs = umaSelector.querySelectorAll('img');
-
-  const anyUnlocked =
-    Array.from(imgs).some(img =>
-      !img.classList.contains('grayscale')
-    );
-
+  // Si hay alguna desbloqueada → bloquear todas
+  const anyUnlocked = Array.from(imgs).some(img => !img.classList.contains('grayscale'));
   imgs.forEach((img, index) => {
-
     const u = UMAS[index];
-
     if (anyUnlocked) {
-
       blockedUmas.add(u.name);
       img.classList.add('grayscale');
-
     } else {
-
       blockedUmas.delete(u.name);
       img.classList.remove('grayscale');
     }
   });
 });
-
-// ==========================
-// Generación de soportes
-// ==========================
-
-function distributeSupports(count) {
-
-  const out = {};
-
-  SUPPORT_TYPES.forEach(type => {
-    out[type] = 0;
-  });
-
-  for (let i = 0; i < count; i++) {
-    out[pickRandom(SUPPORT_TYPES)]++;
-  }
-
-  return out;
-}
-
-// ==========================
-// Generar
-// ==========================
-
-$('generateBtn').addEventListener('click', () => {
-  const availableUmas = UMAS.filter(
-    u => !blockedUmas.has(u.name)
-  );
-
-  const uma = pickRandom(
-    availableUmas.length > 0 ? availableUmas : UMAS
-  );
-
-  $('umaName').textContent = uma.name;
-  $('umaRole').textContent = `Tipo: ${uma.role}`;
-  $('umaImage').src = uma.img;
-
-  const supports = {};
-  SUPPORT_TYPES.forEach(t => supports[t] = 0);
-
-  for(let i = 0; i < 6; i++){
-    supports[pickRandom(SUPPORT_TYPES)]++;
-  }
-
-  const supportsList = $('supportsList');
-  supportsList.innerHTML = '';
-
-  Object.entries(supports).forEach(([type, amount]) => {
-    if(amount > 0){
-      const div = document.createElement('div');
-      div.className = 'p-2 border rounded text-center bg-white';
-      div.innerHTML = `
-        <strong>${type}</strong>
-        <div>${amount}</div>
-      `;
-      supportsList.appendChild(div);
+    // === Soportes ===
+    function distributeSupports(count, mode, distribution, umaRole) {
+      const out = {}; SUPPORT_TYPES.forEach(s => out[s]=0);
+      if (mode === 'simple' || distribution === 'free') {
+        for (let i=0;i<count;i++) out[pickRandom(SUPPORT_TYPES)]++;
+        return out;
+      }
+      if (mode === 'weighted') {
+        const weighted = [];
+        for (const t of SUPPORT_TYPES) {
+          const weight = (t==='Speed'||t==='Power')?3:1;
+          for (let i=0;i<weight;i++) weighted.push(t);
+        }
+        for (let i=0;i<count;i++) out[pickRandom(weighted)]++;
+        return out;
+      }
+      if (distribution === 'focused') {
+        let focus = [];
+        if (umaRole.toLowerCase().includes('speed')) focus = ['Speed','Wit'];
+        else if (umaRole.toLowerCase().includes('stamina')) focus = ['Stamina','Wit'];
+        else if (umaRole.toLowerCase().includes('power')) focus = ['Power','Guts'];
+        else focus = ['Speed','Stamina'];
+        const focusCount = Math.max(1, Math.round(count*0.6));
+        for (let i=0;i<focusCount;i++) out[pickRandom(focus)]++;
+        for (let i=focusCount;i<count;i++) out[pickRandom(SUPPORT_TYPES)]++;
+        return out;
+      }
+      if (distribution === 'balanced') {
+        let i=0; const types = [...SUPPORT_TYPES];
+        while (i<count) { out[types[i % types.length]]++; i++; }
+        return out;
+      }
+      for (let i=0;i<count;i++) out[pickRandom(SUPPORT_TYPES)]++;
+      return out;
     }
-  });
-});
-
-// === Inicializar ===
-(() => {
-  const uma = pickRandom(UMAS);
-
-  $('umaName').textContent = uma.name;
-  $('umaRole').textContent = `Tipo: ${uma.role}`;
-  $('umaImage').src = uma.img;
-})();
+    // === Generar Run ===
+    $('generateBtn').addEventListener('click', () => {
+      const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
+      const lockedUmaName = $('lockUmaInput')?.value?.trim();
+      let uma = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
+      if (lockedUmaName) {
+        const found = UMAS.find(u => u.name.toLowerCase() === lockedUmaName.toLowerCase());
+        if (found) uma = found;
+      }
+      const count = 6;
+      const supports = distributeSupports(count, 'simple', 'free', uma.role);
+      $('umaName').textContent = uma.name;
+      $('umaRole').textContent = `Tipo: ${uma.role}`;
+      $('umaImage').src = uma.img || '';
+      const supportsList = $('supportsList'); supportsList.innerHTML='';
+      Object.entries(supports).forEach(([k,v])=>{
+        if(v>0){
+          const node=document.createElement('div');
+          node.className='p-2 border rounded text-center bg-white';
+          node.innerHTML=`<strong>${k}</strong><div class="text-sm text-gray-600">${v}</div>`;
+          supportsList.appendChild(node);
+        }
+      });
+      const result = {uma, supports, generatedAt:new Date().toISOString()};
+      const exportBtn = $('exportBtn');
+      const copyBtn = $('copyBtn');
+      if(exportBtn) exportBtn.dataset.payload = JSON.stringify(result);
+      if(copyBtn) copyBtn.dataset.payload = JSON.stringify(result);
+    });
+    // === Reroll Uma ===
+    const randomUmaBtn = $('randomUmaBtn');
     
+    if(randomUmaBtn){randomUmaBtn.addEventListener('click', ()=> {
+    const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
+    const u = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
+    $('umaName').textContent = u.name;
+    $('umaRole').textContent = `Tipo: ${u.role}`;
+    $('umaImage').src = u.img;
+  });
+}
+      const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
+      const u = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
+      $('umaName').textContent = u.name;
+      $('umaRole').textContent = `Tipo: ${u.role}`;
+      $('umaImage').src = u.img;
+    });
+    // === Copiar / Exportar JSON ===
+    $('copyBtn').addEventListener('click', async ()=>{
+      const payload=$('copyBtn').dataset.payload;
+      if(!payload) return alert('Genera primero un resultado.');
+      await navigator.clipboard.writeText(payload);
+      alert('JSON copiado al portapapeles.');
+    });
+    $('exportBtn').addEventListener('click', ()=>{
+      const payload=$('exportBtn').dataset.payload;
+      if(!payload) return alert('Genera primero un resultado.');
+      const blob=new Blob([payload],{type:'application/json'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;a.download='uma-run-challenge.json';
+      document.body.appendChild(a);a.click();a.remove();
+      URL.revokeObjectURL(url);
+    });
+    // === Inicializar pantalla ===
+    (function(){
+      const u=pickRandom(UMAS);
+      $('umaName').textContent = u.name; 
+      $('umaRole').textContent = `Tipo: ${u.role}`; 
+      $('umaImage').src = u.img;
+    })();
+  </script>
   <a href="support.html">
-  <small class="text-xs text-gray-500">
-    Haz click en el botón "Soporte" para acceder al randomizador de cartas.
-  </small>
-
-  <button
-    type="button"
-    class="flex-1 bg-pink-500 text-white py-2 rounded hover:bg-pink-600">
-    Soporte
-  </button>
-</a>
+    <small class="text-xs text-gray-500">Haz click en el boton "Soporte" para acceder el randomizador de cartas.</small>
+    <button type="button" class="flex-1 bg-pink-500 text-white py-2 rounded hover:bg-pink-600">Soporte</button>
+  </a>
+  
 </body>
 </html>
-
-
 
 
 
