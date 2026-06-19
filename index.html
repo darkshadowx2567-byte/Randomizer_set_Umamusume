@@ -46,7 +46,6 @@
             <img id="umaImage" src="" alt="Uma Image" class="w-24 h-24 rounded-lg object-cover bg-gray-200" />
             <div>
               <h3 id="umaName" class="text-xl font-semibold">-</h3>
-              <p id="umaRole" class="text-sm text-gray-600">Tipo: -</p>
             </div>
           </div>
 
@@ -150,173 +149,184 @@
       {name: 'Mejiro Bright [Brunissage Line]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1074_107401.png'},
     ];
 
-    const SUPPORT_TYPES = ['Speed','Stamina','Power','Guts','Wit','Pal', 'Group'];
-    let blockedUmas = new Set();
-    const $ = id => document.getElementById(id);
+    const SUPPORT_TYPES = ['Speed','Stamina','Power','Guts','Wit','Pal','Group'];
 
-    function pickRandom(array) { return array[Math.floor(Math.random()*array.length)]; }
+let blockedUmas = new Set();
 
-    // === Selector visual de Umas ===
-    const umaSelector = $('umaSelector');
-    const showUmaSelectorBtn = $('showUmaSelector');
-    showUmaSelectorBtn.addEventListener('click', () => {
-      umaSelector.classList.toggle('hidden');
-      if (!umaSelector.classList.contains('hidden') && umaSelector.childElementCount === 0) {
-        UMAS.forEach(u => {
-          const div = document.createElement('div');
-          div.className = 'relative cursor-pointer group';
-          div.innerHTML = `
-            <img src="${u.img}" alt="${u.name}" title="${u.name}" class="w-full h-24 object-cover rounded transition filter group-hover:brightness-90">
-            <p class="text-[10px] text-center mt-1 truncate">${u.name.split('[')[0].trim()}</p>
-          `;
-          div.addEventListener('click', () => {
-            const img = div.querySelector('img');
-            if (blockedUmas.has(u.name)) {
-              blockedUmas.delete(u.name);
-              img.classList.remove('grayscale');
-            } else {
-              blockedUmas.add(u.name);
-              img.classList.add('grayscale');
-            }
-          });
-          umaSelector.appendChild(div);
-        });
-      }
+const $ = id => document.getElementById(id);
+
+function pickRandom(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+// ==========================
+// Selector visual de Umas
+// ==========================
+
+const umaSelector = $('umaSelector');
+const showUmaSelectorBtn = $('showUmaSelector');
+
+showUmaSelectorBtn.addEventListener('click', () => {
+
+  umaSelector.classList.toggle('hidden');
+
+  if (
+    !umaSelector.classList.contains('hidden') &&
+    umaSelector.childElementCount === 0
+  ) {
+
+    UMAS.forEach(u => {
+
+      const div = document.createElement('div');
+
+      div.className = 'relative cursor-pointer group';
+
+      div.innerHTML = `
+        <img
+          src="${u.img}"
+          alt="${u.name}"
+          title="${u.name}"
+          class="w-full h-24 object-cover rounded transition filter group-hover:brightness-90"
+        >
+
+        <p class="text-[10px] text-center mt-1 truncate">
+          ${u.name.split('[')[0].trim()}
+        </p>
+      `;
+
+      div.addEventListener('click', () => {
+
+        const img = div.querySelector('img');
+
+        if (blockedUmas.has(u.name)) {
+
+          blockedUmas.delete(u.name);
+          img.classList.remove('grayscale');
+
+        } else {
+
+          blockedUmas.add(u.name);
+          img.classList.add('grayscale');
+        }
+      });
+
+      umaSelector.appendChild(div);
     });
+  }
+});
 
-    const toggleAllBtn = $('toggleAllUmas');
-toggleAllBtn.addEventListener('click', () => {
+// ==========================
+// Seleccionar / Deseleccionar todas
+// ==========================
+
+$('toggleAllUmas').addEventListener('click', () => {
+
   const imgs = umaSelector.querySelectorAll('img');
-  // Si hay alguna desbloqueada → bloquear todas
-  const anyUnlocked = Array.from(imgs).some(img => !img.classList.contains('grayscale'));
+
+  const anyUnlocked =
+    Array.from(imgs).some(img =>
+      !img.classList.contains('grayscale')
+    );
+
   imgs.forEach((img, index) => {
+
     const u = UMAS[index];
+
     if (anyUnlocked) {
+
       blockedUmas.add(u.name);
       img.classList.add('grayscale');
+
     } else {
+
       blockedUmas.delete(u.name);
       img.classList.remove('grayscale');
     }
   });
 });
 
+// ==========================
+// Generación de soportes
+// ==========================
 
-    // === Soportes ===
-    function distributeSupports(count, mode, distribution, umaRole) {
-      const out = {}; SUPPORT_TYPES.forEach(s => out[s]=0);
-      if (mode === 'simple' || distribution === 'free') {
-        for (let i=0;i<count;i++) out[pickRandom(SUPPORT_TYPES)]++;
-        return out;
-      }
-      if (mode === 'weighted') {
-        const weighted = [];
-        for (const t of SUPPORT_TYPES) {
-          const weight = (t==='Speed'||t==='Power')?3:1;
-          for (let i=0;i<weight;i++) weighted.push(t);
-        }
-        for (let i=0;i<count;i++) out[pickRandom(weighted)]++;
-        return out;
-      }
-      if (distribution === 'focused') {
-        let focus = [];
-        if (umaRole.toLowerCase().includes('speed')) focus = ['Speed','Wit'];
-        else if (umaRole.toLowerCase().includes('stamina')) focus = ['Stamina','Wit'];
-        else if (umaRole.toLowerCase().includes('power')) focus = ['Power','Guts'];
-        else focus = ['Speed','Stamina'];
-        const focusCount = Math.max(1, Math.round(count*0.6));
-        for (let i=0;i<focusCount;i++) out[pickRandom(focus)]++;
-        for (let i=focusCount;i<count;i++) out[pickRandom(SUPPORT_TYPES)]++;
-        return out;
-      }
-      if (distribution === 'balanced') {
-        let i=0; const types = [...SUPPORT_TYPES];
-        while (i<count) { out[types[i % types.length]]++; i++; }
-        return out;
-      }
-      for (let i=0;i<count;i++) out[pickRandom(SUPPORT_TYPES)]++;
-      return out;
-    }
+function distributeSupports(count) {
 
-    // === Generar Run ===
-    $('generateBtn').addEventListener('click', () => {
-      const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
-      const lockedUmaName = $('lockUmaInput')?.value?.trim();
-      let uma = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
-      if (lockedUmaName) {
-        const found = UMAS.find(u => u.name.toLowerCase() === lockedUmaName.toLowerCase());
-        if (found) uma = found;
-      }
+  const out = {};
 
-      const count = 6;
-      const supports = distributeSupports(count, 'simple', 'free', uma.role);
-
-      $('umaName').textContent = uma.name;
-      $('umaRole').textContent = `Tipo: ${uma.role}`;
-      $('umaImage').src = uma.img || '';
-
-      const supportsList = $('supportsList'); supportsList.innerHTML='';
-      Object.entries(supports).forEach(([k,v])=>{
-        if(v>0){
-          const node=document.createElement('div');
-          node.className='p-2 border rounded text-center bg-white';
-          node.innerHTML=`<strong>${k}</strong><div class="text-sm text-gray-600">${v}</div>`;
-          supportsList.appendChild(node);
-        }
-      });
-
-      const result = {uma, supports, generatedAt:new Date().toISOString()};
-      const exportBtn = $('exportBtn');
-      const copyBtn = $('copyBtn');
-      if(exportBtn) exportBtn.dataset.payload = JSON.stringify(result);
-      if(copyBtn) copyBtn.dataset.payload = JSON.stringify(result);
-    });
-
-    // === Reroll Uma ===
-    const randomUmaBtn = $('randomUmaBtn');
-    
-    if(randomUmaBtn){randomUmaBtn.addEventListener('click', ()=> {
-    const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
-    const u = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
-    $('umaName').textContent = u.name;
-    $('umaRole').textContent = `Tipo: ${u.role}`;
-    $('umaImage').src = u.img;
+  SUPPORT_TYPES.forEach(type => {
+    out[type] = 0;
   });
+
+  for (let i = 0; i < count; i++) {
+    out[pickRandom(SUPPORT_TYPES)]++;
+  }
+
+  return out;
 }
-      const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
-      const u = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
-      $('umaName').textContent = u.name;
-      $('umaRole').textContent = `Tipo: ${u.role}`;
-      $('umaImage').src = u.img;
-    });
 
-    // === Copiar / Exportar JSON ===
-    $('copyBtn').addEventListener('click', async ()=>{
-      const payload=$('copyBtn').dataset.payload;
-      if(!payload) return alert('Genera primero un resultado.');
-      await navigator.clipboard.writeText(payload);
-      alert('JSON copiado al portapapeles.');
-    });
-    $('exportBtn').addEventListener('click', ()=>{
-      const payload=$('exportBtn').dataset.payload;
-      if(!payload) return alert('Genera primero un resultado.');
-      const blob=new Blob([payload],{type:'application/json'});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url;a.download='uma-run-challenge.json';
-      document.body.appendChild(a);a.click();a.remove();
-      URL.revokeObjectURL(url);
-    });
+// ==========================
+// Generar
+// ==========================
 
-    // === Inicializar pantalla ===
-    (function(){
-      const u=pickRandom(UMAS);
-      $('umaName').textContent = u.name; 
-      $('umaRole').textContent = `Tipo: ${u.role}`; 
-      $('umaImage').src = u.img;
-    })();
-  </script>
+$('generateBtn').addEventListener('click', () => {
 
+  const availableUmas =
+    UMAS.filter(u => !blockedUmas.has(u.name));
+
+  const uma = pickRandom(
+    availableUmas.length > 0
+      ? availableUmas
+      : UMAS
+  );
+
+  $('umaName').textContent = uma.name;
+
+  // Lo dejaremos vacío para el futuro popup
+  $('umaRole').textContent = '';
+
+  $('umaImage').src = uma.img;
+
+  const supports = distributeSupports(6);
+
+  const supportsList = $('supportsList');
+  supportsList.innerHTML = '';
+
+  Object.entries(supports).forEach(([type, amount]) => {
+
+    if (amount <= 0) return;
+
+    const node = document.createElement('div');
+
+    node.className =
+      'p-2 border rounded text-center bg-white';
+
+    node.innerHTML = `
+      <strong>${type}</strong>
+      <div class="text-sm text-gray-600">
+        ${amount}
+      </div>
+    `;
+
+    supportsList.appendChild(node);
+  });
+});
+
+// ==========================
+// Inicialización
+// ==========================
+
+(function () {
+
+  const u = pickRandom(UMAS);
+
+  $('umaName').textContent = u.name;
+
+  $('umaRole').textContent = '';
+
+  $('umaImage').src = u.img;
+
+})();
+    
   <a href="support.html">
     <small class="text-xs text-gray-500">Haz click en el boton "Soporte" para acceder el randomizador de cartas.</small>
     <button type="button" class="flex-1 bg-pink-500 text-white py-2 rounded hover:bg-pink-600">Soporte</button>
