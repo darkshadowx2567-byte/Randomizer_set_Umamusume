@@ -269,62 +269,48 @@ function distributeSupports(count) {
 // ==========================
 
 $('generateBtn').addEventListener('click', () => {
-
-  const availableUmas =
-    UMAS.filter(u => !blockedUmas.has(u.name));
+  const availableUmas = UMAS.filter(
+    u => !blockedUmas.has(u.name)
+  );
 
   const uma = pickRandom(
-    availableUmas.length > 0
-      ? availableUmas
-      : UMAS
+    availableUmas.length > 0 ? availableUmas : UMAS
   );
 
   $('umaName').textContent = uma.name;
-
-  // Lo dejaremos vacío para el futuro popup
-  $('umaRole').textContent = '';
-
+  $('umaRole').textContent = `Tipo: ${uma.role}`;
   $('umaImage').src = uma.img;
 
-  const supports = distributeSupports(6);
+  const supports = {};
+  SUPPORT_TYPES.forEach(t => supports[t] = 0);
+
+  for(let i = 0; i < 6; i++){
+    supports[pickRandom(SUPPORT_TYPES)]++;
+  }
 
   const supportsList = $('supportsList');
   supportsList.innerHTML = '';
 
   Object.entries(supports).forEach(([type, amount]) => {
-
-    if (amount <= 0) return;
-
-    const node = document.createElement('div');
-
-    node.className =
-      'p-2 border rounded text-center bg-white';
-
-    node.innerHTML = `
-      <strong>${type}</strong>
-      <div class="text-sm text-gray-600">
-        ${amount}
-      </div>
-    `;
-
-    supportsList.appendChild(node);
+    if(amount > 0){
+      const div = document.createElement('div');
+      div.className = 'p-2 border rounded text-center bg-white';
+      div.innerHTML = `
+        <strong>${type}</strong>
+        <div>${amount}</div>
+      `;
+      supportsList.appendChild(div);
+    }
   });
 });
 
-// ==========================
-// Inicialización
-// ==========================
+// === Inicializar ===
+(() => {
+  const uma = pickRandom(UMAS);
 
-(function () {
-
-  const u = pickRandom(UMAS);
-
-  $('umaName').textContent = u.name;
-
-  $('umaRole').textContent = '';
-
-  $('umaImage').src = u.img;
-
+  $('umaName').textContent = uma.name;
+  $('umaRole').textContent = `Tipo: ${uma.role}`;
+  $('umaImage').src = uma.img;
 })();
     
   <a href="support.html">
