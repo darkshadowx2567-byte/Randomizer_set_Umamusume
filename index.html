@@ -237,10 +237,6 @@ toggleAllBtn.addEventListener('click', () => {
       for (let i=0;i<count;i++) out[pickRandom(SUPPORT_TYPES)]++;
       return out;
     }
-    
-    const supportCountEl = $('supportCount');
-    const supportCountLabel = $('supportCountLabel');
-    supportCountEl.addEventListener('input', ()=> supportCountLabel.textContent = supportCountEl.value);
 
     // === Generar Run ===
     $('generateBtn').addEventListener('click', () => {
@@ -270,12 +266,23 @@ toggleAllBtn.addEventListener('click', () => {
       });
 
       const result = {uma, supports, generatedAt:new Date().toISOString()};
-      $('exportBtn').dataset.payload = JSON.stringify(result);
-      $('copyBtn').dataset.payload = JSON.stringify(result);
+      const exportBtn = $('exportBtn');
+      const copyBtn = $('copyBtn');
+      if(exportBtn) exportBtn.dataset.payload = JSON.stringify(result);
+      if(copyBtn) copyBtn.dataset.payload = JSON.stringify(result);
     });
 
     // === Reroll Uma ===
-    $('randomUmaBtn').addEventListener('click', ()=> {
+    const randomUmaBtn = $('randomUmaBtn');
+    
+    if(randomUmaBtn){randomUmaBtn.addEventListener('click', ()=> {
+    const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
+    const u = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
+    $('umaName').textContent = u.name;
+    $('umaRole').textContent = `Tipo: ${u.role}`;
+    $('umaImage').src = u.img;
+  });
+}
       const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
       const u = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
       $('umaName').textContent = u.name;
