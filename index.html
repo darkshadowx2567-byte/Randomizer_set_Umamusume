@@ -50,9 +50,8 @@
             <h4 class="font-semibold">Composición de soportes</h4>
             <div id="supportsList" class="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2 text-sm"></div>
           </div>
+        </div>
       </section>
-    </main>
-  </div>
   <script>
     // === Datos de Umas ===
     const UMAS = [
@@ -229,12 +228,7 @@ toggleAllBtn.addEventListener('click', () => {
     // === Generar Run ===
     $('generateBtn').addEventListener('click', () => {
       const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
-      const lockedUmaName = $('lockUmaInput')?.value?.trim();
       let uma = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
-      if (lockedUmaName) {
-        const found = UMAS.find(u => u.name.toLowerCase() === lockedUmaName.toLowerCase());
-        if (found) uma = found;
-      }
       const count = 6;
       const supports = distributeSupports(count, 'simple', 'free', uma.role);
       $('umaName').textContent = uma.name;
@@ -249,46 +243,7 @@ toggleAllBtn.addEventListener('click', () => {
           supportsList.appendChild(node);
         }
       });
-      const result = {uma, supports, generatedAt:new Date().toISOString()};
-      const exportBtn = $('exportBtn');
-      const copyBtn = $('copyBtn');
-      if(exportBtn) exportBtn.dataset.payload = JSON.stringify(result);
-      if(copyBtn) copyBtn.dataset.payload = JSON.stringify(result);
-    });
-    // === Reroll Uma ===
-    const randomUmaBtn = $('randomUmaBtn');
     
-    if(randomUmaBtn){randomUmaBtn.addEventListener('click', ()=> {
-    const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
-    const u = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
-    $('umaName').textContent = u.name;
-    $('umaRole').textContent = `Tipo: ${u.role}`;
-    $('umaImage').src = u.img;
-  });
-}
-      const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
-      const u = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
-      $('umaName').textContent = u.name;
-      $('umaRole').textContent = `Tipo: ${u.role}`;
-      $('umaImage').src = u.img;
-    });
-    // === Copiar / Exportar JSON ===
-    $('copyBtn').addEventListener('click', async ()=>{
-      const payload=$('copyBtn').dataset.payload;
-      if(!payload) return alert('Genera primero un resultado.');
-      await navigator.clipboard.writeText(payload);
-      alert('JSON copiado al portapapeles.');
-    });
-    $('exportBtn').addEventListener('click', ()=>{
-      const payload=$('exportBtn').dataset.payload;
-      if(!payload) return alert('Genera primero un resultado.');
-      const blob=new Blob([payload],{type:'application/json'});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url;a.download='uma-run-challenge.json';
-      document.body.appendChild(a);a.click();a.remove();
-      URL.revokeObjectURL(url);
-    });
     // === Inicializar pantalla ===
     (function(){
       const u=pickRandom(UMAS);
@@ -297,10 +252,17 @@ toggleAllBtn.addEventListener('click', () => {
       $('umaImage').src = u.img;
     })();
   </script>
-  <a href="support.html">
-    <small class="text-xs text-gray-500">Haz click en el boton "Soporte" para acceder el randomizador de cartas.</small>
-    <button type="button" class="flex-1 bg-pink-500 text-white py-2 rounded hover:bg-pink-600">Soporte</button>
+  <div class="mt-4">
+  <a href="support.html"
+     class="inline-block bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600">
+     Soporte
   </a>
+  <div>
+    <small class="text-xs text-gray-500">
+      Haz click en Soporte para acceder al randomizador de cartas.
+    </small>
+  </div>
+</div>
   
 </body>
 </html>
