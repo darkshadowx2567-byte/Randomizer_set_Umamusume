@@ -16,38 +16,9 @@
 
     <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <section class="lg:col-span-1 bg-white p-4 rounded-2xl shadow">
-        <h2 class="font-semibold mb-2">Opciones</h2>
-
-        <label class="block text-xs text-gray-600">Número de cartas de soporte</label>
-        <div class="flex items-center gap-2 mb-3">
-          <input id="supportCount" type="range" min="1" max="6" value="6" class="w-full" />
-          <span id="supportCountLabel" class="w-8 text-right">6</span>
-        </div>
-
-        <label class="block text-xs text-gray-600">Modo</label>
-        <select id="mode" class="w-full mb-3 p-2 border rounded">
-          <option value="simple">Simple (aleatorio puro)</option>
-          <option value="weighted">Ponderado (más probabilidad a Speed/Power)</option>
-          <option value="challenge">Challenge (añade restricciones)</option>
-        </select>
-
-        <label class="block text-xs text-gray-600">Tipo de distribución</label>
-        <select id="distribution" class="w-full mb-3 p-2 border rounded">
-          <option value="free">Libre (cualquier combinación)</option>
-          <option value="balanced">Balanceada (intenta cubrir atributos)</option>
-          <option value="focused">Focussed (prioriza 1-2 atributos)</option>
-        </select>
-
-        <div class="mb-3">
-          <label class="inline-flex items-center">
-            <input id="allowSR" type="checkbox" checked class="form-checkbox" />
-            <span class="ml-2 text-sm text-gray-600">Permitir SR/SSR en la selección (solo para flavour)</span>
-          </label>
-        </div>
-
         <div class="flex gap-2 mb-3">
           <button id="generateBtn" class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Generar</button>
-          <button id="randomUmaBtn" class="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300">Reroll Uma</button>
+          <button id="randomUmaBtn"class="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300">Reroll Uma</button>
         </div>
 
         <!-- Bloque visual de selección de Umas -->
@@ -72,138 +43,4315 @@
             <h2 id="resultTitle" class="text-2xl font-bold">Resultado</h2>
             <p id="resultSubtitle" class="text-sm text-gray-600">Presiona <strong>Generar</strong> para crear una run nueva.</p>
           </div>
-          <div class="flex gap-2">
-            <button id="copyBtn" class="px-3 py-2 border rounded">Copiar</button>
-            <button id="exportBtn" class="px-3 py-2 bg-green-600 text-white rounded">Exportar JSON</button>
-          </div>
         </div>
 
-        <div id="resultCard" class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
-          <div class="flex items-center gap-4">
-            <img id="umaImage" src="" alt="Uma Image" class="w-24 h-24 rounded-lg object-cover bg-gray-200" />
-            <div>
-              <h3 id="umaName" class="text-xl font-semibold">-</h3>
-              <p id="umaRole" class="text-sm text-gray-600">Tipo: -</p>
-            </div>
-          </div>
+        <div id="resultCard"
+class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
 
-          <div class="mt-4">
-            <h4 class="font-semibold">Composición de soportes</h4>
-            <div id="supportsList" class="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2 text-sm"></div>
-          </div>
+    <div class="flex items-center gap-4">
 
-          <div class="mt-4">
-            <h4 class="font-semibold">Restricciones / Reto</h4>
-            <p id="challengeText" class="text-sm text-gray-700">—</p>
-          </div>
+        <img
+        id="umaImage"
+        src=""
+        alt="Uma Image"
+        class="w-24 h-24 rounded-lg object-cover bg-gray-200 cursor-pointer hover:scale-105 transition"
+        />
 
-          <div class="mt-4">
-            <h4 class="font-semibold">Notas</h4>
-            <ul id="notesList" class="list-disc pl-5 text-sm text-gray-700"></ul>
-          </div>
+        <div>
+            <h3 id="umaName"
+            class="text-xl font-semibold">
+                -
+            </h3>
         </div>
 
-      </section>
-    </main>
+    </div>
 
-    <footer class="mt-6 text-center text-xs text-gray-500">
-      Hecho con ❤️ — puedes descargar el HTML y usarlo localmente.
-    </footer>
-  </div>
+    <div class="mt-4">
+
+        <h4 class="font-semibold">
+            Composición de soportes
+        </h4>
+
+        <div
+        id="supportsList"
+        class="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+        </div>
+
+    </div>
+
+</div>
+    </section>
+  </main>
+</div>
 
   <script>
     // === Datos de Umas ===
     const UMAS = [
-      {name: 'Special Week [Special Dreamer]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1001_100101.png'},
-      {name: 'Special Week [Hopp\'n♪Happy Heart]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1001_100102.png'},
-      {name: 'Silence Suzuka [Innocent Silence]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1002_100201.png'},
-      {name: 'Tokai Teio [Peak Joy]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1003_100301.png'},
-      {name: 'Tokai Teio [Beyond the Horizon]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1003_100302.png'},
-      {name: 'Maruzensky [Formula R]', role: 'Wit', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1004_100401.png'},
-      {name: 'Maruzensky [Hot☆Summer Night]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1004_100402.png'},
-      {name: 'Fuji Kiseki [Shooting Star Revue]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1005_100501.png'},
-      {name: 'Fuji Kiseki [Succès Étoilé]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1005_100502.png'},
-      {name: 'Oguri Cap [Starlight Beat]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1006_100601.png'},
-      {name: 'Oguri Cap [Ashen Miracle]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1006_100602.png'},
-      {name: 'Gold Ship [Red Strife]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1007_100701.png'},
-      {name: 'Vodka [Wild Top Gear]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1008_100801.png'},
-      {name: 'Daiwa Scarlet [Peak Blue]', role: 'Guts', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1009_100901.png'},
-      {name: 'Taiki Shuttle [Wild Frontier]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1010_101001.png'},
-      {name: 'Taiki Shuttle [Bubblegum☆Memories]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1010_101002.png'},
-      {name: 'Grass Wonder [Stone-Piercing Blue]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1011_101101.png'},
-      {name: 'Grass Wonder [Saintly Jade Cleric]', role: 'Wit', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1011_101102.png'},
-      {name: 'Hishi Amazon [Azure Amazon]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1012_101201.png'},
-      {name: 'Mejiro McQueen [Frontline Elegance]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1013_101301.png'},
-      {name: 'Mejiro McQueen [End of the Skies]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1013_101302.png'},
-      {name: 'El Condor Pasa [El Numero 1]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1014_101401.png'},
-      {name: 'El Condor Pasa [Kukulkan Warrior]', role: 'Guts', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1014_101402.png'},
-      {name: 'T.M. Opera O [O Sole Suo!]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1015_101501.png'},
-      {name: 'T.M. Opera O [New Year, Same Radiance!]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1015_101502.png'},
-      {name: 'Narita Brian [Maverick]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1016_101601.png'},
-      {name: 'Symboli Rudolf [Emperor´s Path]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1017_101701.png'},
-      {name: 'Symboli Rudolf [Archer by Moonlight]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1017_101702.png'},
-      {name: 'Air Groove [Empress Road]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1018_101801.png'},
-      {name: 'Air Groove [Quercus Civilis]', role: 'Guts', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1018_101802.png'},
-      {name: 'Agnes Digital [Full-Color Fangirling]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1019_101901.png'},
-      {name: 'Seiun Sky [Reeling in the Big One]', role: 'Wit', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1020_102001.png'},
-      {name: 'Seiun Sky [Soirée des Chatons]', role: 'Front', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1020_102002.png'},
-      {name: 'Tamamo Cross [Fast as Lightning]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1021_102101.png'},
-      {name: 'Fine Motion [Noble Seamair]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1022_102201.png'},
-      {name: 'Fine Motion [Titania]', role: 'Wit', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1022_102202.png'},
-      {name: 'Biwa Hayahide [pf. Winning Equation...]', role: 'Wit', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1023_102301.png'},
-      {name: 'Biwa Hayahide [Rouge Caroler]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1023_102302.png'},
-      {name: 'Mayano Top Gun [Scramble Zone]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1024_102401.png'},
-      {name: 'Mayano Top Gun [Sunlight Bouquet]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1024_102402.png'},
-      {name: 'Manhattan Cafe [Creeping Shadow]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1025_102501.png'},
-      {name: 'Mihono Bourbon [MB-19890425]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1026_102601.png'},
-      {name: 'Mihono Bourbon [CODE: ICING]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1026_102602.png'},
-      {name: 'Mejiro Ryan [Down the Line]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1027_102701.png'},
-      {name: 'Hishi Akebono [Buono☆Alla Moda]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1028_102801.png'},
-      {name: 'Rice Shower [Rosy Dreams]', role: 'Guts', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1030_103001.png'},
-      {name: 'Rice Shower [Vampire Makeover!]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1030_103002.png'},
-      {name: 'Ines Fujin [Always Electrifying]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1031_103101.png'},
-      {name: 'Agnes Tachyon [Tach-nology]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1032_103201.png'},
-      {name: 'Admire Vega [Starry Nocturne]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1033_103301.png'},
-      {name: 'Inari One [Edomurasaki]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1034_103401.png'},
-      {name: 'Winning Ticket [Get to Winning!]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1035_103501.png'},
-      {name: 'Air Shakur [unsigned]', role: 'Wit', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1036_103601.png'},
-      {name: 'Eishin Flash [Meisterschaft]', role: 'Wit', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1037_103701.png'},
-      {name: 'Eishin Flash [Precise Chocolatier]', role: 'Wit', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1037_103702.png'},
-      {name: 'Curren Chan [Fille Éclair]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1038_103801.png'},
-      {name: 'Curren Chan [Ma Chérie of the New Moon]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1038_103802.png'},
-      {name: 'Kawakami Princess [Princess of Pink]', role: 'Guts', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1039_103901.png'},
-      {name: 'Gold City [Authentic / 1928]', role: 'Guts', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1040_104001.png'},
-      {name: 'Gold City [Autumn Cosmos]', role: 'Wit', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1040_104002.png'},
-      {name: 'Sakura Bakushin O [Blossom in Learning]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1041_104101.png'},
-      {name: 'Sweep Tosho [Platanus Witch]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1044_104401.png'},
-      {name: 'Super Creek [Murmuring Stream]', role: 'Wit', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1045_104501.png'},
-      {name: 'Super Creek [Chiffon-Wrapped Mummy]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1045_104502.png'},
-      {name: 'Smart Falcon [LOVE☆4EVER]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1046_104601.png'},
-      {name: 'Tosen Jordan [Jokester ☆ Vibes]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1048_104801.png'},
-      {name: 'Narita Taishin [Nevertheless]', role: 'Guts', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1050_105001.png'},
-      {name: 'Nishino Flower [Layered Petals]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1051_105101.png'},
-      {name: 'Haru Urara [Bestest Prize]', role: 'Guts', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1052_105201.png'},
-      {name: 'Haru Urara [New Year ♪ New Urara!]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1052_105202.png'},
-      {name: 'Makitanefukukitaru [Rising☆Fortune]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1056_105601.png'},
-      {name: 'Matikanefukukitaru [Lucky Tidings]', role: 'Wit', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1056_105602.png'},
-      {name: 'Meisho Doto [Turbulent Blue]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1058_105801.png'},
-      {name: 'Mejiro Dober [Off the Line]', role: 'Wit', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1059_105901.png'},
-      {name: 'Mejiro Dober [Sapphire Sojourn]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1059_105902.png'},
-      {name: 'Nice Nature [Poinsettia Ribbon]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1060_106001.png'},
-      {name: 'Nice Nature [Run & Win]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1060_106002.png'},
-      {name: 'King Halo [King of Emeralds]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1061_106101.png'},
-      {name: 'King Halo [Cheerleader in Noble White]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1061_106102.png'},
-      {name: 'Matikanetannhauser [Clippety-Tippety-Clop]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1062_106201.png'},
-      {name: 'Mejiro Palmer [Line Breakthrough]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1064_106401.png'},
-      {name: 'Satono Diamond [Natural Brilliance]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1067_106701.png'},
-      {name: 'Kitasan Black [Gilded Shrine to Glory]', role: 'Speed', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1068_106801.png'},
-      {name: 'Sakura Chiyono O [Strength in Full Bloom]', role: 'Guts', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1069_106901.png'},
-      {name: 'Mejiro Ardan [Crystalline]', role: 'Wit',  img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1071_107101.png'},
-      {name: 'Yaeno Muteki [Blazed Head, Covered Fists]', role: 'Power', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1072_107201.png'},
-      {name: 'Mejiro Bright [Brunissage Line]', role: 'Stamina', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1074_107401.png'},
+      {name:'Special Week [Special Dreamer]', img:'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1001_100101.png',
+      stats:{
+        base:{
+          speed:83,
+          stamina:88,
+          power:98,
+          guts:90,
+          wit:91
+        },
+      finale:{
+        speed:102,
+        stamina:108,
+        power:120,
+        guts:110,
+        wit:110
+      },
+        
+        bonus:{
+          speed:"-",
+          stamina:"20%",
+          power:"-",
+          guts:"-",
+          wit:"10%"
+        },
+        
+        aptitude:{
+          surface:{
+            turf:"A",
+            dirt:"G"
+          },
+          
+          distance:{
+            short:"F",
+            mile:"C",
+            medium:"A",
+            long:"A"
+          },
+          
+          strategy:{
+            front:"G",
+            pace:"A",
+            late:"A",
+            end:"C"
+          }
+        }
+      }
+      },
+
+      {name: 'Special Week [Hopp\'n♪Happy Heart]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1001_100102.png',
+        stats:{
+        base:{
+          speed:77,
+          stamina:90,
+          power:103,
+          guts:98,
+          wit:82
+        },
+
+        finale:{
+        speed:94,
+        stamina:110,
+        power:125,
+        guts:119,
+        wit:102
+      },
+        
+        bonus:{
+          speed:"-",
+          stamina:"10%",
+          power:"10%",
+          guts:"10%",
+          wit:"-"
+        },
+        
+        aptitude:{
+          surface:{
+            turf:"A",
+            dirt:"G"
+          },
+          
+          distance:{
+            short:"F",
+            mile:"C",
+            medium:"A",
+            long:"A"
+          },
+          
+          strategy:{
+            front:"G",
+            pace:"A",
+            late:"A",
+            end:"C"
+          }
+        }
+      }
+      },
+
+      {name:'Silence Suzuka [Swift Silence]', img:'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1002_100201.png',
+      stats:{
+        base:{
+          speed:101,
+          stamina:84,
+          power:77,
+          guts:100,
+          wit:88
+        },
+
+        finale:{
+        speed:124,
+        stamina:102,
+        power:94,
+        guts:122,
+        wit:108
+      },
+        
+        bonus:{
+          speed:"20%",
+          stamina:"-",
+          power:"-",
+          guts:"10%",
+          wit:"-"
+        },
+        
+        aptitude:{
+          surface:{
+            turf:"A",
+            dirt:"G"
+          },
+          
+          distance:{
+            short:"D",
+            mile:"A",
+            medium:"A",
+            long:"E"
+          },
+          
+          strategy:{
+            front:"A",
+            pace:"C",
+            late:"E",
+            end:"G"
+          }
+        }
+      }
+      },
+
+      {name: 'Tokai Teio [Peak Joy]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1003_100301.png',
+      stats:{
+        base:{
+          speed:90,
+          stamina:89,
+          power:83,
+          guts:92,
+          wit:96
+        },
+
+        finale:{
+        speed:109,
+        stamina:109,
+        power:102,
+        guts:112,
+        wit:118
+      },
+        
+        bonus:{
+          speed:"20%",
+          stamina:"10%",
+          power:"-",
+          guts:"-",
+          wit:"-"
+        },
+        
+        aptitude:{
+          surface:{
+            turf:"A",
+            dirt:"G"
+          },
+          
+          distance:{
+            short:"F",
+            mile:"E",
+            medium:"A",
+            long:"B"
+          },
+          
+          strategy:{
+            front:"D",
+            pace:"A",
+            late:"C",
+            end:"E"
+          }
+        }
+      }
+      },
+
+      {name: 'Tokai Teio [Beyond the Horizon]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1003_100302.png',
+      stats:{
+        base:{
+          speed:89,
+          stamina:102,
+          power:80,
+          guts:86,
+          wit:93
+        },
+
+        finale:{
+          speed:109,
+          stamina:125,
+          power:98,
+          guts:106,
+          wit:112
+      },
+
+        bonus:{
+          speed:"10%",
+          stamina:"10%",
+          power:"-",
+          guts:"10%",
+          wit:"-"
+        },
+        
+        aptitude:{
+          surface:{
+            turf:"A",
+            dirt:"G"
+          },
+          
+          distance:{
+            short:"F",
+            mile:"E",
+            medium:"A",
+            long:"B"
+          },
+          
+          strategy:{
+            front:"D",
+            pace:"A",
+            late:"C",
+            end:"E"
+          }
+        }
+      }
+      },
+
+    {name: 'Maruzensky [Formula R]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1004_100401.png',
+      stats:{
+        base:{
+          speed:96,
+          stamina:68,
+          power:86,
+          guts:100,
+          wit:100
+        },
+
+        finale:{
+          speed:118,
+          stamina:84,
+          power:105,
+          guts:122,
+          wit:121
+      },
+
+        bonus:{
+          speed:"10%",
+          stamina:"-",
+          power:"-",
+          guts:"-",
+          wit:"20%"
+        },
+        
+        aptitude:{
+          surface:{
+            turf:"A",
+            dirt:"D"
+          },
+          
+          distance:{
+            short:"B",
+            mile:"A",
+            medium:"B",
+            long:"C"
+          },
+          
+          strategy:{
+            front:"A",
+            pace:"E",
+            late:"G",
+            end:"G"
+          }
+        }
+      }
+      },
+
+      {name: 'Maruzensky [Hot☆Summer Night]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1004_100402.png',
+      stats:{
+        base:{
+          speed:100,
+          stamina:69,
+          power:93,
+          guts:87,
+          wit:101
+        },
+
+        finale:{
+          speed:122,
+          stamina:85,
+          power:114,
+          guts:107,
+          wit:122
+      },
+
+        bonus:{
+          speed:"15%",
+          stamina:"-",
+          power:"-",
+          guts:"-",
+          wit:"15%"
+        },
+        
+        aptitude:{
+          surface:{
+            turf:"A",
+            dirt:"D"
+          },
+          
+          distance:{
+            short:"B",
+            mile:"A",
+            medium:"B",
+            long:"C"
+          },
+          
+          strategy:{
+            front:"A",
+            pace:"E",
+            late:"G",
+            end:"G"
+          }
+        }
+      }
+    },
+
+          {name: 'Fuji Kiseki [Shooting Star Revue]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1005_100501.png',
+      stats:{
+        base:{
+          speed:96,
+          stamina:88,
+          power:97,
+          guts:82,
+          wit:87
+        },
+
+        finale:{
+          speed:117,
+          stamina:107,
+          power:118,
+          guts:100,
+          wit:108
+        },
+
+        bonus:{
+          speed:"-",
+          stamina:"-",
+          power:"20%",
+          guts:"-",
+          wit:"10%"
+        },
+
+        aptitude:{
+          surface:{
+            turf:"A",
+            dirt:"F"
+          },
+          
+          distance:{
+            short:"A",
+            mile:"A",
+            medium:"B",
+            long:"E"
+          },
+          
+          strategy:{
+            front:"C",
+            pace:"A",
+            late:"C",
+            end:"E"
+          }
+        }
+      }
+    },
+
+    {name: 'Fuji Kiseki [Succès Étoilé]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1005_100502.png',
+    stats:{
+      base:{
+        speed:98,
+        stamina:77,
+        power:102,
+        guts:78,
+        wit:95
+      },
+
+      finale:{
+        speed:120,
+        stamina:94,
+        power:124,
+        guts:96,
+        wit:116
+      },
+
+      bonus:{
+        speed:"8%",
+        stamina:"-",
+        power:"14%",
+        guts:"-",
+        wit:"8%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"F"
+        },
+        
+        distance:{
+          short:"A",
+          mile:"A",
+          medium:"B",
+          long:"E"
+        },
+        
+        strategy:{
+          front:"C",
+          pace:"A",
+          late:"C",
+          end:"E"
+        }
+      }
+    }
+  },
+
+  {name: 'Oguri Cap [Starlight Beat]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1006_100601.png',
+    stats:{
+      base:{
+        speed:101,
+        stamina:66,
+        power:106,
+        guts:84,
+        wit:93
+      },
+
+      finale:{
+        speed:124,
+        stamina:81,
+        power:130,
+        guts:103,
+        wit:112
+      },
+
+      bonus:{
+        speed:"20%",
+        stamina:"-",
+        power:"10%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"B"
+        },
+        
+        distance:{
+          short:"E",
+          mile:"A",
+          medium:"A",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"F",
+          pace:"A",
+          late:"A",
+          end:"D"
+        }
+      }
+    }
+  },
+
+  {name: 'Oguri Cap [Ashen Miracle]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1006_100602.png',
+    stats:{
+      base:{
+        speed:94,
+        stamina:91,
+        power:111,
+        guts:76,
+        wit:78
+      },
+
+      finale:{
+        speed:115,
+        stamina:11,
+        power:136,
+        guts:93,
+        wit:95
+      },
+
+      bonus:{
+        speed:"15%",
+        stamina:"15%",
+        power:"-",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"B"
+        },
+        
+        distance:{
+          short:"E",
+          mile:"A",
+          medium:"A",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"F",
+          pace:"A",
+          late:"A",
+          end:"D"
+        }
+      }
+    }
+  },
+
+  {name: 'Gold Ship [Red Strife]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1007_100701.png',
+    stats:{
+      base:{
+        speed:82,
+        stamina:96,
+        power:100,
+        guts:177,
+        wit:70
+      },
+
+      finale:{
+        speed:106,
+        stamina:124,
+        power:129,
+        guts:99,
+        wit:92
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"20%",
+        power:"10%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"B",
+          late:"B",
+          end:"A"
+        }
+      }
+    }
+  },
+
+  {name: 'Vodka [Wild Top Gear]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1008_100801.png',
+    stats:{
+      base:{
+        speed:96,
+        stamina:61,
+        power:105,
+        guts:75,
+        wit:88
+      },
+
+      finale:{
+        speed:124,
+        stamina:79,
+        power:136,
+        guts:97,
+        wit:114
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"-",
+        power:"20%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"A",
+          medium:"A",
+          long:"F"
+        },
+        
+        strategy:{
+          front:"C",
+          pace:"B",
+          late:"A",
+          end:"F"
+        }
+      }
+    }
+  },
+
+  {name: 'Daiwa Scarlet [Peak Blue]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1009_100901.png',
+    stats:{
+      base:{
+        speed:84,
+        stamina:77,
+        power:79,
+        guts:95,
+        wit:90
+      },
+
+      finale:{
+        speed:109,
+        stamina:99,
+        power:103,
+        guts:122,
+        wit:117
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"-",
+        power:"-",
+        guts:"20%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"A",
+          medium:"A",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"A",
+          pace:"A",
+          late:"E",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Taiki Shuttle [Wild Frontier]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1010_101001.png',
+    stats:{
+      base:{
+        speed:96,
+        stamina:71,
+        power:98,
+        guts:93,
+        wit:92
+      },
+
+      finale:{
+        speed:118,
+        stamina:87,
+        power:119,
+        guts:113,
+        wit:113
+      },
+
+      bonus:{
+        speed:"20%",
+        stamina:"-",
+        power:"-",
+        guts:"-",
+        wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"B"
+        },
+        
+        distance:{
+          short:"A",
+          mile:"A",
+          medium:"E",
+          long:"G"
+        },
+        
+        strategy:{
+          front:"C",
+          pace:"A",
+          late:"E",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Taiki Shuttle [Bubblegum☆Memories]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1010_101002.png',
+    stats:{
+      base:{
+        speed:102,
+        stamina:71,
+        power:107,
+        guts:92,
+        wit:78
+      },
+
+      finale:{
+        speed:124,
+        stamina:87,
+        power:130,
+        guts:112,
+        wit:97
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"30%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"B"
+        },
+        
+        distance:{
+          short:"A",
+          mile:"A",
+          medium:"E",
+          long:"G"
+        },
+        
+        strategy:{
+          front:"C",
+          pace:"A",
+          late:"E",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Grass Wonder [Stone-Piercing Blue]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1011_101101.png',
+    stats:{
+      base:{
+        speed:91,
+        stamina:70,
+        power:99,
+        guts:74,
+        wit:91
+      },
+
+      finale:{
+        speed:118,
+        stamina:91,
+        power:129,
+        guts:96,
+        wit:116
+      },
+
+      bonus:{
+        speed:"20%",
+        stamina:"-",
+        power:"10%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"A",
+          medium:"B",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"F",
+          pace:"A",
+          late:"A",
+          end:"F"
+        }
+      }
+    }
+  },
+
+  {name: 'Grass Wonder [Saintly Jade Cleric]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1011_101102.png',
+    stats:{
+      base:{
+        speed:91,
+        stamina:83,
+        power:97,
+        guts:79,
+        wit:100
+      },
+
+      finale:{
+        speed:111,
+        stamina:101,
+        power:119,
+        guts:96,
+        wit:123
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"15%",
+        power:"-",
+        guts:"-",
+        wit:"15%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"A",
+          medium:"B",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"F",
+          pace:"A",
+          late:"A",
+          end:"F"
+        }
+      }
+    }
+  },
+
+  {name: 'Hishi Amazon [Azure Amazon]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1012_101201.png',
+    stats:{
+      base:{
+        speed:93,
+        stamina:84,
+        power:105,
+        guts:82,
+        wit:86
+      },
+
+      finale:{
+        speed:113,
+        stamina:103,
+        power:129,
+        guts:100,
+        wit:105
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"20%",
+        guts:"10%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"E"
+        },
+        
+        distance:{
+          short:"D",
+          mile:"A",
+          medium:"A",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"B",
+          late:"C",
+          end:"A"
+        }
+      }
+    }
+  },
+
+  {name: 'Mejiro McQueen [Frontline Elegance]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1013_101301.png',
+    stats:{
+      base:{
+        speed:71,
+        stamina:111,
+        power:71,
+        guts:103,
+        wit:94
+      },
+
+      finale:{
+        speed:87,
+        stamina:136,
+        power:87,
+        guts:125,
+        wit:115
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"20%",
+        power:"-",
+        guts:"-",
+        wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"E"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"F",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"B",
+          pace:"A",
+          late:"D",
+          end:"F"
+        }
+      }
+    }
+  },
+
+  {name: 'Mejiro McQueen [End of the Skies]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1013_101302.png',
+    stats:{
+      base:{
+        speed:74,
+        stamina:110,
+        power:72,
+        guts:108,
+        wit:86
+      },
+
+      finale:{
+        speed:90,
+        stamina:134,
+        power:89,
+        guts:132,
+        wit:105
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"10%",
+        power:"10%",
+        guts:"-",
+        wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"E"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"F",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"B",
+          pace:"A",
+          late:"D",
+          end:"F"
+        }
+      }
+    }
+  },
+
+  {name: 'El Condor Pasa [El☆Número 1]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1014_101401.png',
+    stats:{
+      base:{
+        speed:85,
+        stamina:76,
+        power:80,
+        guts:93,
+        wit:91
+      },
+
+      finale:{
+        speed:110,
+        stamina:98,
+        power:103,
+        guts:100,
+        wit:118
+      },
+
+      bonus:{
+        speed:"20%",
+        stamina:"-",
+        power:"-",
+        guts:"-",
+        wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"B"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"A",
+          medium:"A",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"E",
+          pace:"A",
+          late:"A",
+          end:"C"
+        }
+      }
+    }
+  },
+
+  {name: 'El Condor Pasa [Kukulkan Warrior]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1014_101402.png',
+    stats:{
+      base:{
+        speed:100,
+        stamina:75,
+        power:91,
+        guts:97,
+        wit:87
+      },
+
+      finale:{
+        speed:122,
+        stamina:91,
+        power:112,
+        guts:119,
+        wit:106
+      },
+
+      bonus:{
+        speed:"15%",
+        stamina:"-",
+        power:"-",
+        guts:"15%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"B"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"A",
+          medium:"A",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"E",
+          pace:"A",
+          late:"A",
+          end:"C"
+        }
+      }
+    }
+  },
+
+  {name: 'T.M. Opera O [O Sole Suo!]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1015_101501.png',
+    stats:{
+      base:{
+        speed:75,
+        stamina:108,
+        power:75,
+        guts:102,
+        wit:90
+      },
+
+      finale:{
+        speed:91,
+        stamina:132,
+        power:91,
+        guts:125,
+        wit:111
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"20%",
+        power:"-",
+        guts:"-",
+        wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"E"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"E",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"C",
+          pace:"A",
+          late:"A",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'T.M. Opera O [New Year, Same Radiance!]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1015_101502.png',
+    stats:{
+      base:{
+        speed:87,
+        stamina:102,
+        power:74,
+        guts:88,
+        wit:99
+      },
+
+      finale:{
+        speed:106,
+        stamina:124,
+        power:91,
+        guts:107,
+        wit:122
+      },
+
+      bonus:{
+        speed:"14%",
+        stamina:"8%",
+        power:"-",
+        guts:"-",
+        wit:"8%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"E"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"E",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"C",
+          pace:"A",
+          late:"A",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Narita Brian [Maverick]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1016_101601.png',
+    stats:{
+      base:{
+        speed:93,
+        stamina:89,
+        power:100,
+        guts:89,
+        wit:79
+      },
+
+      finale:{
+        speed:113,
+        stamina:109,
+        power:122,
+        guts:108,
+        wit:98
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"20%",
+        power:"-",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"B",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"A",
+          late:"A",
+          end:"D"
+        }
+      }
+    }
+  },
+
+  {name: 'Symboli Rudolf [Emperor´s Path]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1017_101701.png',
+    stats:{
+      base:{
+        speed:86,
+        stamina:91,
+        power:83,
+        guts:96,
+        wit:94
+      },
+
+      finale:{
+        speed:106,
+        stamina:111,
+        power:101,
+        guts:118,
+        wit:114
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"20%",
+        power:"-",
+        guts:"10%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"E",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"B",
+          pace:"A",
+          late:"A",
+          end:"C"
+        }
+      }
+    }
+  },
+
+  {name: 'Symboli Rudolf [Archer by Moonlight]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1017_101702.png',
+    stats:{
+      base:{
+        speed:83,
+        stamina:87,
+        power:90,
+        guts:90,
+        wit:100
+      },
+
+      finale:{
+        speed:101,
+        stamina:107,
+        power:110,
+        guts:110,
+        wit:122
+      },
+
+      bonus:{
+        speed:"8%",
+        stamina:"14%",
+        power:"-",
+        guts:"-",
+        wit:"8%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"E",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"B",
+          pace:"A",
+          late:"A",
+          end:"C"
+        }
+      }
+    }
+  },
+
+  {name: 'Air Groove [Empress Road]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1018_101801.png',
+    stats:{
+      base:{
+        speed:86,
+        stamina:81,
+        power:81,
+        guts:86,
+        wit:91
+      },
+
+      finale:{
+        speed:111,
+        stamina:105,
+        power:105,
+        guts:112,
+        wit:117
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"-",
+        power:"20%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"C",
+          mile:"B",
+          medium:"A",
+          long:"E"
+        },
+        
+        strategy:{
+          front:"D",
+          pace:"A",
+          late:"A",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Air Groove [Quercus Civilis]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1018_101802.png',
+    stats:{
+      base:{
+        speed:94,
+        stamina:82,
+        power:91,
+        guts:88,
+        wit:95
+      },
+
+      finale:{
+        speed:115,
+        stamina:100,
+        power:111,
+        guts:107,
+        wit:117
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"-",
+        power:"10%",
+        guts:"10%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"C",
+          mile:"B",
+          medium:"A",
+          long:"E"
+        },
+        
+        strategy:{
+          front:"D",
+          pace:"A",
+          late:"A",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Agnes Digital [Full-Color Fangirling]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1019_101901.png',
+    stats:{
+      base:{
+        speed:85,
+        stamina:91,
+        power:83,
+        guts:100,
+        wit:91
+      },
+
+      finale:{
+        speed:104,
+        stamina:111,
+        power:101,
+        guts:122,
+        wit:112
+      },
+
+      bonus:{
+        speed:"8%",
+        stamina:"8%",
+        power:"7%",
+        guts:"-",
+        wit:"7%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"A"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"A",
+          medium:"A",
+          long:"G"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"A",
+          late:"A",
+          end:"B"
+        }
+      }
+    }
+  },
+
+  {name: 'Seiun Sky [Reeling in the Big One]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1020_102001.png',
+    stats:{
+      base:{
+        speed:98,
+        stamina:98,
+        power:88,
+        guts:83,
+        wit:83
+      },
+
+      finale:{
+        speed:120,
+        stamina:120,
+        power:108,
+        guts:101,
+        wit:101
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"10%",
+        power:"-",
+        guts:"-",
+        wit:"20%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"A",
+          pace:"B",
+          late:"D",
+          end:"E"
+        }
+      }
+    }
+  },
+
+  {name: 'Seiun Sky [Soirée des Chatons]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1020_102002.png',
+    stats:{
+      base:{
+        speed:101,
+        stamina:89,
+        power:84,
+        guts:88,
+        wit:88
+      },
+
+      finale:{
+        speed:123,
+        stamina:109,
+        power:103,
+        guts:108,
+        wit:107
+      },
+
+      bonus:{
+        speed:"8%",
+        stamina:"-",
+        power:"8%",
+        guts:"14%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"A",
+          pace:"B",
+          late:"D",
+          end:"E"
+        }
+      }
+    }
+  },
+
+  {name: 'Tamamo Cross [Fast as Lightning]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1021_102101.png',
+    stats:{
+      base:{
+        speed:83,
+        stamina:95,
+        power:105,
+        guts:83,
+        wit:84
+      },
+
+      finale:{
+        speed:101,
+        stamina:116,
+        power:129,
+        guts:102,
+        wit:102
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"20%",
+        power:"10%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"F"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"E",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"A",
+          late:"A",
+          end:"A"
+        }
+      }
+    }
+  },
+
+  {name: 'Fine Motion [Noble Seamair]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1022_102201.png',
+    stats:{
+      base:{
+        speed:96,
+        stamina:84,
+        power:95,
+        guts:88,
+        wit:87
+      },
+
+      finale:{
+        speed:117,
+        stamina:102,
+        power:116,
+        guts:108,
+        wit:107
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"15%",
+        guts:"-",
+        wit:"15%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"A",
+          medium:"A",
+          long:"C"
+        },
+        
+        strategy:{
+          front:"D",
+          pace:"A",
+          late:"E",
+          end:"C"
+        }
+      }
+    }
+  },
+
+  {name: 'Fine Motion [Titania]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1022_102202.png',
+    stats:{
+      base:{
+        speed:89,
+        stamina:78,
+        power:89,
+        guts:94,
+        wit:100
+      },
+
+      finale:{
+        speed:109,
+        stamina:96,
+        power:109,
+        guts:115,
+        wit:121
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"-",
+        guts:"10%",
+        wit:"20%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"A",
+          medium:"A",
+          long:"C"
+        },
+        
+        strategy:{
+          front:"D",
+          pace:"A",
+          late:"E",
+          end:"C"
+        }
+      }
+    }
+  },
+
+  {name: 'Biwa Hayahide [pf. Winning Equation...]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1023_102301.png',
+    stats:{
+      base:{
+        speed:85,
+        stamina:93,
+        power:82,
+        guts:93,
+        wit:97
+      },
+
+      finale:{
+        speed:104,
+        stamina:114,
+        power:101,
+        guts:114,
+        wit:117
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"-",
+        guts:"10%",
+        wit:"20%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"F"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"E",
+          pace:"A",
+          late:"B",
+          end:"E"
+        }
+      }
+    }
+  },
+
+  {name: 'Biwa Hayahide [Rouge Caroler]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1023_102302.png',
+    stats:{
+      base:{
+        speed:83,
+        stamina:99,
+        power:76,
+        guts:96,
+        wit:96
+      },
+
+      finale:{
+        speed:102,
+        stamina:121,
+        power:93,
+        guts:117,
+        wit:117
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"12%",
+        power:"12%",
+        guts:"-",
+        wit:"6%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"F"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"E",
+          pace:"A",
+          late:"B",
+          end:"E"
+        }
+      }
+    }
+  },
+
+  {name: 'Mayano Top Gun [Scramble Zone]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1024_102401.png',
+    stats:{
+      base:{
+        speed:73,
+        stamina:100,
+        power:67,
+        guts:95,
+        wit:90
+      },
+
+      finale:{
+        speed:94,
+        stamina:130,
+        power:86,
+        guts:123,
+        wit:117
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"20%",
+        power:"-",
+        guts:"10%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"E"
+        },
+        
+        distance:{
+          short:"D",
+          mile:"D",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"A",
+          pace:"A",
+          late:"B",
+          end:"B"
+        }
+      }
+    }
+  },
+
+  {name: 'Mayano Top Gun [Sunlight Bouquet]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1024_102402.png',
+    stats:{
+      base:{
+        speed:83,
+        stamina:100,
+        power:82,
+        guts:90,
+        wit:95
+      },
+
+      finale:{
+        speed:102,
+        stamina:123,
+        power:100,
+        guts:110,
+        wit:115
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"10%",
+        power:"-",
+        guts:"-",
+        wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"E"
+        },
+        
+        distance:{
+          short:"D",
+          mile:"D",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"A",
+          pace:"A",
+          late:"B",
+          end:"B"
+        }
+      }
+    }
+  },
+
+  {name: 'Manhattan Cafe [Creeping Shadow]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1025_102501.png',
+    stats:{
+      base:{
+        speed:83,
+        stamina:98,
+        power:94,
+        guts:86,
+        wit:89
+      },
+
+      finale:{
+        speed:101,
+        stamina:120,
+        power:115,
+        guts:105,
+        wit:109
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"30%",
+        power:"-",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"F",
+          medium:"B",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"C",
+          late:"A",
+          end:"C"
+        }
+      }
+    }
+  },
+
+  {name: 'Mihono Bourbon [MB-19890425]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1026_102601.png',
+    stats:{
+      base:{
+        speed:96,
+        stamina:72,
+        power:92,
+        guts:102,
+        wit:89
+      },
+
+      finale:{
+        speed:117,
+        stamina:88,
+        power:112,
+        guts:124,
+        wit:109
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"20%",
+        power:"10%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"C",
+          mile:"B",
+          medium:"A",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"A",
+          pace:"E",
+          late:"G",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Mihono Bourbon [CODE: ICING]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1026_102602.png',
+    stats:{
+      base:{
+        speed:100,
+        stamina:68,
+        power:92,
+        guts:96,
+        wit:94
+      },
+
+      finale:{
+        speed:123,
+        stamina:83,
+        power:112,
+        guts:117,
+        wit:115
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"10%",
+        power:"10%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"C",
+          mile:"B",
+          medium:"A",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"A",
+          pace:"E",
+          late:"G",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Mejiro Ryan [Down the Line]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1027_102701.png',
+    stats:{
+      base:{
+        speed:87,
+        stamina:66,
+        power:95,
+        guts:71,
+        wit:81
+      },
+
+      finale:{
+        speed:120,
+        stamina:91,
+        power:130,
+        guts:98,
+        wit:111
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"20%",
+        guts:"-",
+        wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"E",
+          mile:"C",
+          medium:"A",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"F",
+          pace:"A",
+          late:"A",
+          end:"F"
+        }
+      }
+    }
+  },
+
+  {name: 'Hishi Akebono [Buono☆Alla Moda]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1028_102801.png',
+    stats:{
+      base:{
+        speed:99,
+        stamina:60,
+        power:108,
+        guts:91,
+        wit:92
+      },
+
+      finale:{
+        speed:120,
+        stamina:74,
+        power:132,
+        guts:111,
+        wit:113
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"20%",
+        guts:"10%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"F"
+        },
+        
+        distance:{
+          short:"A",
+          mile:"B",
+          medium:"F",
+          long:"G"
+        },
+        
+        strategy:{
+          front:"B",
+          pace:"A",
+          late:"C",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Rice Shower [Rosy Dreams]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1030_103001.png',
+    stats:{
+      base:{
+        speed:71,
+        stamina:117,
+        power:70,
+        guts:102,
+        wit:90
+      },
+
+      finale:{
+        speed:87,
+        stamina:143,
+        power:86,
+        guts:125,
+        wit:109
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"10%",
+        power:"-",
+        guts:"20%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"E",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"B",
+          pace:"A",
+          late:"C",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Rice Shower [Vampire Makeover!]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1030_103002.png',
+    stats:{
+      base:{
+        speed:76,
+        stamina:121,
+        power:67,
+        guts:97,
+        wit:89
+      },
+
+      finale:{
+        speed:93,
+        stamina:148,
+        power:82,
+        guts:118,
+        wit:109
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"15%",
+        power:"15%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"E",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"B",
+          pace:"A",
+          late:"C",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Ines Fujin [Always Electrifying]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1031_103101.png',
+    stats:{
+      base:{
+        speed:100,
+        stamina:96,
+        power:72,
+        guts:98,
+        wit:84
+      },
+
+      finale:{
+        speed:122,
+        stamina:117,
+        power:88,
+        guts:120,
+        wit:103
+      },
+
+      bonus:{
+        speed:"15%",
+        stamina:"-",
+        power:"-",
+        guts:"15%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"A",
+          medium:"A",
+          long:"C"
+        },
+        
+        strategy:{
+          front:"A",
+          pace:"C",
+          late:"G",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Agnes Tachyon [Tach-nology]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1032_103201.png',
+    stats:{
+      base:{
+        speed:82,
+        stamina:76,
+        power:76,
+        guts:79,
+        wit:87
+      },
+
+      finale:{
+        speed:112,
+        stamina:104,
+        power:104,
+        guts:108,
+        wit:122
+      },
+
+      bonus:{
+        speed:"20%",
+        stamina:"-",
+        power:"-",
+        guts:"10%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"D",
+          medium:"A",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"E",
+          pace:"A",
+          late:"B",
+          end:"F"
+        }
+      }
+    }
+  },
+
+  {name: 'Admire Vega [Starry Nocturne]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1033_103301.png',
+    stats:{
+      base:{
+        speed:96,
+        stamina:79,
+        power:108,
+        guts:69,
+        wit:98
+      },
+
+      finale:{
+        speed:118,
+        stamina:96,
+        power:132,
+        guts:85,
+        wit:119
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"-",
+        power:"20%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"C",
+          medium:"A",
+          long:"C"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"G",
+          late:"B",
+          end:"A"
+        }
+      }
+    }
+  },
+
+  {name: 'Inari One [Edomurasaki]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1034_103401.png',
+    stats:{
+      base:{
+        speed:88,
+        stamina:100,
+        power:109,
+        guts:74,
+        wit:79
+      },
+
+      finale:{
+        speed:108,
+        stamina:122,
+        power:133,
+        guts:90,
+        wit:97
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"10%",
+        power:"20%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"A"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"B",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"B",
+          late:"B",
+          end:"A"
+        }
+      }
+    }
+  },
+
+  {name: 'Winning Ticket [Get to Winning!]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1035_103501.png',
+    stats:{
+      base:{
+        speed:87,
+        stamina:68,
+        power:91,
+        guts:74,
+        wit:80
+      },
+
+      finale:{
+        speed:120,
+        stamina:93,
+        power:125,
+        guts:101,
+        wit:111
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"10%",
+        power:"20%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"F",
+          medium:"A",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"B",
+          late:"A",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Air Shakur [unsigned]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1036_103601.png',
+    stats:{
+      base:{
+        speed:99,
+        stamina:85,
+        power:95,
+        guts:69,
+        wit:102
+      },
+
+      finale:{
+        speed:120,
+        stamina:104,
+        power:116,
+        guts:84,
+        wit:126
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"-",
+        guts:"-",
+        wit:"30%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"E",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"C",
+          late:"A",
+          end:"A"
+        }
+      }
+    }
+  },
+
+  {name: 'Eishin Flash [Meisterschaft]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1037_103701.png',
+    stats:{
+      base:{
+        speed:100,
+        stamina:83,
+        power:93,
+        guts:82,
+        wit:92
+      },
+
+      finale:{
+        speed:122,
+        stamina:101,
+        power:113,
+        guts:100,
+        wit:114
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"10%",
+        guts:"-",
+        wit:"20%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"F",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"B",
+          late:"A",
+          end:"C"
+        }
+      }
+    }
+  },
+
+  {name: 'Eishin Flash [Precise Chocolatier]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1037_103702.png',
+    stats:{
+      base:{
+        speed:94,
+        stamina:88,
+        power:84,
+        guts:82,
+        wit:102
+      },
+
+      finale:{
+        speed:115,
+        stamina:107,
+        power:103,
+        guts:100,
+        wit:125
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"8%",
+        power:"8%",
+        guts:"-",
+        wit:"14%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"F",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"B",
+          late:"A",
+          end:"C"
+        }
+      }
+    }
+  },
+
+  {name: 'Curren Chan [Fille Éclair]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1038_103801.png',
+    stats:{
+      base:{
+        speed:97,
+        stamina:58,
+        power:107,
+        guts:91,
+        wit:97
+      },
+
+      finale:{
+        speed:119,
+        stamina:71,
+        power:130,
+        guts:111,
+        wit:119
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"-",
+        power:"20%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"F"
+        },
+        
+        distance:{
+          short:"A",
+          mile:"D",
+          medium:"G",
+          long:"G"
+        },
+        
+        strategy:{
+          front:"B",
+          pace:"A",
+          late:"E",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Curren Chan [Ma Chérie of the New Moon]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1038_103802.png',
+    stats:{
+      base:{
+        speed:100,
+        stamina:54,
+        power:109,
+        guts:85,
+        wit:102
+      },
+
+      finale:{
+        speed:122,
+        stamina:65,
+        power:133,
+        guts:104,
+        wit:126
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"-",
+        power:"10%",
+        guts:"-",
+        wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"F"
+        },
+        
+        distance:{
+          short:"A",
+          mile:"D",
+          medium:"G",
+          long:"G"
+        },
+        
+        strategy:{
+          front:"B",
+          pace:"A",
+          late:"E",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Kawakami Princess [Princess of Pink]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1039_103901.png',
+    stats:{
+      base:{
+        speed:100,
+        stamina:71,
+        power:107,
+        guts:82,
+        wit:90
+      },
+
+      finale:{
+        speed:122,
+        stamina:87,
+        power:131,
+        guts:101,
+        wit:109
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"10%",
+        guts:"20%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"D",
+          mile:"B",
+          medium:"A",
+          long:"F"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"C",
+          late:"A",
+          end:"D"
+        }
+      }
+    }
+  },
+
+  {name: 'Gold City [Authentic / 1928]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1040_104001.png',
+    stats:{
+      base:{
+        speed:89,
+        stamina:92,
+        power:94,
+        guts:92,
+        wit:83
+      },
+
+      finale:{
+        speed:109,
+        stamina:113,
+        power:114,
+        guts:112,
+        wit:102
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"10%",
+        guts:"20%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"D"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"A",
+          medium:"B",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"F",
+          pace:"A",
+          late:"A",
+          end:"F"
+        }
+      }
+    }
+  },
+
+  {name: 'Gold City [Autumn Cosmos]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1040_104002.png',
+    stats:{
+      base:{
+        speed:86,
+        stamina:98,
+        power:86,
+        guts:98,
+        wit:82
+      },
+
+      finale:{
+        speed:105,
+        stamina:120,
+        power:105,
+        guts:119,
+        wit:101
+      },
+
+      bonus:{
+        speed:"8%",
+        stamina:"-",
+        power:"8%",
+        guts:"-",
+        wit:"14%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"D"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"A",
+          medium:"B",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"F",
+          pace:"A",
+          late:"A",
+          end:"F"
+        }
+      }
+    }
+  },
+
+  {name: 'Sakura Bakushin O [Blossom in Learning]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1041_104101.png',
+    stats:{
+      base:{
+        speed:87,
+        stamina:54,
+        power:93,
+        guts:85,
+        wit:81
+      },
+
+      finale:{
+        speed:120,
+        stamina:74,
+        power:128,
+        guts:116,
+        wit:112
+      },
+
+      bonus:{
+        speed:"20%",
+        stamina:"-",
+        power:"-",
+        guts:"-",
+        wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"A",
+          mile:"B",
+          medium:"G",
+          long:"G"
+        },
+        
+        strategy:{
+          front:"A",
+          pace:"A",
+          late:"F",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Sweep Tosho [Platanus Witch]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1044_104401.png',
+    stats:{
+      base:{
+        speed:101,
+        stamina:85,
+        power:110,
+        guts:65,
+        wit:89
+      },
+
+      finale:{
+        speed:123,
+        stamina:104,
+        power:135,
+        guts:79,
+        wit:109
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"-",
+        power:"20%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"E",
+          mile:"A",
+          medium:"A",
+          long:"D"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"G",
+          late:"A",
+          end:"A"
+        }
+      }
+    }
+  },
+
+  {name: 'Super Creek [Murmuring Stream]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1045_104501.png',
+    stats:{
+      base:{
+        speed:65,
+        stamina:100,
+        power:71,
+        guts:100,
+        wit:89
+      },
+
+      finale:{
+        speed:84,
+        stamina:129,
+        power:92,
+        guts:129,
+        wit:116
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"10%",
+        power:"-",
+        guts:"-",
+        wit:"20%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"G",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"D",
+          pace:"A",
+          late:"B",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Super Creek [Chiffon-Wrapped Mummy]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1045_104502.png',
+    stats:{
+      base:{
+        speed:74,
+        stamina:106,
+        power:75,
+        guts:98,
+        wit:97
+      },
+
+      finale:{
+        speed:90,
+        stamina:129,
+        power:92,
+        guts:119,
+        wit:120
+      },
+
+      bonus:{
+        speed:"14%",
+        stamina:"8%",
+        power:"-",
+        guts:"8%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"G",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"D",
+          pace:"A",
+          late:"B",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Smart Falcon [LOVE☆4EVER]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1046_104601.png',
+    stats:{
+      base:{
+        speed:94,
+        stamina:85,
+        power:85,
+        guts:100,
+        wit:86
+      },
+
+      finale:{
+        speed:115,
+        stamina:104,
+        power:104,
+        guts:122,
+        wit:105
+      },
+
+      bonus:{
+        speed:"20%",
+        stamina:"-",
+        power:"10%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"E",
+          dirt:"A"
+        },
+        
+        distance:{
+          short:"B",
+          mile:"A",
+          medium:"A",
+          long:"E"
+        },
+        
+        strategy:{
+          front:"A",
+          pace:"D",
+          late:"G",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Tosen Jordan [Jokester ☆ Vibes]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1048_104801.png',
+  stats:{
+      base:{
+        speed:89,
+        stamina:98,
+        power:75,
+        guts:101,
+        wit:87
+      },
+
+      finale:{
+        speed:109,
+        stamina:120,
+        power:92,
+        guts:123,
+        wit:106
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"-",
+        power:"10%",
+        guts:"10%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"F",
+          medium:"A",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"C",
+          pace:"A",
+          late:"B",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Narita Taishin [Nevertheless]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1050_105001.png',
+    stats:{
+      base:{
+        speed:96,
+        stamina:82,
+        power:99,
+        guts:79,
+        wit:94
+      },
+
+      finale:{
+        speed:118,
+        stamina:100,
+        power:121,
+        guts:97,
+        wit:114
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"-",
+        power:"-",
+        guts:"20%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"G",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"F",
+          late:"B",
+          end:"A"
+        }
+      }
+    }
+  },
+
+  {name: 'Nishino Flower [Layered Petals]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1051_105101.png',
+    stats:{
+      base:{
+        speed:93,
+        stamina:81,
+        power:95,
+        guts:86,
+        wit:95
+      },
+
+      finale:{
+        speed:113,
+        stamina:99,
+        power:116,
+        guts:105,
+        wit:117
+      },
+
+      bonus:{
+        speed:"15%",
+        stamina:"-",
+        power:"15%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"F"
+        },
+        
+        distance:{
+          short:"A",
+          mile:"A",
+          medium:"E",
+          long:"G"
+        },
+        
+        strategy:{
+          front:"F",
+          pace:"A",
+          late:"A",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Haru Urara [Bestest Prize]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1052_105201.png',
+    stats:{
+      base:{
+        speed:83,
+        stamina:58,
+        power:89,
+        guts:86,
+        wit:84
+      },
+
+      finale:{
+        speed:115,
+        stamina:79,
+        power:123,
+        guts:119,
+        wit:114
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"10%",
+        guts:"20%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"G",
+          dirt:"A"
+        },
+        
+        distance:{
+          short:"A",
+          mile:"B",
+          medium:"G",
+          long:"G"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"G",
+          late:"A",
+          end:"B"
+        }
+      }
+    }
+  },
+
+  {name: 'Haru Urara [New Year ♪ New Urara!]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1052_105202.png',
+    stats:{
+      base:{
+        speed:94,
+        stamina:54,
+        power:106,
+        guts:98,
+        wit:98
+      },
+
+      finale:{
+        speed:115,
+        stamina:66,
+        power:130,
+        guts:119,
+        wit:120
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"20%",
+        guts:"10%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"G",
+          dirt:"A"
+        },
+        
+        distance:{
+          short:"A",
+          mile:"B",
+          medium:"G",
+          long:"G"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"G",
+          late:"A",
+          end:"B"
+        }
+      }
+    }
+  },
+
+  {name: 'Makitanefukukitaru [Rising☆Fortune]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1056_105601.png',
+    stats:{
+      base:{
+        speed:77,
+        stamina:81,
+        power:88,
+        guts:81,
+        wit:73
+      },
+
+      finale:{
+        speed:106,
+        stamina:111,
+        power:121,
+        guts:111,
+        wit:101
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"20%",
+        power:"10%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"F"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"B",
+          late:"A",
+          end:"F"
+        }
+      }
+    }
+  },
+
+  {name: 'Matikanefukukitaru [Lucky Tidings]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1056_105602.png',
+    stats:{
+      base:{
+        speed:87,
+        stamina:100,
+        power:94,
+        guts:94,
+        wit:75
+      },
+
+      finale:{
+        speed:106,
+        stamina:122,
+        power:115,
+        guts:115,
+        wit:92
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"10%",
+        power:"-",
+        guts:"10%",
+        wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"F"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"B",
+          late:"A",
+          end:"F"
+        }
+      }
+    }
+  },
+
+  {name: 'Meisho Doto [Turbulent Blue]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1058_105801.png',
+    stats:{
+      base:{
+        speed:93,
+        stamina:95,
+        power:85,
+        guts:96,
+        wit:81
+      },
+
+      finale:{
+        speed:113,
+        stamina:116,
+        power:104,
+        guts:118,
+        wit:99
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"20%",
+        power:"-",
+        guts:"10%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"E"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"F",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"F",
+          pace:"A",
+          late:"B",
+          end:"E"
+        }
+      }
+    }
+  },
+
+  {name: 'Mejiro Dober [Off the Line]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1059_105901.png',
+    stats:{
+      base:{
+        speed:96,
+        stamina:85,
+        power:97,
+        guts:75,
+        wit:97
+      },
+
+      finale:{
+        speed:117,
+        stamina:104,
+        power:119,
+        guts:92,
+        wit:118
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"-",
+        power:"-",
+        guts:"-",
+        wit:"20%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"E",
+          mile:"A",
+          medium:"A",
+          long:"F"
+        },
+        
+        strategy:{
+          front:"C",
+          pace:"B",
+          late:"A",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Mejiro Dober [Sapphire Sojourn]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1059_105902.png',
+    stats:{
+      base:{
+        speed:94,
+        stamina:78,
+        power:92,
+        guts:86,
+        wit:100
+      },
+
+      finale:{
+        speed:115,
+        stamina:95,
+        power:113,
+        guts:105,
+        wit:122
+      },
+
+      bonus:{
+        speed:"20%",
+        stamina:"-",
+        power:"-",
+        guts:"-",
+        wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"E",
+          mile:"A",
+          medium:"A",
+          long:"F"
+        },
+        
+        strategy:{
+          front:"C",
+          pace:"B",
+          late:"A",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Nice Nature [Poinsettia Ribbon]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1060_106001.png',
+    stats:{
+      base:{
+        speed:86,
+        stamina:72,
+        power:89,
+        guts:69,
+        wit:84
+      },
+
+      finale:{
+        speed:118,
+        stamina:99,
+        power:123,
+        guts:96,
+        wit:114
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"20%",
+        guts:"-",
+        wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"F",
+          pace:"B",
+          late:"A",
+          end:"D"
+        }
+      }
+    }
+  },
+
+  {name: 'Nice Nature [Run & Win]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1060_106002.png',
+    stats:{
+      base:{
+        speed:86,
+        stamina:86,
+        power:94,
+        guts:86,
+        wit:98
+      },
+
+      finale:{
+        speed:105,
+        stamina:105,
+        power:115,
+        guts:105,
+        wit:120
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"10%",
+        power:"10%",
+        guts:"-",
+        wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"F",
+          pace:"B",
+          late:"A",
+          end:"D"
+        }
+      }
+    }
+  },
+
+  {name: 'King Halo [King of Emeralds]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1061_106101.png',
+    stats:{
+      base:{
+        speed:87,
+        stamina:60,
+        power:93,
+        guts:73,
+        wit:87
+      },
+
+      finale:{
+        speed:120,
+        stamina:82,
+        power:127,
+        guts:100,
+        wit:121
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"20%",
+        guts:"10%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"A",
+          mile:"B",
+          medium:"B",
+          long:"C"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"B",
+          late:"A",
+          end:"D"
+        }
+      }
+    }
+  },
+
+  {name: 'King Halo [Cheerleader in Noble White]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1061_106102.png',
+  stats:{
+      base:{
+        speed:100,
+        stamina:62,
+        power:110,
+        guts:89,
+        wit:89
+      },
+
+      finale:{
+        speed:122,
+        stamina:76,
+        power:134,
+        guts:108,
+        wit:110
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"-",
+        power:"10%",
+        guts:"10%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"A",
+          mile:"B",
+          medium:"B",
+          long:"C"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"B",
+          late:"A",
+          end:"D"
+        }
+      }
+    }
+  },
+
+  {name: 'Matikanetannhauser [Clippety-Tippety-Clop]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1062_106201.png',
+    stats:{
+      base:{
+        speed:79,
+        stamina:91,
+        power:82,
+        guts:88,
+        wit:85
+      },
+
+      finale:{
+        speed:103,
+        stamina:117,
+        power:106,
+        guts:114,
+        wit:110
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"20%",
+        power:"-",
+        guts:"10%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"D",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"F",
+          pace:"A",
+          late:"A",
+          end:"E"
+        }
+      }
+    }
+  },
+
+  {name: 'Mejiro Palmer [Line Breakthrough]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1064_106401.png',
+    stats:{
+      base:{
+        speed:92,
+        stamina:103,
+        power:76,
+        guts:91,
+        wit:88
+      },
+
+      finale:{
+        speed:112,
+        stamina:126,
+        power:93,
+        guts:111,
+        wit:108
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"10%",
+        power:"-",
+        guts:"10%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"F",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"A",
+          pace:"E",
+          late:"F",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Satono Diamond [Natural Brilliance]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1067_106701.png',
+    stats:{
+      base:{
+        speed:91,
+        stamina:88,
+        power:93,
+        guts:83,
+        wit:95
+      },
+
+      finale:{
+        speed:111,
+        stamina:108,
+        power:113,
+        guts:101,
+        wit:117
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"15%",
+        power:"-",
+        guts:"-",
+        wit:"15%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"B",
+          late:"A",
+          end:"D"
+        }
+      }
+    }
+  },
+
+  {name: 'Kitasan Black [Gilded Shrine to Glory]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1068_106801.png',
+    stats:{
+      base:{
+        speed:97,
+        stamina:100,
+        power:79,
+        guts:86,
+        wit:88
+      },
+
+      finale:{
+        speed:119,
+        stamina:122,
+        power:97,
+        guts:105,
+        wit:107
+      },
+
+      bonus:{
+        speed:"20%",
+        stamina:"10%",
+        power:"-",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"E",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"A",
+          pace:"B",
+          late:"C",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Sakura Chiyono O [Strength in Full Bloom]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1069_106901.png',
+    stats:{
+      base:{
+        speed:93,
+        stamina:96,
+        power:78,
+        guts:93,
+        wit:90
+      },
+
+      finale:{
+        speed:114,
+        stamina:117,
+        power:95,
+        guts:114,
+        wit:110
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"-",
+        power:"-",
+        guts:"10%",
+        wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"E",
+          mile:"A",
+          medium:"A",
+          long:"E"
+        },
+        
+        strategy:{
+          front:"B",
+          pace:"A",
+          late:"F",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Mejiro Ardan [Crystalline]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1071_107101.png',
+    stats:{
+      base:{
+        speed:92,
+        stamina:89,
+        power:89,
+        guts:80,
+        wit:100
+      },
+
+      finale:{
+        speed:113,
+        stamina:109,
+        power:109,
+        guts:98,
+        wit:121
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"-",
+        power:"-",
+        guts:"-",
+        wit:"20%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"F"
+        },
+        
+        distance:{
+          short:"E",
+          mile:"B",
+          medium:"A",
+          long:"D"
+        },
+        
+        strategy:{
+          front:"C",
+          pace:"A",
+          late:"D",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Yaeno Muteki [Blazed Head, Covered Fists]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1072_107201.png',
+    stats:{
+      base:{
+        speed:92,
+        stamina:81,
+        power:97,
+        guts:97,
+        wit:83
+      },
+
+      finale:{
+        speed:113,
+        stamina:99,
+        power:119,
+        guts:119,
+        wit:100
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"20%",
+        guts:"10%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"E"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"B",
+          medium:"A",
+          long:"E"
+        },
+        
+        strategy:{
+          front:"F",
+          pace:"A",
+          late:"A",
+          end:"G"
+        }
+      }
+    }
+  },
+
+  {name: 'Mejiro Bright [Brunissage Line]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1074_107401.png',
+    stats:{
+      base:{
+        speed:89,
+        stamina:107,
+        power:87,
+        guts:75,
+        wit:92
+      },
+
+      finale:{
+        speed:109,
+        stamina:130,
+        power:106,
+        guts:92,
+        wit:111
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"14%",
+        power:"-",
+        guts:"8%",
+        wit:"8%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"D",
+          late:"A",
+          end:"A"
+        }
+      }
+    }
+  },
+
     ];
 
-    const SUPPORT_TYPES = ['Speed','Stamina','Power','Guts','Wit','Friend'];
+    const SUPPORT_TYPES = ['Speed','Stamina','Power','Guts','Wit','Pal', 'Group'];
     let blockedUmas = new Set();
     const $ = id => document.getElementById(id);
 
@@ -211,27 +4359,40 @@
 
     // === Selector visual de Umas ===
     const umaSelector = $('umaSelector');
-    const showUmaSelectorBtn = $('showUmaSelector');
-    showUmaSelectorBtn.addEventListener('click', () => {
+    $('showUmaSelector').addEventListener('click',()=>{
       umaSelector.classList.toggle('hidden');
-      if (!umaSelector.classList.contains('hidden') && umaSelector.childElementCount === 0) {
-        UMAS.forEach(u => {
-          const div = document.createElement('div');
-          div.className = 'relative cursor-pointer group';
-          div.innerHTML = `
-            <img src="${u.img}" alt="${u.name}" title="${u.name}" class="w-full h-24 object-cover rounded transition filter group-hover:brightness-90">
-            <p class="text-[10px] text-center mt-1 truncate">${u.name.split('[')[0].trim()}</p>
+      
+      if(
+        !umaSelector.classList.contains('hidden')
+        && umaSelector.childElementCount===0
+      ){
+        
+        UMAS.forEach(u=>{
+          const div=document.createElement('div');
+          div.className='relative cursor-pointer group';
+          
+          div.innerHTML=`
+          <img src="${u.img}"
+          class="w-full h-24 object-cover rounded">
+          
+          <p class="text-[10px] text-center mt-1 truncate">
+            ${u.name.split('[')[0]}
+            </p>
+            
           `;
-          div.addEventListener('click', () => {
-            const img = div.querySelector('img');
-            if (blockedUmas.has(u.name)) {
+          
+          div.addEventListener('click',()=>{
+            const img=div.querySelector('img');
+            if(blockedUmas.has(u.name)){
               blockedUmas.delete(u.name);
-              img.classList.toggle('grayscale');
-            } else {
+              img.classList.remove('grayscale');
+            }
+            else{
               blockedUmas.add(u.name);
               img.classList.add('grayscale');
             }
           });
+          
           umaSelector.appendChild(div);
         });
       }
@@ -241,11 +4402,10 @@
 toggleAllBtn.addEventListener('click', () => {
   const imgs = umaSelector.querySelectorAll('img');
   // Si hay alguna desbloqueada → bloquear todas
-  const anyBlocked = Array.from(imgs).some(img => img.classList.contains('grayscale'));
-
-imgs.forEach((img, index) => {
+  const anyUnlocked = Array.from(imgs).some(img => !img.classList.contains('grayscale'));
+  imgs.forEach((img, index) => {
     const u = UMAS[index];
-    if (!anyBlocked) {
+    if (anyUnlocked) {
       blockedUmas.add(u.name);
       img.classList.add('grayscale');
     } else {
@@ -255,9 +4415,8 @@ imgs.forEach((img, index) => {
   });
 });
 
-
     // === Soportes ===
-    function distributeSupports(count, mode, distribution, umaRole) {
+    function distributeSupports(count, mode, distribution) {
       const out = {}; SUPPORT_TYPES.forEach(s => out[s]=0);
       if (mode === 'simple' || distribution === 'free') {
         for (let i=0;i<count;i++) out[pickRandom(SUPPORT_TYPES)]++;
@@ -292,103 +4451,212 @@ imgs.forEach((img, index) => {
       return out;
     }
 
-    function generateChallenge(mode) {
-      const challenges = [
-        'No usar SR/SSR en la run (solo R/Normal allowed).',
-        'Entrenar prioritariamente Guts durante las primeras 6 semanas.',
-        'No usar items de recuperación hasta la mitad del training camp.',
-        'Equipar al final una skill de recuperación obligatoria.',
-        'Ganar URA Finals con A Rank mínimo (objetivo).',
-        'Solo supports de tipo Speed y Wisdom permitidos.'
-      ];
-      if (mode === 'challenge') return pickRandom(challenges);
-      return Math.random()<0.25?pickRandom(challenges):'Sin restricciones especiales.';
-    }
-
-    const supportCountEl = $('supportCount');
-    const supportCountLabel = $('supportCountLabel');
-    supportCountEl.addEventListener('input', ()=> supportCountLabel.textContent = supportCountEl.value);
-
     // === Generar Run ===
-    $('generateBtn').addEventListener('click', () => {
-      const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
-      const lockedUmaName = null;
-      let uma = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
-      if (lockedUmaName) {
-        const found = UMAS.find(u => u.name.toLowerCase() === lockedUmaName.toLowerCase());
-        if (found) uma = found;
+    let currentUma = null;
+
+$('generateBtn').addEventListener('click',()=>{
+
+const availableUmas=
+UMAS.filter(
+u=>!blockedUmas.has(u.name)
+);
+
+const uma=
+pickRandom(
+availableUmas.length
+? availableUmas
+: UMAS
+);
+
+currentUma=uma;
+
+document.getElementById("umaName").innerText=
+uma.name;
+
+document.getElementById("umaImage").src=
+uma.img;
+
+
+const supports=
+distributeSupports(
+6,
+'simple',
+'free'
+);
+
+const supportsList=
+document.getElementById("supportsList");
+
+supportsList.innerHTML="";
+
+Object.entries(supports).forEach(([k,v])=>{
+
+if(v>0){
+
+const node=
+document.createElement("div");
+
+node.className=
+'p-2 border rounded text-center bg-white';
+
+node.innerHTML=
+`<strong>${k}</strong>
+<div>${v}</div>`;
+
+supportsList.appendChild(node);
+
+}
+
+});
+
+});
+
+    // generar soportes 
+    const supports = distributeSupports(6,'simple','free');
+    const supportsList = $('supportsList');
+    supportsList.innerHTML='';
+    Object.entries(supports).forEach(([k,v])=>{
+      if(v>0){
+        const node=document.createElement('div');
+        node.className='p-2 border rounded text-center bg-white';
+        node.innerHTML=`<strong>${k}</strong>
+        <div class="text-sm text-gray-600"> ${v} </div>`;
+        
+        supportsList.appendChild(node);
       }
-
-      const count = parseInt(supportCountEl.value,10);
-      const mode = $('mode').value;
-      const distribution = $('distribution').value;
-      const supports = distributeSupports(count, mode, distribution, uma.role);
-
-      const notes = [];
-      if (!$('allowSR').checked) notes.push('Restricción: evita usar SR/SSR en la selección de support cards.');
-      if (mode==='weighted') notes.push('Modo ponderado: mayor probabilidad de Speed/Power.');
-      if (distribution==='focused') notes.push('Distribución: enfoque en atributos relacionados con la Uma.');
-      const challenge = generateChallenge(mode);
-
-      $('umaName').textContent = uma.name;
-      $('umaRole').textContent = `Tipo: ${uma.role}`;
-      $('umaImage').src = uma.img || '';
-
-      const supportsList = $('supportsList'); supportsList.innerHTML='';
-      Object.entries(supports).forEach(([k,v])=>{
-        if(v>0){
-          const node=document.createElement('div');
-          node.className='p-2 border rounded text-center bg-white';
-          node.innerHTML=`<strong>${k}</strong><div class="text-sm text-gray-600">${v}</div>`;
-          supportsList.appendChild(node);
-        }
-      });
-
-      $('challengeText').textContent = challenge;
-      const notesList = $('notesList'); notesList.innerHTML='';
-      notes.forEach(n=>{
-        const li = document.createElement('li');
-        li.textContent = n;
-        notesList.appendChild(li);
-      });
-
-      const result = {uma,supports,challenge,notes,generatedAt:new Date().toISOString()};
-      $('exportBtn').dataset.payload = JSON.stringify(result);
-      $('copyBtn').dataset.payload = JSON.stringify(result);
     });
 
-    // === Reroll Uma ===
+    $('umaImage').addEventListener('click',()=>{
+      if(!currentUma) return;
+      
+      const u=currentUma;
+      
+      $('modalName').textContent=u.name;
+      $('modalImage').src=u.img.replace('/thumb','');
+      
+      $('modalStats').innerHTML=`
+      
+      <div class="space-y-4">
+        
+        <div class="border p-3 rounded">
+          
+          <h3 class="font-bold">
+            Base stats
+          </h3>
+          
+          <div class="grid grid-cols-5 gap-2 text-center">
+            <div>🏃<br>${u.stats.base.speed}</div>
+            <div>❤<br>${u.stats.base.stamina}</div>
+            <div>💪<br>${u.stats.base.power}</div>
+            <div>🔥<br>${u.stats.base.guts}</div>
+            <div>🧠<br>${u.stats.base.wit}</div>
+          </div>
+        </div>
+
+        <div class="border p-3 rounded">
+          <h3 class="font-bold">
+            Finale stats
+            </h3>
+            
+            <div class="grid grid-cols-5 gap-2 text-center">
+              <div>🏃<br>${u.stats.finale.speed}</div>
+              <div>❤<br>${u.stats.finale.stamina}</div>
+              <div>💪<br>${u.stats.finale.power}</div>
+              <div>🔥<br>${u.stats.finale.guts}</div>
+              <div>🧠<br>${u.stats.finale.wit}</div>
+            </div>
+          </div>
+        
+      <div class="border p-3 rounded">
+        <h3 class="font-bold">
+          Stat bonuses
+        </h3>
+        
+        <div class="grid grid-cols-5 gap-2 text-center">
+          <div>🏃<br>${u.stats.bonus.speed}</div>
+          <div>❤<br>${u.stats.bonus.stamina}</div>
+          <div>💪<br>${u.stats.bonus.power}</div>
+          <div>🔥<br>${u.stats.bonus.guts}</div>
+          <div>🧠<br>${u.stats.bonus.wit}</div>
+        </div>
+    
+      <div class="border p-3 rounded">
+        <h3 class="font-bold">
+          Aptitude
+        </h3>
+      
+        <div>
+          Surface:
+          Turf ${u.stats.aptitude.surface.turf}
+          |
+          Dirt ${u.stats.aptitude.surface.dirt}
+        </div>
+      <div>
+        
+      Distance:
+        Short ${u.stats.aptitude.distance.short}
+        |
+        Mile ${u.stats.aptitude.distance.mile}
+        |
+        Medium ${u.stats.aptitude.distance.medium}
+        |
+        Long ${u.stats.aptitude.distance.long}
+    </div>
+  <div>
+    
+    Strategy:
+      Front ${u.stats.aptitude.strategy.front}
+      |
+      Pace ${u.stats.aptitude.strategy.pace}
+      |
+      Late ${u.stats.aptitude.strategy.late}
+      |
+      End ${u.stats.aptitude.strategy.end}
+  </div>
+</div>
+</div>
+`;
+
+$('umaModal').classList.remove('hidden');
+});
+window.addEventListener("load", function(){
+
+    const modal =
+    document.getElementById("umaModal");
+
+    const closeBtn =
+    document.getElementById("closeModal");
+
+    // Cerrar con X
+    closeBtn.onclick = function(){
+
+        modal.classList.add("hidden");
+
+    };
+
+    // Cerrar clic fuera
+    modal.onclick = function(e){
+
+        if(e.target===modal){
+
+            modal.classList.add("hidden");
+
+        }
+
+    };
+
+});    // === Reroll Uma ===
     $('randomUmaBtn').addEventListener('click', ()=> {
       const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
       const u = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
       $('umaName').textContent = u.name;
-      $('umaRole').textContent = `Tipo: ${u.role}`;
       $('umaImage').src = u.img;
-    });
-
-    // === Copiar / Exportar JSON ===
-    $('copyBtn').addEventListener('click', async ()=>{
-      const payload=$('copyBtn').dataset.payload;
-      if(!payload) return alert('Genera primero un resultado.');
-      await navigator.clipboard.writeText(payload);
-      alert('JSON copiado al portapapeles.');
-    });
-    $('exportBtn').addEventListener('click', ()=>{
-      const payload=$('exportBtn').dataset.payload;
-      if(!payload) return alert('Genera primero un resultado.');
-      const blob=new Blob([payload],{type:'application/json'});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      a.href=url;a.download='uma-run-challenge.json';
-      document.body.appendChild(a);a.click();a.remove();
-      URL.revokeObjectURL(url);
     });
 
     // === Inicializar pantalla ===
     (function(){
       const u=pickRandom(UMAS);
-      $('umaName').textContent = u.name; 
-      $('umaRole').textContent = `Tipo: ${u.role}`; 
+      $('umaName').textContent = u.name;  
       $('umaImage').src = u.img;
     })();
   </script>
@@ -397,6 +4665,38 @@ imgs.forEach((img, index) => {
     <small class="text-xs text-gray-500">Haz click en el boton "Soporte" para acceder el randomizador de cartas.</small>
     <button type="button" class="flex-1 bg-pink-500 text-white py-2 rounded hover:bg-pink-600">Soporte</button>
   </a>
-  
+
+  <div id="umaModal"
+class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+
+    <div id="modalContent"
+    class="bg-white rounded-xl p-6 w-[900px] max-w-[95%] relative">
+
+        <button
+        id="closeModal"
+        class="absolute top-3 right-3 text-3xl font-bold cursor-pointer z-50">
+            ×
+        </button>
+
+        <h2 id="modalName"
+        class="text-2xl font-bold text-center mb-6">
+        </h2>
+
+        <div class="flex gap-6">
+
+            <div class="flex-1">
+                <div id="modalStats"></div>
+            </div>
+
+            <div>
+                <img id="modalImage"
+                class="w-80 rounded-lg object-contain">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>  
 </body>
 </html>
