@@ -4529,9 +4529,27 @@ u=>!blockedUmas.has(u.name)
 // Si todas están bloqueadas
 if(availableUmas.length===0){
 
-alert(
-"Ninguna Uma ha sido elegida.\n\nSelecciona al menos una para generar."
-);
+document.getElementById("resultCard").innerHTML=`
+
+<div class="flex flex-col items-center justify-center py-10">
+
+<div class="text-6xl mb-4">
+🐎
+</div>
+
+<h3 class="text-xl font-bold text-red-500 mb-2">
+Ninguna Uma disponible
+</h3>
+
+<p class="text-gray-600 text-center max-w-sm">
+
+Selecciona al menos una Uma para generar.
+
+</p>
+
+</div>
+
+`;
 
 return;
 
@@ -4544,6 +4562,46 @@ availableUmas
 );
 
 currentUma=uma;
+
+  document.getElementById("resultCard").innerHTML=`
+
+<div class="flex flex-col sm:flex-row items-center gap-4">
+
+<img
+id="umaImage"
+src="${uma.img}"
+class="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-cover bg-gray-200 cursor-pointer hover:scale-105 transition"
+/>
+
+<div>
+
+<h3 id="umaName"
+class="text-xl font-semibold">
+
+${uma.name}
+
+</h3>
+
+</div>
+
+</div>
+
+<div class="mt-4">
+
+<h4 class="font-semibold">
+
+Composición de soportes
+
+</h4>
+
+<div id="supportsList"
+class="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+
+</div>
+
+</div>
+
+`;
 
 
 document.getElementById(
