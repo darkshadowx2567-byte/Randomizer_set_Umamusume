@@ -10,10 +10,24 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
   <div class="max-w-7xl mx-auto p-3 sm:p-6">
-    <header class="mb-6">
-      <h1 class="text-3xl font-extrabold">Uma Challenge Randomizer</h1>
-      <p class="text-sm text-gray-600">Genera retos y composiciones de cartas de soporte para una run aleatoria (no ligado al juego original).</p>
-    </header>
+    <header class="mb-6 text-center">
+
+    <h1 class="text-3xl font-extrabold">
+        Uma Challenge Randomizer
+    </h1>
+
+    <p class="text-sm text-gray-600 mb-4">
+        Genera retos y composiciones de cartas de soporte
+    </p>
+
+    <a href="support.html"
+    class="inline-block bg-pink-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-pink-600 transition shadow">
+
+        🎴 Soporte
+
+    </a>
+
+</header>
 
     <main class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4">
       <section class="lg:col-span-1 bg-white p-4 rounded-2xl shadow">
@@ -4511,19 +4525,35 @@ UMAS.filter(
 u=>!blockedUmas.has(u.name)
 );
 
+
+// Si todas están bloqueadas
+if(availableUmas.length===0){
+
+alert(
+"Ninguna Uma ha sido elegida.\n\nSelecciona al menos una para generar."
+);
+
+return;
+
+}
+
+
 const uma=
 pickRandom(
-availableUmas.length
-? availableUmas
-: UMAS
+availableUmas
 );
 
 currentUma=uma;
 
-document.getElementById("umaName").innerText=
+
+document.getElementById(
+"umaName"
+).innerText=
 uma.name;
 
-document.getElementById("umaImage").src=
+document.getElementById(
+"umaImage"
+).src=
 uma.img;
 
 
@@ -4535,11 +4565,14 @@ distributeSupports(
 );
 
 const supportsList=
-document.getElementById("supportsList");
+document.getElementById(
+"supportsList"
+);
 
 supportsList.innerHTML="";
 
-Object.entries(supports).forEach(([k,v])=>{
+Object.entries(supports)
+.forEach(([k,v])=>{
 
 if(v>0){
 
@@ -4710,11 +4743,6 @@ window.addEventListener("load", function(){
       $('umaImage').src = u.img;
     })();
   </script>
-
-  <a href="support.html">
-    <small class="text-xs text-gray-500">Haz click en el boton "Soporte" para acceder el randomizador de cartas.</small>
-    <button type="button" class="flex-1 bg-pink-500 text-white py-2 rounded hover:bg-pink-600">Soporte</button>
-  </a>
 
   <div id="umaModal"
 class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
