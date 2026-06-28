@@ -205,7 +205,7 @@
           {name: 'Mayano Top Gun [Tracen Academy]', rarity: 'R', img: 'https://img.game8.co/4216932/d10a5d12814ff99769c5747966ec8b3c.png/show'},
           {name: 'Manhattan Cafe [Tracen Academy]', rarity: 'R', img: 'https://img.game8.co/4216964/2e51a394a56c396e1c52fbc0340bade1.png/show'},
           {name: 'Satono Diamond [Tracen Academy]', rarity: 'R', img: 'https://img.game8.co/4220092/9589a7fa91696cd23fd7123a3b8cf1f9.png/show'},
-          {name: 'Zenno Bob Roy [Tracen Academy]', rarity: 'R', img: 'https://img.game8.co/4240323/7e2a6bce31f9530c4728acbdb0d3ed03.png/show'},
+          {name: 'Zenno Rob Roy [Tracen Academy]', rarity: 'R', img: 'https://img.game8.co/4240323/7e2a6bce31f9530c4728acbdb0d3ed03.png/show'},
           {name: 'Sakura Chiyono O [Tracen Academy]', rarity: 'R', img: 'https://img.game8.co/4240306/159ae442c50884f1c84304c745aeeeb5.png/show'},
           {name: 'Nakayama Festa [Tracen Academy]', rarity: 'R', img: 'https://img.game8.jp/6242691/518eb1a1653835326e11430893a0420b.png/show'},
           {name: 'Tosen Jordan [Tracen Academy]', rarity: 'R', img: 'https://j-img.game8.co/6087644/ffd7588568164ca8c913c5b38410dc76.png/show'},
@@ -265,7 +265,7 @@
           {name: 'Bamboo Memory [Tracen Academy]', rarity: 'R', img: 'https://img.game8.co/4265541/f4778bb3cd801b3c9c38603aa50089e2.png/show'},
           {name: 'Inari One [Tracen Academy]', rarity: 'R', img: 'https://img.game8.jp/6374825/8a59c6654d209107dac9061810277666.png/show'},
           {name: 'Admire Vega [Tracen Academy]', rarity: 'R', img: 'https://img.game8.jp/6435146/d9d56032a8789b86f6fa814dc420b6d2.png/show'},
-        ]
+        ] 
       },
 
       Guts: {
@@ -443,71 +443,51 @@
 // --- Variables para el selector de cartas ---
 let disabledCards = new Set(); // guardará las cartas desactivadas
 
-function generateAllSlots() {
+function initCardSelector() {
+  const container = document.getElementById("allCardsGrid");
+  container.innerHTML = "";
 
-    const usedCards=new Set();
-    const usedCharacters=new Set();
+  const allCards = [];
 
-    const baseName=name =>
-        name.includes("[")
-        ? name.split("[")[0].trim()
-        : name;
-
-    for(let i=1;i<=SLOT_COUNT;i++){
-
-        const type=document.getElementById(`type-${i}`).value;
-
-        const bucket=SUPPORT_CARDS[type];
-
-        const pool=[];
-
-        if(bucket.SSR)
-            pool.push(...bucket.SSR.map(c=>({...c,rarity:"SSR"})));
-
-        if(bucket.SR)
-            pool.push(...bucket.SR.map(c=>({...c,rarity:"SR"})));
-
-        if(bucket.R)
-            pool.push(...bucket.R.map(c=>({...c,rarity:"R"})));
-
-        const chosenDiv=document.getElementById(`chosen-${i}`);
-
-        const available=pool.filter(c=>{
-
-            const character=baseName(c.name);
-
-            return(
-                !disabledCards.has(c.name) &&
-                !usedCards.has(c.name) &&
-                !usedCharacters.has(character)
-            );
-
-        });
-
-        if(available.length===0){
-
-            chosenDiv.innerHTML=
-            `<div style="color:var(--muted)">
-            Sin cartas disponibles
-            </div>`;
-
-            continue;
-        }
-
-        const card=pickRandom(available);
-
-        usedCards.add(card.name);
-        usedCharacters.add(baseName(card.name));
-
-        chosenDiv.innerHTML=`
-            ${card.img ? `<img src="${card.img}">` : ""}
-            <div class="meta">
-            <strong>${card.name}</strong><br>
-            <small>${card.rarity} — ${type}</small>
-            </div>
-        `;
+  // Recolectar todas las cartas
+  for (const type in SUPPORT_CARDS) {
+    for (const rarity in SUPPORT_CARDS[type]) {
+      SUPPORT_CARDS[type][rarity].forEach(card => {
+        allCards.push({ ...card, type, rarity });
+      });
     }
-}
+  }
+
+  // --- ORDENAR POR RAREZA: SSR > SR > R ---
+  const rarityPriority = { SSR: 3, SR: 2, R: 1 };
+  const sortedCards = allCards.slice().sort((a, b) => {
+    return rarityPriority[b.rarity] - rarityPriority[a.rarity];
+  });
+
+  // FILTRO POR TIPO (iconos arriba)
+  const typeIcons = document.querySelectorAll(".type-icon");
+  let currentTypeFilter = null;
+
+  function updateCardDisplayByType(type) {
+    const imgs = document.querySelectorAll("#allCardsGrid img");
+    imgs.forEach(img => {
+      img.style.display = (!type || img.dataset.type === type) ? "inline-block" : "none";
+    });
+  }
+
+  typeIcons.forEach(icon => {
+    icon.addEventListener("click", () => {
+      const type = icon.dataset.type;
+      currentTypeFilter = currentTypeFilter === type ? null : type;
+
+      typeIcons.forEach(i => i.classList.remove("active"));
+      if (currentTypeFilter) {
+        document.querySelector(`[data-type="${currentTypeFilter}"]`).classList.add("active");
+      }
+
+      updateCardDisplayByType(currentTypeFilter);
+    });
+  });
 
   // --- CREAR IMÁGENES YA ORDENADAS ---
   sortedCards.forEach(card => {
@@ -540,6 +520,20 @@ function generateAllSlots() {
     container.appendChild(img);
   });
 }
+
+  const container = document.getElementById("allCardsGrid");
+  container.innerHTML = ""; // limpiar por si acaso
+
+  const allCards = [];
+
+  // Recorrer SUPPORT_CARDS por tipo y rareza
+  for (const type in SUPPORT_CARDS) {
+    for (const rarity in SUPPORT_CARDS[type]) {
+      SUPPORT_CARDS[type][rarity].forEach(card => {
+        allCards.push({ ...card, type, rarity }); // guardamos tipo y rareza
+      });
+    }
+  }
 
 
   function updateCardDisplayByType(type) {
@@ -664,58 +658,29 @@ function generateAllSlots() {
     // Filtrar cartas que estén deshabilitadas por el selector global
     const poolAvailable = pool.filter(c => !disabledCards.has(c.name));
 
-    // Eliminar cartas repetidas y personajes repetidos
-let available = poolAvailable.filter(c => {
-    const character = baseName(c.name);
+    // Filtrar para eliminar las cartas que ya se usaron (por nombre exacto)
+    // y también eliminar cartas cuyo personaje base ya haya sido usado en otro slot
+    let available = poolAvailable.filter(c => {
+      const b = baseName(c.name);
+      return !usedCards.has(c.name) && !usedCharacters.has(b);
+    });
 
-    return (
-        !usedCards.has(c.name) &&
-        !usedCharacters.has(character)
-    );
-});
-
-let card = null;
-
-// Elegir una carta válida
-if (available.length > 0) {
-    card = pickRandom(available);
-} else {
-    chosenDiv.innerHTML =
-      `<div style="color:var(--muted)">
-      Sin cartas disponibles (todas ya usadas o deshabilitadas)
-      </div>`;
-    continue;
-}
-
-// Registrar carta y personaje usados
-usedCards.add(card.name);
-usedCharacters.add(baseName(card.name));
-
-      if (!card) {
-    chosenDiv.innerHTML = `
+    // Si no hay disponibles, no permitir duplicar personaje
+if (available.length === 0) {
+  chosenDiv.innerHTML = `
     <div style="color:var(--muted)">
-    Sin cartas disponibles (todas ya usadas o deshabilitadas)
-    </div>`;
-    continue;
+      Sin cartas disponibles
+      <br>
+      <small>(todos los personajes posibles ya fueron usados o deshabilitados)</small>
+    </div>
+  `;
+  continue;
 }
-
-chosenDiv.innerHTML = `
-${card.img ? `<img src="${card.img}" alt="${card.name}" loading="lazy">` : ''}
-<div class="meta">
-<strong>${card.name}</strong><br>
-<small style="color:var(--muted)">
-${card.rarity} — ${type}
-</small>
-</div>
-`;
-        continue;
-      }
-    }
 
     // Elegir una carta aleatoria y marcarla como usada (por carta y por personaje)
     const card = pickRandom(available);
     usedCards.add(card.name);
-  usedCharacters.add(baseName(card.name))
+    usedCharacters.add(baseName(card.name));
 
     // Mostrar en su respectivo slot
     chosenDiv.innerHTML = `
@@ -781,5 +746,5 @@ ${card.rarity} — ${type}
     
   </script>
 
-</body>
+  </body>
 </html>
