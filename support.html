@@ -686,14 +686,22 @@ usedCards.add(card.name);
 usedCharacters.add(baseName(card.name));
 
       if (!card) {
-        chosenDiv.innerHTML = `<div style="color:var(--muted)">Sin cartas disponibles (todas ya usadas o deshabilitadas)</div>`;
-        continue;
-      } else {
-        usedCards.add(card.name);
-        chosenDiv.innerHTML = `
-          ${card.img ? `<img src="${card.img}" alt="${card.name}" loading="lazy">` : ''}
-          <div class="meta"><strong>${card.name}</strong><br><small style="color:var(--muted)">${card.rarity} — ${type}</small></div>
-        `;
+    chosenDiv.innerHTML = `
+    <div style="color:var(--muted)">
+    Sin cartas disponibles (todas ya usadas o deshabilitadas)
+    </div>`;
+    continue;
+}
+
+chosenDiv.innerHTML = `
+${card.img ? `<img src="${card.img}" alt="${card.name}" loading="lazy">` : ''}
+<div class="meta">
+<strong>${card.name}</strong><br>
+<small style="color:var(--muted)">
+${card.rarity} — ${type}
+</small>
+</div>
+`;
         continue;
       }
     }
@@ -766,10 +774,6 @@ usedCharacters.add(baseName(card.name));
     for(let i=1;i<=SLOT_COUNT;i++) updateCardList(i);
     
   </script>
-
-  <a href="index.html">
-  <button type="button" class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Volver al inicio</button>
-</a>
 
 </body>
 </html>
