@@ -4629,7 +4629,9 @@ uma.img;
     <div class="space-y-4">
 
         <div class="border p-3 rounded">
-            <h3 class="font-bold">Base stats</h3>
+            <h3 class="font-bold">
+                Base stats
+            </h3>
 
             <div class="grid grid-cols-5 gap-2 text-center">
                 <div>🏃<br>${u.stats.base.speed}</div>
@@ -4638,7 +4640,73 @@ uma.img;
                 <div>🔥<br>${u.stats.base.guts}</div>
                 <div>🧠<br>${u.stats.base.wit}</div>
             </div>
+        </div>
 
+        <div class="border p-3 rounded">
+            <h3 class="font-bold">
+                Finale stats
+            </h3>
+
+            <div class="grid grid-cols-5 gap-2 text-center">
+                <div>🏃<br>${u.stats.finale.speed}</div>
+                <div>❤<br>${u.stats.finale.stamina}</div>
+                <div>💪<br>${u.stats.finale.power}</div>
+                <div>🔥<br>${u.stats.finale.guts}</div>
+                <div>🧠<br>${u.stats.finale.wit}</div>
+            </div>
+        </div>
+
+        <div class="border p-3 rounded">
+            <h3 class="font-bold">
+                Stat bonuses
+            </h3>
+
+            <div class="grid grid-cols-5 gap-2 text-center">
+                <div>🏃<br>${u.stats.bonus.speed}</div>
+                <div>❤<br>${u.stats.bonus.stamina}</div>
+                <div>💪<br>${u.stats.bonus.power}</div>
+                <div>🔥<br>${u.stats.bonus.guts}</div>
+                <div>🧠<br>${u.stats.bonus.wit}</div>
+            </div>
+        </div>
+
+        <div class="border p-3 rounded">
+            <h3 class="font-bold">
+                Aptitude
+            </h3>
+
+            <div class="space-y-2">
+
+                <div>
+                    Surface:
+                    Turf ${u.stats.aptitude.surface.turf}
+                    |
+                    Dirt ${u.stats.aptitude.surface.dirt}
+                </div>
+
+                <div>
+                    Distance:
+                    Short ${u.stats.aptitude.distance.short}
+                    |
+                    Mile ${u.stats.aptitude.distance.mile}
+                    |
+                    Medium ${u.stats.aptitude.distance.medium}
+                    |
+                    Long ${u.stats.aptitude.distance.long}
+                </div>
+
+                <div>
+                    Strategy:
+                    Front ${u.stats.aptitude.strategy.front}
+                    |
+                    Pace ${u.stats.aptitude.strategy.pace}
+                    |
+                    Late ${u.stats.aptitude.strategy.late}
+                    |
+                    End ${u.stats.aptitude.strategy.end}
+                </div>
+
+            </div>
         </div>
 
     </div>
