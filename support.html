@@ -443,51 +443,71 @@
 // --- Variables para el selector de cartas ---
 let disabledCards = new Set(); // guardará las cartas desactivadas
 
-function initCardSelector() {
-  const container = document.getElementById("allCardsGrid");
-  container.innerHTML = "";
+function generateAllSlots() {
 
-  const allCards = [];
+    const usedCards=new Set();
+    const usedCharacters=new Set();
 
-  // Recolectar todas las cartas
-  for (const type in SUPPORT_CARDS) {
-    for (const rarity in SUPPORT_CARDS[type]) {
-      SUPPORT_CARDS[type][rarity].forEach(card => {
-        allCards.push({ ...card, type, rarity });
-      });
+    const baseName=name =>
+        name.includes("[")
+        ? name.split("[")[0].trim()
+        : name;
+
+    for(let i=1;i<=SLOT_COUNT;i++){
+
+        const type=document.getElementById(`type-${i}`).value;
+
+        const bucket=SUPPORT_CARDS[type];
+
+        const pool=[];
+
+        if(bucket.SSR)
+            pool.push(...bucket.SSR.map(c=>({...c,rarity:"SSR"})));
+
+        if(bucket.SR)
+            pool.push(...bucket.SR.map(c=>({...c,rarity:"SR"})));
+
+        if(bucket.R)
+            pool.push(...bucket.R.map(c=>({...c,rarity:"R"})));
+
+        const chosenDiv=document.getElementById(`chosen-${i}`);
+
+        const available=pool.filter(c=>{
+
+            const character=baseName(c.name);
+
+            return(
+                !disabledCards.has(c.name) &&
+                !usedCards.has(c.name) &&
+                !usedCharacters.has(character)
+            );
+
+        });
+
+        if(available.length===0){
+
+            chosenDiv.innerHTML=
+            `<div style="color:var(--muted)">
+            Sin cartas disponibles
+            </div>`;
+
+            continue;
+        }
+
+        const card=pickRandom(available);
+
+        usedCards.add(card.name);
+        usedCharacters.add(baseName(card.name));
+
+        chosenDiv.innerHTML=`
+            ${card.img ? `<img src="${card.img}">` : ""}
+            <div class="meta">
+            <strong>${card.name}</strong><br>
+            <small>${card.rarity} — ${type}</small>
+            </div>
+        `;
     }
-  }
-
-  // --- ORDENAR POR RAREZA: SSR > SR > R ---
-  const rarityPriority = { SSR: 3, SR: 2, R: 1 };
-  const sortedCards = allCards.slice().sort((a, b) => {
-    return rarityPriority[b.rarity] - rarityPriority[a.rarity];
-  });
-
-  // FILTRO POR TIPO (iconos arriba)
-  const typeIcons = document.querySelectorAll(".type-icon");
-  let currentTypeFilter = null;
-
-  function updateCardDisplayByType(type) {
-    const imgs = document.querySelectorAll("#allCardsGrid img");
-    imgs.forEach(img => {
-      img.style.display = (!type || img.dataset.type === type) ? "inline-block" : "none";
-    });
-  }
-
-  typeIcons.forEach(icon => {
-    icon.addEventListener("click", () => {
-      const type = icon.dataset.type;
-      currentTypeFilter = currentTypeFilter === type ? null : type;
-
-      typeIcons.forEach(i => i.classList.remove("active"));
-      if (currentTypeFilter) {
-        document.querySelector(`[data-type="${currentTypeFilter}"]`).classList.add("active");
-      }
-
-      updateCardDisplayByType(currentTypeFilter);
-    });
-  });
+}
 
   // --- CREAR IMÁGENES YA ORDENADAS ---
   sortedCards.forEach(card => {
@@ -520,20 +540,6 @@ function initCardSelector() {
     container.appendChild(img);
   });
 }
-
-  const container = document.getElementById("allCardsGrid");
-  container.innerHTML = ""; // limpiar por si acaso
-
-  const allCards = [];
-
-  // Recorrer SUPPORT_CARDS por tipo y rareza
-  for (const type in SUPPORT_CARDS) {
-    for (const rarity in SUPPORT_CARDS[type]) {
-      SUPPORT_CARDS[type][rarity].forEach(card => {
-        allCards.push({ ...card, type, rarity }); // guardamos tipo y rareza
-      });
-    }
-  }
 
 
   function updateCardDisplayByType(type) {
