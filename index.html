@@ -83,17 +83,15 @@ class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
 
 </div>
 
-    <div class="mt-4">
+    <div id="supportsSection" class="mt-4 hidden">
 
-        <h4 class="font-semibold">
-            Composición de soportes
-        </h4>
+    <h4 class="font-semibold">
+        Composición de soportes
+    </h4>
 
-        <div
-        id="supportsList"
-        class="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
-        </div>
-
+    <div
+    id="supportsList"
+    class="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
     </div>
 
 </div>
@@ -4721,7 +4719,12 @@ img.classList.remove("hidden");
 
 });
 
-
+  document.getElementById(
+"supportsSection"
+).classList.remove(
+"hidden"
+);
+  
 const supports=
 distributeSupports(
 6,
