@@ -4778,11 +4778,32 @@ supportsList.appendChild(node);
     });
 
     // === Inicializar pantalla ===
-    (function(){
-      const u=pickRandom(UMAS);
-      $('umaName').textContent = u.name;  
-      $('umaImage').src = u.img;
-    })();
+    document.addEventListener("DOMContentLoaded", ()=>{
+
+    const modal = document.getElementById("umaModal");
+    const closeBtn = document.getElementById("closeModal");
+
+    if(closeBtn){
+
+        closeBtn.addEventListener("click", ()=>{
+
+            modal.classList.add("hidden");
+
+        });
+
+    }
+
+    modal.addEventListener("click", (e)=>{
+
+        if(e.target===modal){
+
+            modal.classList.add("hidden");
+
+        }
+
+    });
+
+});
   </script>
 
   <div id="umaModal"
