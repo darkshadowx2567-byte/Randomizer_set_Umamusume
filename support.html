@@ -690,7 +690,6 @@ usedCharacters.add(baseName(card.name));
         continue;
       } else {
         usedCards.add(card.name);
-        usedCharacters.add(baseName(card.name));
         chosenDiv.innerHTML = `
           ${card.img ? `<img src="${card.img}" alt="${card.name}" loading="lazy">` : ''}
           <div class="meta"><strong>${card.name}</strong><br><small style="color:var(--muted)">${card.rarity} — ${type}</small></div>
