@@ -702,6 +702,7 @@ usedCharacters.add(baseName(card.name));
     // Elegir una carta aleatoria y marcarla como usada (por carta y por personaje)
     const card = pickRandom(available);
     usedCards.add(card.name);
+  usedCharacters.add(baseName(card.name))
 
     // Mostrar en su respectivo slot
     chosenDiv.innerHTML = `
