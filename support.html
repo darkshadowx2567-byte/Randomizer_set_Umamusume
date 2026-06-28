@@ -658,28 +658,32 @@ function generateAllSlots() {
     // Filtrar cartas que estén deshabilitadas por el selector global
     const poolAvailable = pool.filter(c => !disabledCards.has(c.name));
 
-    // Filtrar para eliminar las cartas que ya se usaron (por nombre exacto)
-    // y también eliminar cartas cuyo personaje base ya haya sido usado en otro slot
-    let available = poolAvailable.filter(c => {
-      const b = baseName(c.name);
-      return !usedCards.has(c.name) && !usedCharacters.has(b);
-    });
+    // Eliminar cartas repetidas y personajes repetidos
+let available = poolAvailable.filter(c => {
+    const character = baseName(c.name);
 
-    // Si no hay disponibles estrictos, intentar fallbacks que TAMBIÉN respeten disabledCards
-    if (available.length === 0) {
-      // fallback1: cartas no usadas por nombre (pero aún respetando disabled + personaje)
-      const fallback1 = poolAvailable.filter(c => !usedCards.has(c.name) && !usedCharacters.has(baseName(c.name)));
+    return (
+        !usedCards.has(c.name) &&
+        !usedCharacters.has(character)
+    );
+});
 
-      // fallback2: cartas que no compiten por personaje (pero respetando disabled + no repetir nombre)
-      const fallback2 = poolAvailable.filter(c => !usedCharacters.has(baseName(c.name)) && !usedCards.has(c.name));
+let card = null;
 
-      // fallback3: cualquier carta disponible que no esté disabled y no repetida por nombre (aceptar personaje repetido si no hay más)
-      const fallback3 = poolAvailable.filter(c => !usedCards.has(c.name));
+// Elegir una carta válida
+if (available.length > 0) {
+    card = pickRandom(available);
+} else {
+    chosenDiv.innerHTML =
+      `<div style="color:var(--muted)">
+      Sin cartas disponibles (todas ya usadas o deshabilitadas)
+      </div>`;
+    continue;
+}
 
-      let card = null;
-      if (fallback1.length > 0) card = pickRandom(fallback1);
-      else if (fallback2.length > 0) card = pickRandom(fallback2);
-      else if (fallback3.length > 0) card = pickRandom(fallback3);
+// Registrar carta y personaje usados
+usedCards.add(card.name);
+usedCharacters.add(baseName(card.name));
 
       if (!card) {
         chosenDiv.innerHTML = `<div style="color:var(--muted)">Sin cartas disponibles (todas ya usadas o deshabilitadas)</div>`;
@@ -698,7 +702,6 @@ function generateAllSlots() {
     // Elegir una carta aleatoria y marcarla como usada (por carta y por personaje)
     const card = pickRandom(available);
     usedCards.add(card.name);
-    usedCharacters.add(baseName(card.name));
 
     // Mostrar en su respectivo slot
     chosenDiv.innerHTML = `
