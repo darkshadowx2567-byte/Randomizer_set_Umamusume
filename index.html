@@ -4518,6 +4518,138 @@ toggleAllBtn.addEventListener('click', () => {
     // === Generar Run ===
     let currentUma = null;
 
+    function setupUmaImageClick(){
+
+const img = document.getElementById("umaImage");
+
+if(!img) return;
+
+img.onclick = function(){
+
+if(!currentUma) return;
+
+const u = currentUma;
+
+document.getElementById(
+"modalName"
+).textContent = u.name;
+
+document.getElementById(
+"modalImage"
+).src = u.img.replace('/thumb','');
+
+
+document.getElementById(
+"modalStats"
+).innerHTML = `
+
+<div class="space-y-4">
+
+<div class="border p-3 rounded">
+
+<h3 class="font-bold">
+Base stats
+</h3>
+
+<div class="grid grid-cols-5 gap-2 text-center">
+
+<div>🏃<br>${u.stats.base.speed}</div>
+<div>❤<br>${u.stats.base.stamina}</div>
+<div>💪<br>${u.stats.base.power}</div>
+<div>🔥<br>${u.stats.base.guts}</div>
+<div>🧠<br>${u.stats.base.wit}</div>
+
+</div>
+
+</div>
+
+
+<div class="border p-3 rounded">
+
+<h3 class="font-bold">
+Finale stats
+</h3>
+
+<div class="grid grid-cols-5 gap-2 text-center">
+
+<div>🏃<br>${u.stats.finale.speed}</div>
+<div>❤<br>${u.stats.finale.stamina}</div>
+<div>💪<br>${u.stats.finale.power}</div>
+<div>🔥<br>${u.stats.finale.guts}</div>
+<div>🧠<br>${u.stats.finale.wit}</div>
+
+</div>
+
+</div>
+
+
+<div class="border p-3 rounded">
+
+<h3 class="font-bold">
+Stat bonuses
+</h3>
+
+<div class="grid grid-cols-5 gap-2 text-center">
+
+<div>🏃<br>${u.stats.bonus.speed}</div>
+<div>❤<br>${u.stats.bonus.stamina}</div>
+<div>💪<br>${u.stats.bonus.power}</div>
+<div>🔥<br>${u.stats.bonus.guts}</div>
+<div>🧠<br>${u.stats.bonus.wit}</div>
+
+</div>
+
+</div>
+
+
+<div class="border p-3 rounded">
+
+<h3 class="font-bold">
+Aptitude
+</h3>
+
+<p>
+Surface:
+Turf ${u.stats.aptitude.surface.turf}
+|
+Dirt ${u.stats.aptitude.surface.dirt}
+</p>
+
+<p>
+Distance:
+Short ${u.stats.aptitude.distance.short}
+|
+Mile ${u.stats.aptitude.distance.mile}
+|
+Medium ${u.stats.aptitude.distance.medium}
+|
+Long ${u.stats.aptitude.distance.long}
+</p>
+
+<p>
+Strategy:
+Front ${u.stats.aptitude.strategy.front}
+|
+Pace ${u.stats.aptitude.strategy.pace}
+|
+Late ${u.stats.aptitude.strategy.late}
+|
+End ${u.stats.aptitude.strategy.end}
+</p>
+
+</div>
+
+</div>
+`;
+
+document
+.getElementById("umaModal")
+.classList.remove("hidden");
+
+};
+
+}
+
 $('generateBtn').addEventListener('click',()=>{
 
 const availableUmas=
@@ -4562,6 +4694,8 @@ availableUmas
 );
 
 currentUma=uma;
+
+  setupUmaImageClick();
 
   document.getElementById("resultCard").innerHTML=`
 
@@ -4667,126 +4801,7 @@ supportsList.appendChild(node);
       }
     });
 
-    $('umaImage').addEventListener('click',()=>{
-      if(!currentUma) return;
-      
-      const u=currentUma;
-      
-      $('modalName').textContent=u.name;
-      $('modalImage').src=u.img.replace('/thumb','');
-      
-      $('modalStats').innerHTML=`
-      
-      <div class="space-y-4">
-        
-        <div class="border p-3 rounded">
-          
-          <h3 class="font-bold">
-            Base stats
-          </h3>
-          
-          <div class="grid grid-cols-5 gap-2 text-center">
-            <div>🏃<br>${u.stats.base.speed}</div>
-            <div>❤<br>${u.stats.base.stamina}</div>
-            <div>💪<br>${u.stats.base.power}</div>
-            <div>🔥<br>${u.stats.base.guts}</div>
-            <div>🧠<br>${u.stats.base.wit}</div>
-          </div>
-        </div>
-
-        <div class="border p-3 rounded">
-          <h3 class="font-bold">
-            Finale stats
-            </h3>
-            
-            <div class="grid grid-cols-5 gap-2 text-center">
-              <div>🏃<br>${u.stats.finale.speed}</div>
-              <div>❤<br>${u.stats.finale.stamina}</div>
-              <div>💪<br>${u.stats.finale.power}</div>
-              <div>🔥<br>${u.stats.finale.guts}</div>
-              <div>🧠<br>${u.stats.finale.wit}</div>
-            </div>
-          </div>
-        
-      <div class="border p-3 rounded">
-        <h3 class="font-bold">
-          Stat bonuses
-        </h3>
-        
-        <div class="grid grid-cols-5 gap-2 text-center">
-          <div>🏃<br>${u.stats.bonus.speed}</div>
-          <div>❤<br>${u.stats.bonus.stamina}</div>
-          <div>💪<br>${u.stats.bonus.power}</div>
-          <div>🔥<br>${u.stats.bonus.guts}</div>
-          <div>🧠<br>${u.stats.bonus.wit}</div>
-        </div>
-    
-      <div class="border p-3 rounded">
-        <h3 class="font-bold">
-          Aptitude
-        </h3>
-      
-        <div>
-          Surface:
-          Turf ${u.stats.aptitude.surface.turf}
-          |
-          Dirt ${u.stats.aptitude.surface.dirt}
-        </div>
-      <div>
-        
-      Distance:
-        Short ${u.stats.aptitude.distance.short}
-        |
-        Mile ${u.stats.aptitude.distance.mile}
-        |
-        Medium ${u.stats.aptitude.distance.medium}
-        |
-        Long ${u.stats.aptitude.distance.long}
-    </div>
-  <div>
-    
-    Strategy:
-      Front ${u.stats.aptitude.strategy.front}
-      |
-      Pace ${u.stats.aptitude.strategy.pace}
-      |
-      Late ${u.stats.aptitude.strategy.late}
-      |
-      End ${u.stats.aptitude.strategy.end}
-  </div>
-</div>
-</div>
-`;
-
-$('umaModal').classList.remove('hidden');
-});
-window.addEventListener("load", function(){
-
-    const modal =
-    document.getElementById("umaModal");
-
-    const closeBtn =
-    document.getElementById("closeModal");
-
-    // Cerrar con X
-    closeBtn.onclick = function(){
-
-        modal.classList.add("hidden");
-
-    };
-
-    // Cerrar clic fuera
-    modal.onclick = function(e){
-
-        if(e.target===modal){
-
-            modal.classList.add("hidden");
-
-        }
-
-    };
-
-});    // === Reroll Uma ===
+        // === Reroll Uma ===
     $('randomUmaBtn').addEventListener('click', ()=> {
       const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
       const u = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
