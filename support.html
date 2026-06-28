@@ -52,8 +52,16 @@
   </style>
 </head>
 <body>
+  <div style="display:flex;justify-content:space-between;align-items:center;">
   <h1>Support Card Deck Randomizer</h1>
-  <p class="note">Selecciona el tipo en cada slot (3 arriba, 3 abajo).</p>
+
+  <button onclick="window.location.href='index.html'"
+          id="homeBtn">
+    Volver al inicio
+  </button>
+</div>
+
+<p class="note">Selecciona el tipo en cada slot (3 arriba, 3 abajo).</p>
 
   <div class="grid-3" id="grid">
     <!-- Los slots se crearán por JS -->
@@ -79,8 +87,14 @@
       <img src="https://gametora.com/images/umamusume/icons/utx_ico_obtain_05.png" alt="Pal" data-type="Pal" class="type-icon bw" title="Pal">
       <img src="https://gametora.com/images/umamusume/icons/utx_ico_obtain_06.png" alt="Group" data-type="Group" class="type-icon bw" title="Group">
     </div>
+
+    <div style="text-align:center;margin-bottom:15px;">
+    <button onclick="toggleAllCards()" id="toggleAllBtn">
+        Seleccionar todas
+    </button>
+</div>
+    
     <div id="allCardsGrid" style="display:flex;flex-wrap:wrap;max-width:980px;margin:12px auto"></div>
-    <button onclick="toggleAllCards()" id="toggleAllBtn">Seleccionar todas</button>
   </div>
 
   <script>
