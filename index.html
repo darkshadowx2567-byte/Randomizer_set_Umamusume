@@ -27,6 +27,12 @@
 
     </a>
 
+    <button
+    id="themeBtn"
+    class="ml-3 bg-gray-300 px-4 py-3 rounded-xl">
+    🌙
+  </button>
+
 </header>
 
     <main class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4">
@@ -737,6 +743,54 @@ class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
       }
     }
   },
+      {name: 'Gold Ship [RUN! RUIN! LAUNCHER!]', img: 'https://gametora.com/images/umamusume/characters/chara_stand_1007_100702.png',
+    stats:{
+      base:{
+        speed:79,
+        stamina:93,
+        power:112,
+        guts:73,
+        wit:93
+      },
+
+      finale:{
+        speed:96,
+        stamina:113,
+        power:137,
+        guts:89,
+        wit:115
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"-",
+        power:"20%",
+        guts:"-",
+        wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"C",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"B",
+          late:"B",
+          end:"A"
+        }
+      }
+    }
+  },
 
   {name: 'Vodka [Wild Top Gear]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1008_100801.png',
     stats:{
@@ -1154,6 +1208,55 @@ class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
         power:"10%",
         guts:"-",
         wit:"10%"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"E"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"F",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"B",
+          pace:"A",
+          late:"D",
+          end:"F"
+        }
+      }
+    }
+  },
+      
+  {name: 'Mejiro McQueen [Fair Lady of the Waves]', img: 'https://gametora.com/images/umamusume/characters/chara_stand_1013_101303.png',
+    stats:{
+      base:{
+        speed:82,
+        stamina:85,
+        power:82,
+        guts:113,
+        wit:88
+      },
+
+      finale:{
+        speed:100,
+        stamina:104,
+        power:100,
+        guts:138,
+        wit:108
+      },
+
+      bonus:{
+        speed:"8%",
+        stamina:"8%",
+        power:"-",
+        guts:"-",
+        wit:"14%"
       },
 
       aptitude:{
@@ -4416,8 +4519,22 @@ class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
     ];
 
     const SUPPORT_TYPES = ['Speed','Stamina','Power','Guts','Wit','Pal', 'Group'];
-    let blockedUmas = new Set();
-    const $ = id => document.getElementById(id);
+    let blockedUmas = new Set(
+JSON.parse(
+localStorage.getItem("blockedUmas")
+) || []
+);
+
+const $ = id => document.getElementById(id);
+
+function saveSelections(){
+
+localStorage.setItem(
+"blockedUmas",
+JSON.stringify([...blockedUmas])
+);
+
+}
 
     function pickRandom(array) { return array[Math.floor(Math.random()*array.length)]; }
 
@@ -4437,7 +4554,8 @@ class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
           
           div.innerHTML=`
           <img src="${u.img}"
-          class="w-full h-24 object-cover rounded">
+class="w-full h-24 object-cover rounded
+${blockedUmas.has(u.name) ? 'grayscale' : ''}">
           
           <p class="text-[10px] text-center mt-1 truncate">
             ${u.name.split('[')[0]}
@@ -4448,13 +4566,18 @@ class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
           div.addEventListener('click',()=>{
             const img=div.querySelector('img');
             if(blockedUmas.has(u.name)){
-              blockedUmas.delete(u.name);
-              img.classList.remove('grayscale');
-            }
-            else{
-              blockedUmas.add(u.name);
-              img.classList.add('grayscale');
-            }
+
+    blockedUmas.delete(u.name);
+    img.classList.remove('grayscale');
+
+}else{
+
+    blockedUmas.add(u.name);
+    img.classList.add('grayscale');
+
+}
+
+saveSelections();
           });
           
           umaSelector.appendChild(div);
@@ -4514,6 +4637,21 @@ toggleAllBtn.addEventListener('click', () => {
       for (let i=0;i<count;i++) out[pickRandom(SUPPORT_TYPES)]++;
       return out;
     }
+
+    const SCENARIOS=[
+
+"URA Finale",
+"Unity Cup",
+"Make a New Track",
+];
+
+function getScenario(){
+
+return pickRandom(
+SCENARIOS
+);
+
+}
 
     // === Generar Run ===
     let currentUma = null;
@@ -4590,6 +4728,20 @@ ${uma.name}
 </div>
 
 <div class="mt-4">
+
+  <div class="mt-4 p-3 rounded bg-indigo-100">
+
+<h4 class="font-semibold">
+Escenario recomendado
+</h4>
+
+<div class="text-indigo-700 font-bold">
+
+🎵 ${getScenario()}
+
+</div>
+
+</div>
 
 <div id="supportsSection" class="mt-4">
 
@@ -4806,6 +4958,45 @@ supportsList.appendChild(node);
     });
 
 });
+
+const themeBtn=$("themeBtn");
+
+function applyTheme(){
+
+const dark=
+localStorage.getItem("darkMode")==="true";
+
+document.body.classList.toggle(
+"darkMode",
+dark
+);
+
+themeBtn.innerText=
+dark ? "☀️":"🌙";
+
+}
+
+themeBtn.addEventListener(
+"click",
+()=>{
+
+const current=
+localStorage.getItem(
+"darkMode"
+)==="true";
+
+localStorage.setItem(
+"darkMode",
+!current
+);
+
+applyTheme();
+
+}
+);
+
+applyTheme();
+
   </script>
 
   <div id="umaModal"
@@ -4839,6 +5030,58 @@ class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
 
     </div>
 
-</div>  
+</div>
+
+<style>
+
+.darkMode{
+
+background:#1f2937 !important;
+color:#e5e7eb !important;
+
+}
+
+/* Paneles principales */
+.darkMode section,
+.darkMode #resultCard{
+
+background:#374151 !important;
+border-color:#6b7280 !important;
+
+}
+
+/* Cuadros específicos que antes quedaban blancos */
+.darkMode .bg-white,
+.darkMode .bg-gray-50,
+.darkMode .bg-gray-100,
+.darkMode .bg-indigo-100{
+
+background:#4b5563 !important;
+border-color:#6b7280 !important;
+
+}
+
+/* Texto dentro de esos cuadros */
+.darkMode .bg-white *,
+.darkMode .bg-gray-50 *,
+.darkMode .bg-gray-100 *,
+.darkMode .bg-indigo-100 *{
+
+color:black !important;
+
+}
+
+/* Inputs y selectores */
+.darkMode input,
+.darkMode select{
+
+background:#4b5563 !important;
+color:black !important;
+border-color:#6b7280 !important;
+
+}
+
+</style>
+
 </body>
 </html>
