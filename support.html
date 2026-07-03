@@ -49,16 +49,55 @@
 .type-icon.active {
   filter: none; /* color al activarse */
 }
+
+.dark-mode{
+background:#3c3c3c;
+color:#eee;
+}
+
+.dark-mode .slot{
+background:#4a4a4a;
+}
+
+.dark-mode .chosen{
+background:linear-gradient(
+180deg,
+#555,
+#444
+);
+}
+
+.dark-mode select{
+background:#555;
+color:white;
+border-color:#777;
+}
+
+.dark-mode .note{
+color:#ccc;
+}
+
+.dark-mode .card-item{
+color:#eee;
+}
   </style>
 </head>
 <body>
   <div style="display:flex;justify-content:space-between;align-items:center;">
+
+<div style="display:flex;gap:10px;align-items:center;">
   <h1>Support Card Deck Randomizer</h1>
 
   <button onclick="window.location.href='index.html'"
           id="homeBtn">
     Volver al inicio
   </button>
+
+  <button id="themeBtn">
+🌙
+</button>
+
+</div>
 </div>
 
 <p class="note">Selecciona el tipo en cada slot (3 arriba, 3 abajo).</p>
@@ -128,6 +167,7 @@
           {name: 'Narita Top Road [Peachy Silhouette]', rarity: 'SSR' ,img: 'https://img.game8.jp/6598084/73d78e6a3631acd61b2a0beecea6b1c6.png/show'},
           {name: 'Air Shakur [Mag!c Number]', rarity: 'SSR', img: 'https://img.game8.jp/6681857/5f17a27a7a01d0a9a9de9f3128723067.png/show'},
           {name: 'Seeking the Pearl [Cheer that Changed the World]', rarity: 'SSR', img: 'https://img.game8.jp/6766502/85d6230d0f2d4d0784272aa1a60e4144.png/show'},
+          {name: 'Maruzensky [Sentimental Flare ♪]', rarity: 'SSR', img: 'https://img.game8.jp/7023306/34a6cf3f273c050a6d0ec0eb44e77797.png/show'},
         ],
         
         SR: [
@@ -286,6 +326,7 @@
           {name: 'Bamboo Memory [Make These Feelings Reach You!]', rarity: 'SSR', img: 'https://img.game8.jp/6766503/044c6c6b105195cf49322334ce7a20b1.png/show'},
           {name: 'El Condor Pasa [Twinkle in Your Eyes ∞]', rarity: 'SSR', img: 'https://img.game8.jp/6953387/5ec9a2e70ead0e6adfe9d785b087a9b4.png/show'},
           {name: 'Special Week [Take Hold of Our Dreams!]', rarity: 'SSR', img: 'https://img.game8.jp/7005819/77f004363fde1d89a7033acc7ad04879.png/show'},
+          {name: 'Sakura Chiyono O [A Good Heart Blossoms to its Fullest!]', rarity: 'SSR', img: 'https://img.game8.jp/7023303/904179138b52be85330df0df55716842.png/show'},
         ],
         
         SR: [
@@ -337,6 +378,7 @@
           {name: 'Mr. C.B. [Dear Mr. C.B.]', rarity: 'SSR', img: 'https://img.game8.jp/6806185/9c0caeeb261d9978b5bc2449d27221ab.png/show'},
           {name: 'Rice Shower [Day I Dreamed Of]', rarity: 'SSR', img: 'https://img.game8.jp/6847728/22643e44b0de19f4e6a6d489c7853590.png/show'},
           {name: 'Matikanetannhauser [Machitan☆Adventure]', rarity: 'SSR', img: 'https://img.game8.jp/6953386/86f4692fe6cc7e5d98570cc54b10a6ba.png/show'},
+          {name: 'Nakayama Festa [Trusting the Dice]', rarity: 'SSR', img: 'https://img.game8.jp/7023304/5f4ea4f51565a0782c918303288dd4b8.png/show'},
         ],
         
         SR: [
@@ -401,6 +443,67 @@
     const SLOT_COUNT = 6;
     const GRID = document.getElementById('grid');
 
+    /* =========================
+   GUARDADO LOCAL
+========================= */
+
+const STORAGE_KEYS = {
+  slotTypes: "support_slot_types",
+  disabledCards: "support_disabled_cards",
+  darkMode: "support_dark_mode"
+};
+
+function saveSlotSelections() {
+  const selections = [];
+
+  for(let i=1;i<=SLOT_COUNT;i++){
+    selections.push(
+      document.getElementById(`type-${i}`).value
+    );
+  }
+
+  localStorage.setItem(
+    STORAGE_KEYS.slotTypes,
+    JSON.stringify(selections)
+  );
+}
+
+function loadSlotSelections() {
+  const saved = JSON.parse(
+    localStorage.getItem(STORAGE_KEYS.slotTypes)
+  );
+
+  if(!saved) return;
+
+  saved.forEach((value,index)=>{
+    const select =
+      document.getElementById(`type-${index+1}`);
+
+    if(select){
+      select.value=value;
+    }
+  });
+}
+
+function saveDisabledCards(){
+  localStorage.setItem(
+    STORAGE_KEYS.disabledCards,
+    JSON.stringify([...disabledCards])
+  );
+}
+
+function loadDisabledCards(){
+  const saved = JSON.parse(
+    localStorage.getItem(
+      STORAGE_KEYS.disabledCards
+    )
+  );
+
+  if(saved){
+    disabledCards=new Set(saved);
+  }
+}
+
     // Helper
     function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
@@ -429,7 +532,12 @@
       // inicializar lista
       updateCardList(i);
       // actualizar lista al cambiar tipo
-      slot.querySelector('select').addEventListener('change', ()=> updateCardList(i));
+      slot.querySelector('select').addEventListener(
+'change',
+()=>{
+    updateCardList(i);
+    saveSlotSelections();
+});
     }
 
     // Actualiza la lista visible (por rareza) bajo el selector en ese slot
@@ -515,6 +623,7 @@ function initCardSelector() {
         img.classList.add("disabled");
         img.style.filter = "grayscale(100%)";
       }
+      saveDisabledCards();
     });
 
     container.appendChild(img);
@@ -632,6 +741,7 @@ function toggleAllCards() {
     });
     btn.innerText = "Seleccionar todas";
   }
+  saveDisabledCards();
 }
 
 // Genera la carta aleatoria por slot y evita duplicados de carta y de personaje
@@ -743,6 +853,57 @@ if (available.length === 0) {
 
     // Inicial: actualizar listas
     for(let i=1;i<=SLOT_COUNT;i++) updateCardList(i);
+
+    /* =========================
+   MODO OSCURO
+========================= */
+
+const themeBtn =
+document.getElementById("themeBtn");
+
+function applyTheme(){
+
+const dark =
+localStorage.getItem(
+STORAGE_KEYS.darkMode
+)==="true";
+
+document.body.classList.toggle(
+"dark-mode",
+dark
+);
+
+themeBtn.innerText=
+dark ? "☀️":"🌙";
+}
+
+themeBtn.addEventListener(
+"click",
+()=>{
+const dark=
+localStorage.getItem(
+STORAGE_KEYS.darkMode
+)==="true";
+
+localStorage.setItem(
+STORAGE_KEYS.darkMode,
+!dark
+);
+
+applyTheme();
+});
+
+
+/* =========================
+   CARGA INICIAL
+========================= */
+
+loadDisabledCards();
+
+setTimeout(()=>{
+loadSlotSelections();
+applyTheme();
+},0);
     
   </script>
 
