@@ -516,9 +516,7 @@ function loadDisabledCards(){
         <div class="chosen" id="chosen-${i}">
           <div class="placeholder" style="color:var(--muted)">Sin carta generada</div>
         </div>
-        <label style="display:block;margin-top:8px;font-weight:600">
-  ${i === 6 ? "Slot 6 — Prestada" : `Slot ${i} — Tipo`}
-</label>
+        <label style="display:block;margin-top:8px;font-weight:600">${i === 6 ? "Slot 6 — Prestada" : `Slot ${i} — Tipo`}</label>
         <select id="type-${i}" data-slot="${i}">
           <option value="Speed">Speed</option>
           <option value="Stamina">Stamina</option>
