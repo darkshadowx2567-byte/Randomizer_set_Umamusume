@@ -516,7 +516,9 @@ function loadDisabledCards(){
         <div class="chosen" id="chosen-${i}">
           <div class="placeholder" style="color:var(--muted)">Sin carta generada</div>
         </div>
-        <label style="display:block;margin-top:8px;font-weight:600">Slot ${i} — Tipo</label>
+        <label style="display:block;margin-top:8px;font-weight:600">
+  ${i === 6 ? "Slot 6 — Prestada" : `Slot ${i} — Tipo`}
+</label>
         <select id="type-${i}" data-slot="${i}">
           <option value="Speed">Speed</option>
           <option value="Stamina">Stamina</option>
@@ -765,8 +767,11 @@ function generateAllSlots() {
 
     const chosenDiv = document.getElementById(`chosen-${i}`);
 
-    // Filtrar cartas que estén deshabilitadas por el selector global
-    const poolAvailable = pool.filter(c => !disabledCards.has(c.name));
+    // Slot 6 = carta prestada (ignora cartas deshabilitadas)
+// Slots 1-5 = respetan cartas deshabilitadas
+const poolAvailable = (i === 6)
+  ? pool
+  : pool.filter(c => !disabledCards.has(c.name));
 
     // Filtrar para eliminar las cartas que ya se usaron (por nombre exacto)
     // y también eliminar cartas cuyo personaje base ya haya sido usado en otro slot
