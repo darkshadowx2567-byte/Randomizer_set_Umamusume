@@ -80,6 +80,99 @@ color:#ccc;
 .dark-mode .card-item{
 color:#eee;
 }
+
+/* =========================
+   DISEÑO PARA MÓVILES
+   ========================= */
+
+@media (max-width: 768px) {
+
+  body {
+    padding: 10px;
+  }
+
+  /* Título y botones superiores */
+
+  h1 {
+    font-size: 20px;
+  }
+
+  body > div:first-child {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  body > div:first-child > div {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Los 6 slots pasan de 3 columnas a 2 */
+
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    width: 100%;
+  }
+
+  .slot {
+    padding: 8px;
+  }
+
+  .chosen {
+    min-height: 90px;
+  }
+
+  .chosen img {
+    max-width: 100%;
+  }
+
+  select {
+    font-size: 13px;
+    padding: 5px;
+  }
+
+  /* Botones */
+
+  .controls {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  /* Iconos de tipos */
+
+  #typeIcons {
+    flex-wrap: wrap;
+    gap: 8px !important;
+  }
+
+  .type-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  /* Cartas */
+
+  #allCardsGrid {
+    justify-content: center;
+  }
+
+  #allCardsGrid img {
+    width: 70px !important;
+    margin: 3px !important;
+  }
+
+  h3 {
+    text-align: center;
+    font-size: 22px;
+  }
+}
   </style>
 </head>
 <body>
@@ -226,6 +319,7 @@ color:#eee;
           {name: 'Ikuno Dictus [Beloved Orchid Bouquet]', rarity: 'SSR', img: 'https://img.game8.jp/6847727/895d4f7a9046ee42cc16f61d8951d3d2.png/show'},
           {name: 'Zenno Rob Roy ["Rhodonite and the Dreamstone"]', rarity: 'SSR', img: 'https://img.game8.jp/6953385/e623bbf3742fb0caaf5048a6ccd70141.png/show'},
           {name: 'Manhattan Cafe [It´s on the House]', rarity: 'SSR', img: 'https://img.game8.co/4545601/6129dc980db140582cdae966f6dff479.png/show'},
+          {name: 'Biwa Hayahide [Uchronia Architect]', rarity: 'SSR', img: 'https://img.game8.co/4545596/d6bdb42443db439a9fce762e6a3392ee.png/show'},
         ], 
         
         SR: [
@@ -330,6 +424,7 @@ color:#eee;
           {name: 'El Condor Pasa [Twinkle in Your Eyes ∞]', rarity: 'SSR', img: 'https://img.game8.jp/6953387/5ec9a2e70ead0e6adfe9d785b087a9b4.png/show'},
           {name: 'Special Week [Take Hold of Our Dreams!]', rarity: 'SSR', img: 'https://img.game8.jp/7005819/77f004363fde1d89a7033acc7ad04879.png/show'},
           {name: 'Sakura Chiyono O [A Good Heart Blossoms to its Fullest!]', rarity: 'SSR', img: 'https://img.game8.jp/7023303/904179138b52be85330df0df55716842.png/show'},
+          {name: 'Twin Turbo [TT Ignition!]', rarity: 'SSR', img: 'https://img.game8.co/4545597/684e999f6beda5fc9131add3427871a4.png/show'},
         ],
         
         SR: [
@@ -382,6 +477,7 @@ color:#eee;
           {name: 'Rice Shower [Day I Dreamed Of]', rarity: 'SSR', img: 'https://img.game8.jp/6847728/22643e44b0de19f4e6a6d489c7853590.png/show'},
           {name: 'Matikanetannhauser [Machitan☆Adventure]', rarity: 'SSR', img: 'https://img.game8.jp/6953386/86f4692fe6cc7e5d98570cc54b10a6ba.png/show'},
           {name: 'Nakayama Festa [Trusting the Dice]', rarity: 'SSR', img: 'https://img.game8.jp/7023304/5f4ea4f51565a0782c918303288dd4b8.png/show'},
+          {name: 'Tokai Teio [Teio-Oo-Oo!!!]', rarity: 'SSR', img: 'https://img.game8.co/4545595/0d4d36d32745227beb16b94d6a659335.png/show'},
         ],
         
         SR: [
