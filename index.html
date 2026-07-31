@@ -2801,6 +2801,55 @@ class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
     }
   },
 
+  {name: 'Winning Ticket [Dream Deliverer]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1035_103502.png',
+    stats:{
+      base:{
+        speed:101,
+        stamina:73,
+        power:109,
+        guts:87,
+        wit:80
+      },
+
+      finale:{
+        speed:123,
+        stamina:90,
+        power:133,
+        guts:106,
+        wit:98
+      },
+
+      bonus:{
+        speed:"8%",
+        stamina:"-",
+        power:"14%",
+        guts:"8%",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"F",
+          medium:"A",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"B",
+          late:"A",
+          end:"G"
+        }
+      }
+    }
+  },
+
   {name: 'Air Shakur [unsigned]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1036_103601.png',
     stats:{
       base:{
@@ -3560,6 +3609,55 @@ class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
         power:"-",
         guts:"20%",
         wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"F",
+          mile:"G",
+          medium:"A",
+          long:"A"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"F",
+          late:"B",
+          end:"A"
+        }
+      }
+    }
+  },
+
+  {name: 'Narita Taishin [Nevertheless]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1050_105002.png',
+    stats:{
+      base:{
+        speed:90,
+        stamina:84,
+        power:93,
+        guts:82,
+        wit:101
+      },
+
+      finale:{
+        speed:110,
+        stamina:103,
+        power:113,
+        guts:100,
+        wit:124
+      },
+
+      bonus:{
+        speed:"-",
+        stamina:"8%",
+        power:"-",
+        guts:"8%",
+        wit:"14%"
       },
 
       aptitude:{
@@ -5151,7 +5249,7 @@ applyTheme();
 class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
 
     <div id="modalContent"
-    class="bg-white rounded-xl p-6 w-[900px] max-w-[95%] relative">
+class="bg-white rounded-xl p-6 w-[900px] max-w-[95vw] relative">
 
         <button
         id="closeModal"
@@ -5181,6 +5279,66 @@ class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
 </div>
 
 <style>
+
+  /* ===== Ajustes para móviles ===== */
+
+@media (max-width: 768px) {
+
+    /* Fondo del modal */
+    #umaModal {
+        padding: 10px;
+        align-items: flex-start;
+        overflow-y: auto;
+    }
+
+    /* Ventana */
+    #modalContent {
+        width: 100%;
+        max-width: 100%;
+        max-height: 90vh;
+
+        margin-top: 20px;
+        padding: 16px;
+
+        overflow-y: auto;
+        border-radius: 16px;
+    }
+
+    /* Botón X */
+    #closeModal {
+        position: sticky;
+        top: 0;
+        float: right;
+
+        font-size: 40px;
+        padding: 5px 10px;
+
+        background: white;
+        border-radius: 50%;
+    }
+
+    /* Nombre */
+    #modalName {
+        font-size: 22px;
+        line-height: 1.2;
+
+        padding-right: 45px;
+
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Imagen */
+    #modalImage {
+        width: 180px !important;
+        margin: 0 auto;
+    }
+
+    /* Texto de estadísticas */
+    #modalStats {
+        font-size: 15px;
+    }
+}
 
 .darkMode{
 
