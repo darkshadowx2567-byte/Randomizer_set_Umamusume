@@ -5702,7 +5702,7 @@ Escenario recomendado
 ${renderSparkPills(blueSparks,pinkSparks)}
 
 ${offMetaMode ? `
-  <div class="off-meta-box mt-3 p-3 rounded-lg">
+  <div id="offMetaBox" class="off-meta-box mt-3 p-3 rounded-lg">
     <strong>⚠️ Modo difícil activo</strong>
     <div class="mt-1">
       Llevar en <strong>${offMetaRecommendation.strategyRunName}</strong>, en distancia <strong>${offMetaRecommendation.distance}</strong> y superficie <strong>${offMetaRecommendation.surface}</strong>.
@@ -5865,6 +5865,42 @@ img.classList.remove("hidden");
 
   $('umaName').textContent = u.name;
   $('umaImage').src = u.img;
+
+  // Recalcular Sparks usando los datos de la nueva Uma
+  const offMetaMode = document.getElementById('offMetaMode')?.checked === true;
+  const offMetaRecommendation = offMetaMode
+    ? getOffMetaRecommendation(u)
+    : null;
+
+  const blueSparks = mergeSparks(
+    generateBlueSparks(u, supports)
+  );
+
+  const pinkSparks = mergeSparks(
+    offMetaMode
+      ? generateOffMetaPinkSparks(offMetaRecommendation)
+      : generatePinkSparks(u)
+  );
+
+  const sparksSection = document.getElementById('sparksSection');
+  if(sparksSection){
+    sparksSection.outerHTML = renderSparkPills(blueSparks, pinkSparks);
+  }
+
+  const offMetaBox = document.getElementById('offMetaBox');
+  if(offMetaBox){
+    offMetaBox.outerHTML = offMetaMode ? `
+      <div id="offMetaBox" class="off-meta-box mt-3 p-3 rounded-lg">
+        <strong>⚠️ Modo difícil activo</strong>
+        <div class="mt-1">
+          Llevar en <strong>${offMetaRecommendation.strategyRunName}</strong>, en distancia <strong>${offMetaRecommendation.distance}</strong> y superficie <strong>${offMetaRecommendation.surface}</strong>.
+        </div>
+        <div class="text-xs mt-1 opacity-80">
+          Aptitudes originales: ${offMetaRecommendation.strategy} ${offMetaRecommendation.strategyGrade} · ${offMetaRecommendation.distance} ${offMetaRecommendation.distanceGrade} · ${offMetaRecommendation.surface} ${offMetaRecommendation.surfaceGrade}
+        </div>
+      </div>
+    ` : '';
+  }
 });
 
     // === Inicializar pantalla ===
