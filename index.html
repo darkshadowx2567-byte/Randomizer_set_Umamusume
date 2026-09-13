@@ -43,6 +43,14 @@
           <button id="randomUmaBtn"class="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300">Reroll Uma</button>
         </div>
 
+        <label class="flex items-center gap-2 mt-2 text-sm cursor-pointer">
+          <input type="checkbox" id="offMetaMode" class="w-4 h-4 accent-pink-500">
+          <span>Modo difícil: Aptitudes invertidas</span>
+        </label>
+        <p class="text-xs text-gray-500 mt-1">
+          Recomienda una distancia y estrategia poco favorables para la Uma.
+        </p>
+
         <!-- Bloque visual de selección de Umas -->
         <hr class="my-3" />
         <div>
@@ -5292,6 +5300,286 @@ SCENARIOS
 
 }
 
+
+    // === Recomendador de Sparks ===
+    const SPARK_STATS = ['speed','stamina','power','guts','wit'];
+
+    const SPARK_STAT_LABELS = {
+      speed: 'Speed',
+      stamina: 'Stamina',
+      power: 'Power',
+      guts: 'Guts',
+      wit: 'Wit'
+    };
+
+    const SPARK_STAT_ICONS = {
+      speed: '🏃',
+      stamina: '❤️',
+      power: '💪',
+      guts: '🔥',
+      wit: '🧠'
+    };
+
+    const APTITUDE_VALUES = {
+      A: 5,
+      B: 4,
+      C: 2,
+      D: 1,
+      E: 0,
+      F: 0,
+      G: 0
+    };
+
+    function getBonusNumber(value){
+      if(!value || value === '-') return 0;
+      return parseFloat(String(value).replace('%','')) || 0;
+    }
+
+    function weightedRandom(items){
+      const total = items.reduce((sum,item)=>sum + item.weight,0);
+      let roll = Math.random() * total;
+
+      for(const item of items){
+        roll -= item.weight;
+        if(roll <= 0) return item.value;
+      }
+
+      return items[items.length-1].value;
+    }
+
+    function generateBlueSparks(uma, supports){
+      const candidates = SPARK_STATS.map(stat=>{
+        const label = SPARK_STAT_LABELS[stat];
+        const supportCount = supports[label] || 0;
+        const bonus = getBonusNumber(uma.stats.bonus[stat]);
+        const base = Number(uma.stats.base[stat]) || 0;
+        const finale = Number(uma.stats.finale[stat]) || 0;
+
+        /*
+         * Más peso = más recomendable.
+         * - Menos cartas de ese tipo = más necesidad de herencia.
+         * - Menor bonus = más necesidad de herencia.
+         * - Menor stat base/final = más necesidad de herencia.
+         */
+        let weight = 1;
+        weight += Math.max(0, 2 - supportCount) * 0.9;
+        weight += Math.max(0, 15 - bonus) / 10;
+        weight += Math.max(0, 115 - finale) / 30;
+        weight += Math.max(0, 95 - base) / 40;
+
+        return { value:stat, weight:Math.max(0.2,weight) };
+      });
+
+      const sparks = [];
+
+      for(let i=0;i<3;i++){
+        sparks.push({
+          stat: weightedRandom(candidates),
+          stars: Math.floor(Math.random()*3)+1
+        });
+      }
+
+      return sparks;
+    }
+
+    function getOffMetaRecommendation(uma){
+      const distanceNames = {
+        short:'Sprint',
+        mile:'Mile',
+        medium:'Medium',
+        long:'Long'
+      };
+
+      const strategyNames = {
+        front:'Front',
+        pace:'Pace',
+        late:'Late',
+        end:'End'
+      };
+
+      const strategyRunNames = {
+        front:'Front Runner',
+        pace:'Pace Chaser',
+        late:'Late Surger',
+        end:'End Closer'
+      };
+
+      const pickWeakest = (entries)=>{
+        const values = entries.map(([key,grade])=>({
+          key,
+          grade,
+          score: APTITUDE_VALUES[grade] ?? 0
+        }));
+
+        const weakestScore = Math.min(...values.map(item=>item.score));
+        const weakest = values.filter(item=>item.score===weakestScore);
+        return weakest[Math.floor(Math.random()*weakest.length)];
+      };
+
+      const surfaceNames = {
+        turf:'Turf',
+        dirt:'Dirt'
+      };
+
+      const surface = pickWeakest(Object.entries(uma.stats.aptitude.surface));
+      const distance = pickWeakest(Object.entries(uma.stats.aptitude.distance));
+      const strategy = pickWeakest(Object.entries(uma.stats.aptitude.strategy));
+
+      return {
+        surface: surfaceNames[surface.key],
+        distance: distanceNames[distance.key],
+        strategy: strategyNames[strategy.key],
+        strategyRunName: strategyRunNames[strategy.key],
+        surfaceGrade: surface.grade,
+        distanceGrade: distance.grade,
+        strategyGrade: strategy.grade
+      };
+    }
+
+    function generateOffMetaPinkSparks(recommendation){
+      const values = [
+        recommendation.surface,
+        recommendation.distance,
+        recommendation.strategy
+      ];
+      const sparks = [];
+
+      for(let i=0;i<3;i++){
+        sparks.push({
+          value: values[Math.floor(Math.random()*values.length)],
+          stars: Math.floor(Math.random()*3)+1
+        });
+      }
+
+      return sparks;
+    }
+
+    function generatePinkSparks(uma){
+      const candidates = [];
+
+      const distanceNames = {
+        short:'Sprint',
+        mile:'Mile',
+        medium:'Medium',
+        long:'Long'
+      };
+
+      const strategyNames = {
+        front:'Front',
+        pace:'Pace',
+        late:'Late',
+        end:'End'
+      };
+
+      const surfaceNames = {
+        turf:'Turf',
+        dirt:'Dirt'
+      };
+
+      Object.entries(uma.stats.aptitude.surface).forEach(([key,grade])=>{
+        candidates.push({
+          value:surfaceNames[key],
+          weight:APTITUDE_VALUES[grade] || 0
+        });
+      });
+
+      Object.entries(uma.stats.aptitude.distance).forEach(([key,grade])=>{
+        candidates.push({
+          value:distanceNames[key],
+          weight:APTITUDE_VALUES[grade] || 0
+        });
+      });
+
+      Object.entries(uma.stats.aptitude.strategy).forEach(([key,grade])=>{
+        candidates.push({
+          value:strategyNames[key],
+          weight:APTITUDE_VALUES[grade] || 0
+        });
+      });
+
+      // Si la Uma tiene muy pocas aptitudes utilizables,
+      // permitimos las demás para conservar el componente aleatorio.
+      const usable = candidates.filter(item=>item.weight > 0);
+      const pool = usable.length >= 3
+        ? usable
+        : candidates.map(item=>({
+            ...item,
+            weight: Math.max(1,item.weight)
+          }));
+
+      const sparks = [];
+
+      for(let i=0;i<3;i++){
+        sparks.push({
+          value: weightedRandom(pool),
+          stars: Math.floor(Math.random()*3)+1
+        });
+      }
+
+      return sparks;
+    }
+
+    function mergeSparks(sparks){
+      const merged = {};
+
+      sparks.forEach(spark=>{
+        const value = spark.value ?? spark.stat;
+        if(!value) return;
+        if(!merged[value]) merged[value] = 0;
+        merged[value] += spark.stars || 0;
+      });
+
+      return Object.entries(merged)
+        .map(([value,stars])=>({value,stars}))
+        .sort((a,b)=>b.stars-a.stars);
+    }
+
+    function starsHTML(count){
+      return `<span class="spark-stars">${'★'.repeat(count)}</span>`;
+    }
+
+    function renderSparkPills(blueSparks, pinkSparks){
+      const blue = blueSparks.map(spark=>{
+        const stat = spark.value ?? spark.stat;
+        const label = SPARK_STAT_LABELS[stat] || stat || 'Stat';
+        const icon = SPARK_STAT_ICONS[stat] || '★';
+
+        return `
+        <div class="spark-pill spark-blue">
+          <span>${icon}</span>
+          <strong>${label}</strong>
+          ${starsHTML(spark.stars)}
+        </div>
+        `;
+      }).join('');
+
+      const pink = pinkSparks.map(spark=>`
+        <div class="spark-pill spark-pink">
+          <span>◆</span>
+          <strong>${spark.value}</strong>
+          ${starsHTML(spark.stars)}
+        </div>
+      `).join('');
+
+      return `
+        <div id="sparksSection" class="mt-4">
+          <h4 class="font-semibold mb-2">Sparks recomendadas</h4>
+
+          <div class="spark-row">
+            ${blue}
+          </div>
+
+          <div class="spark-row mt-2">
+            ${pink}
+          </div>
+
+          <p class="text-xs text-gray-500 mt-2">
+            Basado en aptitudes, bonus de stats y composición de soportes.
+          </p>
+        </div>
+      `;
+    }
+
     // === Generar Run ===
     let currentUma = null;
 
@@ -5342,6 +5630,22 @@ availableUmas
 );
 
 currentUma=uma;
+
+const supports = distributeSupports(6,'simple','free');
+const offMetaMode = document.getElementById('offMetaMode')?.checked === true;
+const offMetaRecommendation = offMetaMode
+  ? getOffMetaRecommendation(uma)
+  : null;
+
+const blueSparks = mergeSparks(
+  generateBlueSparks(uma,supports)
+);
+
+const pinkSparks = mergeSparks(
+  offMetaMode
+    ? generateOffMetaPinkSparks(offMetaRecommendation)
+    : generatePinkSparks(uma)
+);
 
   document.getElementById("resultCard").innerHTML=`
 
@@ -5395,8 +5699,34 @@ Escenario recomendado
 
 </div>
 
+${renderSparkPills(blueSparks,pinkSparks)}
+
+${offMetaMode ? `
+  <div class="off-meta-box mt-3 p-3 rounded-lg">
+    <strong>⚠️ Modo difícil activo</strong>
+    <div class="mt-1">
+      Llevar en <strong>${offMetaRecommendation.strategyRunName}</strong>, en distancia <strong>${offMetaRecommendation.distance}</strong> y superficie <strong>${offMetaRecommendation.surface}</strong>.
+    </div>
+    <div class="text-xs mt-1 opacity-80">
+      Aptitudes originales: ${offMetaRecommendation.strategy} ${offMetaRecommendation.strategyGrade} · ${offMetaRecommendation.distance} ${offMetaRecommendation.distanceGrade} · ${offMetaRecommendation.surface} ${offMetaRecommendation.surfaceGrade}
+    </div>
+  </div>
+` : ''}
+
 `;
 
+
+const supportsList = $("supportsList");
+supportsList.innerHTML = '';
+
+Object.entries(supports).forEach(([type,count])=>{
+  if(count > 0){
+    const node = document.createElement('div');
+    node.className = 'p-2 border rounded text-center bg-white';
+    node.innerHTML = `<strong>${type}</strong><div class="text-sm text-gray-600">${count}</div>`;
+    supportsList.appendChild(node);
+  }
+});
 
 document.getElementById(
 "umaName"
@@ -5509,42 +5839,6 @@ img.classList.remove("hidden");
     $("umaModal").classList.remove("hidden");
 
 });
-  
-const supports=
-distributeSupports(
-6,
-'simple',
-'free'
-);
-
-const supportsList=
-document.getElementById(
-"supportsList"
-);
-
-supportsList.innerHTML="";
-
-Object.entries(supports)
-.forEach(([k,v])=>{
-
-if(v>0){
-
-const node=
-document.createElement("div");
-
-node.className=
-'p-2 border rounded text-center bg-white';
-
-node.innerHTML=
-`<strong>${k}</strong>
-<div>${v}</div>`;
-
-supportsList.appendChild(node);
-
-}
-
-});
-
 });
 
     // generar soportes 
@@ -5564,11 +5858,14 @@ supportsList.appendChild(node);
 
         // === Reroll Uma ===
     $('randomUmaBtn').addEventListener('click', ()=> {
-      const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
-      const u = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
-      $('umaName').textContent = u.name;
-      $('umaImage').src = u.img;
-    });
+  const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
+  const u = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
+
+  currentUma = u;
+
+  $('umaName').textContent = u.name;
+  $('umaImage').src = u.img;
+});
 
     // === Inicializar pantalla ===
     document.addEventListener("DOMContentLoaded", ()=>{
@@ -5779,6 +6076,78 @@ color:black !important;
 border-color:#6b7280 !important;
 
 }
+
+
+  /* ===== Sparks recomendadas ===== */
+  .spark-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  .spark-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    min-height:34px;
+    padding:6px 10px;
+    border-radius:9px;
+    font-size:14px;
+    line-height:1;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+  }
+
+  .spark-blue{
+    background:linear-gradient(180deg,#35a9e8 0%,#1684c4 100%);
+    border:1px solid #0f6fa8;
+    color:white;
+  }
+
+  .spark-pink{
+    background:linear-gradient(180deg,#f04b9a 0%,#d72d78 100%);
+    border:1px solid #b51e60;
+    color:white;
+  }
+
+  .spark-stars{
+    color:#ffd84a;
+    letter-spacing:1px;
+    text-shadow:0 1px 1px rgba(0,0,0,.45);
+    white-space:nowrap;
+  }
+
+  @media (max-width: 640px){
+    .spark-pill{
+      font-size:13px;
+      padding:6px 8px;
+    }
+  }
+
+  .darkMode .spark-pill,
+  .darkMode .spark-pill strong,
+  .darkMode .spark-pill span:not(.spark-stars){
+    color:white !important;
+  }
+
+  .darkMode .spark-stars{
+    color:#ffd84a !important;
+  }
+
+  .off-meta-box{
+    background:linear-gradient(180deg,#fef3c7 0%,#fde68a 100%);
+    border:1px solid #f59e0b;
+    color:#78350f;
+  }
+
+  .darkMode .off-meta-box{
+    background:linear-gradient(180deg,#fef3c7 0%,#fde68a 100%) !important;
+    border-color:#f59e0b !important;
+    color:#78350f !important;
+  }
+
+  .darkMode .off-meta-box strong{
+    color:#78350f !important;
+  }
 
 </style>
 
