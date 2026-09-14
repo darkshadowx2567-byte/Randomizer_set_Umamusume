@@ -183,34 +183,44 @@ color:#eee;
   <h1>Support Card Deck Randomizer</h1>
 
   <button onclick="window.location.href='index.html'"
-          id="homeBtn">
+          id="homeBtn" data-i18n="home">
     Volver al inicio
-  </button>
+</button>
 
   <button id="themeBtn">
 🌙
 </button>
 
+<button id="langBtn" class="...">
+    🇺🇸 EN
+</button>
+
 </div>
 </div>
 
-<p class="note">Selecciona el tipo en cada slot (3 arriba, 3 abajo).</p>
+<p class="note" data-i18n="note">
+    Selecciona el tipo en cada slot (3 arriba, 3 abajo).
+</p>
 
   <div class="grid-3" id="grid">
     <!-- Los slots se crearán por JS -->
   </div>
 
   <div class="controls">
-    <button id="generateBtn">Generar</button>
-    <button id="clearDeckBtn">Limpiar Deck</button>
+    <button id="generateBtn" data-i18n="generate">Generar</button>
+    <button id="clearDeckBtn" data-i18n="clearDeck">Limpiar Deck</button>
   </div>
 
   <!-- Botón y contenedor del selector -->
   <div class="controls">
-    <button id="toggleSelectorBtn">Mostrar / Ocultar Selector de Cartas</button>
+    <button id="toggleSelectorBtn" data-i18n="toggleSelector">
+    Mostrar / Ocultar Selector de Cartas
+</button>
   </div>
   <div id="cardSelector" style="display:none; margin-top:20px;">
-    <h3>Selecciona las cartas que NO deseas incluir:</h3>    
+    <h3 data-i18n="selectorTitle">
+    Selecciona las cartas que NO deseas incluir:
+</h3>    
       <div id="typeIcons" style="display:flex;justify-content:center;gap:12px;margin:16px 0;">
       <img src="https://gametora.com/images/umamusume/icons/utx_ico_obtain_00.png" alt="Speed" data-type="Speed" class="type-icon bw" title="Speed">
       <img src="https://gametora.com/images/umamusume/icons/utx_ico_obtain_01.png" alt="Stamina" data-type="Stamina" class="type-icon bw" title="Stamina">
@@ -222,15 +232,43 @@ color:#eee;
     </div>
 
     <div style="text-align:center;margin-bottom:15px;">
-    <button onclick="toggleAllCards()" id="toggleAllBtn">
-        Seleccionar todas
-    </button>
+    <button onclick="toggleAllCards()" id="toggleAllBtn" data-i18n="selectAll">
+    Seleccionar todas
 </div>
     
     <div id="allCardsGrid" style="display:flex;flex-wrap:wrap;max-width:980px;margin:12px auto"></div>
   </div>
 
   <script>
+    const TRANSLATIONS = {
+  es: {
+    home: "Volver al inicio",
+    note: "Selecciona el tipo en cada slot (3 arriba, 3 abajo).",
+    generate: "Generar",
+    clearDeck: "Limpiar Deck",
+    toggleSelector: "Mostrar / Ocultar Selector de Cartas",
+    selectorTitle: "Selecciona las cartas que NO deseas incluir:",
+    selectAll: "Seleccionar todas",
+    deselectAll: "Deseleccionar todas"
+  },
+
+  en: {
+    home: "Back to Home",
+    note: "Select the type for each slot (3 top, 3 bottom).",
+    generate: "Generate",
+    clearDeck: "Clear Deck",
+    toggleSelector: "Show / Hide Card Selector",
+    selectorTitle: "Select the cards you do NOT want to include:",
+    selectAll: "Select all",
+    deselectAll: "Deselect all"
+  }
+};
+
+let currentLanguage = localStorage.getItem("language") || "es";
+
+function t(key) {
+  return TRANSLATIONS[currentLanguage][key] ?? key;
+}
     /* =========================
        Datos: añade tus cartas aquí
        Estructura: SUPPORT_CARDS[Tipo][Rareza] = [{name, img}, ...]
@@ -842,16 +880,17 @@ function toggleAllCards() {
   // Si el texto actual es "Seleccionar todas", entonces al hacer clic queremos
   // pasar todas a blanco y negro (deshabilitarlas). Si el texto es "Deseleccionar todas",
   // queremos devolverlas a color (habilitarlas).
-  const selectingAll = btn.innerText === "Seleccionar todas";
+  const selectingAll = btn.dataset.state !== "allSelected";
 
-  if (selectingAll) {
+if (selectingAll) {
     // Poner todas en blanco y negro y marcarlas como deshabilitadas
     allImages.forEach(img => {
       disabledCards.add(img.title);
       img.classList.add("disabled");
       img.style.filter = "grayscale(100%)";
     });
-    btn.innerText = "Deseleccionar todas";
+    btn.dataset.state = "allSelected";
+    btn.textContent = t("deselectAll");
   } else {
     // Volver todas a color y quitarlas de deshabilitadas
     allImages.forEach(img => {
@@ -859,7 +898,8 @@ function toggleAllCards() {
       img.classList.remove("disabled");
       img.style.filter = "grayscale(0)";
     });
-    btn.innerText = "Seleccionar todas";
+    btn.dataset.state = "";
+    btn.textContent = t("selectAll");
   }
   saveDisabledCards();
 }
@@ -1027,6 +1067,43 @@ setTimeout(()=>{
 loadSlotSelections();
 applyTheme();
 },0);
+
+function applyLanguage() {
+
+    document.documentElement.lang = currentLanguage;
+
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+        el.textContent = t(el.dataset.i18n);
+    });
+
+    const langBtn = document.getElementById("langBtn");
+
+    if (langBtn) {
+        langBtn.textContent =
+            currentLanguage === "es" ? "🇺🇸 EN" : "🇪🇸 ES";
+    }
+
+    const toggleAllBtn = document.getElementById("toggleAllBtn");
+
+    if (toggleAllBtn) {
+        toggleAllBtn.textContent =
+            toggleAllBtn.dataset.state === "allSelected"
+                ? t("deselectAll")
+                : t("selectAll");
+    }
+}
+
+document.getElementById("langBtn").addEventListener("click", () => {
+
+    currentLanguage =
+        currentLanguage === "es" ? "en" : "es";
+
+    localStorage.setItem("language", currentLanguage);
+
+    applyLanguage();
+});
+
+applyLanguage();
     
   </script>
 
