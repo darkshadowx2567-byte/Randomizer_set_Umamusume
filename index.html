@@ -4,9 +4,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Uma Run Randomizer — Generador de sets para Uma Musume</title>
+  <title data-i18n-title="pageTitle">Uma Run Randomizer — Generador de sets para Uma Musume</title>
   <link rel="icon" type="image/x-icon" href="logo.png">
-  <meta name="description" content="Generador de retos / sets randomizados para Uma Musume (train & supports)." />
+  <meta name="description" data-i18n-meta="pageDescription" content="Generador de retos / sets randomizados para Uma Musume (train & supports)." />
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -17,14 +17,14 @@
         Uma Challenge Randomizer
     </h1>
 
-    <p class="text-sm text-gray-600 mb-4">
+    <p class="text-sm text-gray-600 mb-4" data-i18n="subtitle">
         Genera retos y composiciones de cartas de soporte
     </p>
 
     <a href="support.html"
     class="inline-block bg-pink-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-pink-600 transition shadow">
 
-        🎴 Soporte
+        🎴 <span data-i18n="support">Soporte</span>
 
     </a>
 
@@ -32,6 +32,13 @@
     id="themeBtn"
     class="ml-3 bg-gray-300 px-4 py-3 rounded-xl">
     🌙
+  </button>
+
+  <button
+    id="langBtn"
+    class="ml-2 bg-gray-300 text-blue-600 px-4 py-3 rounded-xl font-bold"
+    aria-label="Change language">
+    🇺🇸 EN
   </button>
 
 </header>
@@ -45,21 +52,21 @@
 
         <label class="flex items-center gap-2 mt-2 text-sm cursor-pointer">
           <input type="checkbox" id="offMetaMode" class="w-4 h-4 accent-pink-500">
-          <span>Modo difícil: Aptitudes invertidas</span>
+          <span data-i18n="hardMode">Modo difícil: Aptitudes invertidas</span>
         </label>
         <p class="text-xs text-gray-500 mt-1">
-          Recomienda una distancia y estrategia poco favorables para la Uma.
+          <span data-i18n="hardModeDesc">Recomienda una distancia y estrategia poco favorables para la Uma.</span>
         </p>
 
         <!-- Bloque visual de selección de Umas -->
         <hr class="my-3" />
         <div>
-          <label class="block text-xs text-gray-600 mb-2">Bloquear Umas</label>
+          <label class="block text-xs text-gray-600 mb-2" data-i18n="blockUmas">Bloquear Umas</label>
             <div class="flex gap-2 mb-2">
-            <button id="showUmaSelector" class="flex-1 bg-pink-500 text-white py-2 rounded hover:bg-pink-600">Mostrar lista de Umas</button>
-            <button id="toggleAllUmas" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400">Seleccionar/Deseleccionar todas</button>
+            <button id="showUmaSelector" data-i18n="showUmas" class="flex-1 bg-pink-500 text-white py-2 rounded hover:bg-pink-600">Mostrar lista de Umas</button>
+            <button id="toggleAllUmas" data-i18n="toggleUmas" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400">Seleccionar/Deseleccionar todas</button>
           </div>
-          <small class="text-xs text-gray-500">Haz click en las imágenes para bloquear/desbloquear (gris = bloqueada).</small>
+          <small class="text-xs text-gray-500" data-i18n="blockHint">Haz click en las imágenes para bloquear/desbloquear (gris = bloqueada).</small>
 
           <div id="umaSelector" class="hidden mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 max-h-96 overflow-y-auto border p-2 rounded bg-gray-50"></div>
         </div>
@@ -70,8 +77,8 @@
       <section class="lg:col-span-2 bg-white p-6 rounded-2xl shadow">
         <div class="flex items-start justify-between">
           <div>
-            <h2 id="resultTitle" class="text-2xl font-bold">Resultado</h2>
-            <p id="resultSubtitle" class="text-sm text-gray-600">Presiona <strong>Generar</strong> para crear una run nueva.</p>
+            <h2 id="resultTitle" data-i18n="result" class="text-2xl font-bold">Resultado</h2>
+            <p id="resultSubtitle" class="text-sm text-gray-600" data-i18n-html="resultSubtitle">Presiona <strong>Generar</strong> para crear una run nueva.</p>
           </div>
         </div>
 
@@ -91,7 +98,7 @@ class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
         <h3 id="umaName"
         class="text-xl font-semibold text-gray-500">
 
-            Presiona Generar 🎲
+            <span data-i18n="generatePrompt">Presiona Generar 🎲</span>
 
         </h3>
     </div>
@@ -100,8 +107,8 @@ class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
 
     <div id="supportsSection" class="mt-4 hidden">
 
-    <h4 class="font-semibold">
-        Composición de soportes
+    <h4 class="font-semibold" data-i18n="supportComposition">
+        ${t("supportComposition")}
     </h4>
 
     <div
@@ -5173,6 +5180,129 @@ localStorage.getItem("blockedUmas")
 
 const $ = id => document.getElementById(id);
 
+/* === Sistema de idiomas ES / EN === */
+const TRANSLATIONS = {
+  es: {
+    pageTitle: "Uma Run Randomizer — Generador de sets para Uma Musume",
+    pageDescription: "Generador de retos / sets randomizados para Uma Musume (train & supports).",
+    subtitle: "Genera retos y composiciones de cartas de soporte",
+    support: "Soporte",
+    hardMode: "Modo difícil: Aptitudes invertidas",
+    hardModeDesc: "Recomienda una distancia y estrategia poco favorables para la Uma.",
+    blockUmas: "Bloquear Umas",
+    showUmas: "Mostrar lista de Umas",
+    toggleUmas: "Seleccionar/Deseleccionar todas",
+    blockHint: "Haz click en las imágenes para bloquear/desbloquear (gris = bloqueada).",
+    result: "Resultado",
+    resultSubtitle: "Presiona <strong>Generar</strong> para crear una run nueva.",
+    supportComposition: "Composición de soportes",
+    generate: "Generar",
+    generatePrompt: "Presiona Generar 🎲",
+    reroll: "Reroll Uma",
+    emptyTitle: "Aún no has generado una Uma",
+    emptyText: "Presiona <strong>Generar</strong> para comenzar una nueva run.",
+    scenario: "Escenario recomendado",
+    sparks: "Sparks recomendadas",
+    sparksBased: "Basado en aptitudes, bonus de stats y composición de soportes.",
+    hardActive: "⚠️ Modo difícil activo",
+    carry: "Llevar en",
+    distance: "distancia",
+    surface: "superficie",
+    originalAptitudes: "Aptitudes originales",
+    baseStats: "Base stats",
+    finaleStats: "Finale stats",
+    statBonuses: "Stat bonuses",
+    aptitude: "Aptitude",
+    surfaceLabel: "Surface:",
+    distanceLabel: "Distance:",
+    strategyLabel: "Strategy:"
+  },
+  en: {
+    pageTitle: "Uma Run Randomizer — Uma Musume Set Generator",
+    pageDescription: "Random challenge / set generator for Uma Musume (train & supports).",
+    subtitle: "Generate challenges and support card compositions",
+    support: "Support",
+    hardMode: "Hard mode: Inverted Aptitudes",
+    hardModeDesc: "Recommends an unfavorable distance and strategy for the Uma.",
+    blockUmas: "Block Umas",
+    showUmas: "Show Uma list",
+    toggleUmas: "Select/Deselect all",
+    blockHint: "Click the images to block/unblock (gray = blocked).",
+    result: "Result",
+    resultSubtitle: "Press <strong>Generate</strong> to create a new run.",
+    supportComposition: "Support composition",
+    generate: "Generate",
+    generatePrompt: "Press Generate 🎲",
+    reroll: "Reroll Uma",
+    emptyTitle: "You haven't generated an Uma yet",
+    emptyText: "Press <strong>Generate</strong> to start a new run.",
+    scenario: "Recommended scenario",
+    sparks: "Recommended Sparks",
+    sparksBased: "Based on aptitudes, stat bonuses, and support composition.",
+    hardActive: "⚠️ Hard mode active",
+    carry: "Run as",
+    distance: "distance",
+    surface: "surface",
+    originalAptitudes: "Original aptitudes",
+    baseStats: "Base stats",
+    finaleStats: "Finale stats",
+    statBonuses: "Stat bonuses",
+    aptitude: "Aptitude",
+    surfaceLabel: "Surface:",
+    distanceLabel: "Distance:",
+    strategyLabel: "Strategy:"
+  }
+};
+
+let currentLanguage = localStorage.getItem("language") || "es";
+
+function t(key){
+  return TRANSLATIONS[currentLanguage][key] ?? key;
+}
+
+function applyLanguage(){
+  document.documentElement.lang = currentLanguage;
+
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+
+  document.querySelectorAll("[data-i18n-html]").forEach(el => {
+    el.innerHTML = t(el.dataset.i18nHtml);
+  });
+
+  const title = document.querySelector("[data-i18n-title]");
+  if(title) title.textContent = t("pageTitle");
+
+  const meta = document.querySelector("[data-i18n-meta]");
+  if(meta) meta.setAttribute("content", t("pageDescription"));
+
+  if($("generateBtn")) $("generateBtn").textContent = t("generate");
+  if($("randomUmaBtn")) $("randomUmaBtn").textContent = t("reroll");
+
+  const langBtn = $("langBtn");
+  if(langBtn){
+    langBtn.textContent = currentLanguage === "es" ? "🇺🇸 EN" : "🇪🇸 ES";
+  }
+
+  if(currentUma){
+    renderCurrentResultLanguage();
+  }
+}
+
+function renderCurrentResultLanguage(){
+  const resultTitle = $("resultTitle");
+  if(resultTitle) resultTitle.textContent = t("result");
+}
+
+if($("langBtn")){
+  $("langBtn").addEventListener("click", ()=>{
+    currentLanguage = currentLanguage === "es" ? "en" : "es";
+    localStorage.setItem("language", currentLanguage);
+    applyLanguage();
+  });
+}
+
 function saveSelections(){
 
 localStorage.setItem(
@@ -5563,7 +5693,7 @@ SCENARIOS
 
       return `
         <div id="sparksSection" class="mt-4">
-          <h4 class="font-semibold mb-2">Sparks recomendadas</h4>
+          <h4 class="font-semibold mb-2">${t("sparks")}</h4>
 
           <div class="spark-row">
             ${blue}
@@ -5574,7 +5704,7 @@ SCENARIOS
           </div>
 
           <p class="text-xs text-gray-500 mt-2">
-            Basado en aptitudes, bonus de stats y composición de soportes.
+            ${t("sparksBased")}
           </p>
         </div>
       `;
@@ -5606,11 +5736,11 @@ class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
         </div>
 
         <h3 class="text-xl font-bold text-gray-700 mb-2">
-            Aún no has generado una Uma
+            ${t("emptyTitle")}
         </h3>
 
         <p class="text-gray-500 text-center">
-            Presiona <strong>Generar</strong> para comenzar una nueva run.
+            ${t("emptyText")}
         </p>
 
     </div>
@@ -5675,7 +5805,7 @@ ${uma.name}
   <div class="mt-4 p-3 rounded bg-indigo-100">
 
 <h4 class="font-semibold">
-Escenario recomendado
+${t("scenario")}
 </h4>
 
 <div class="text-indigo-700 font-bold">
@@ -5688,8 +5818,8 @@ Escenario recomendado
 
 <div id="supportsSection" class="mt-4">
 
-    <h4 class="font-semibold">
-        Composición de soportes
+    <h4 class="font-semibold" data-i18n="supportComposition">
+        ${t("supportComposition")}
     </h4>
 
     <div
@@ -5703,12 +5833,12 @@ ${renderSparkPills(blueSparks,pinkSparks)}
 
 ${offMetaMode ? `
   <div id="offMetaBox" class="off-meta-box mt-3 p-3 rounded-lg">
-    <strong>⚠️ Modo difícil activo</strong>
+    <strong>${t("hardActive")}</strong>
     <div class="mt-1">
-      Llevar en <strong>${offMetaRecommendation.strategyRunName}</strong>, en distancia <strong>${offMetaRecommendation.distance}</strong> y superficie <strong>${offMetaRecommendation.surface}</strong>.
+      ${t("carry")} <strong>${offMetaRecommendation.strategyRunName}</strong>, ${t("distance")} <strong>${offMetaRecommendation.distance}</strong> y ${t("surface")} <strong>${offMetaRecommendation.surface}</strong>.
     </div>
     <div class="text-xs mt-1 opacity-80">
-      Aptitudes originales: ${offMetaRecommendation.strategy} ${offMetaRecommendation.strategyGrade} · ${offMetaRecommendation.distance} ${offMetaRecommendation.distanceGrade} · ${offMetaRecommendation.surface} ${offMetaRecommendation.surfaceGrade}
+      ${t("originalAptitudes")}: ${offMetaRecommendation.strategy} ${offMetaRecommendation.strategyGrade} · ${offMetaRecommendation.distance} ${offMetaRecommendation.distanceGrade} · ${offMetaRecommendation.surface} ${offMetaRecommendation.surfaceGrade}
     </div>
   </div>
 ` : ''}
@@ -5891,12 +6021,12 @@ img.classList.remove("hidden");
   if(offMetaBox){
     offMetaBox.outerHTML = offMetaMode ? `
       <div id="offMetaBox" class="off-meta-box mt-3 p-3 rounded-lg">
-        <strong>⚠️ Modo difícil activo</strong>
+        <strong>${t("hardActive")}</strong>
         <div class="mt-1">
-          Llevar en <strong>${offMetaRecommendation.strategyRunName}</strong>, en distancia <strong>${offMetaRecommendation.distance}</strong> y superficie <strong>${offMetaRecommendation.surface}</strong>.
+          ${t("carry")} <strong>${offMetaRecommendation.strategyRunName}</strong>, ${t("distance")} <strong>${offMetaRecommendation.distance}</strong> y ${t("surface")} <strong>${offMetaRecommendation.surface}</strong>.
         </div>
         <div class="text-xs mt-1 opacity-80">
-          Aptitudes originales: ${offMetaRecommendation.strategy} ${offMetaRecommendation.strategyGrade} · ${offMetaRecommendation.distance} ${offMetaRecommendation.distanceGrade} · ${offMetaRecommendation.surface} ${offMetaRecommendation.surfaceGrade}
+          ${t("originalAptitudes")}: ${offMetaRecommendation.strategy} ${offMetaRecommendation.strategyGrade} · ${offMetaRecommendation.distance} ${offMetaRecommendation.distanceGrade} · ${offMetaRecommendation.surface} ${offMetaRecommendation.surfaceGrade}
         </div>
       </div>
     ` : '';
@@ -5968,6 +6098,7 @@ applyTheme();
 );
 
 applyTheme();
+applyLanguage();
 
   </script>
 
