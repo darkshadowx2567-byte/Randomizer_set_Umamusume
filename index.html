@@ -3846,6 +3846,55 @@ class="mt-4 border rounded p-4 bg-gradient-to-r from-white to-gray-50">
     }
   },
 
+  {name: 'Nakayama Festa [Desperate Measures]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1049_104901.png',
+  stats:{
+      base:{
+        speed:97,
+        stamina:92,
+        power:99,
+        guts:75,
+        wit:87
+      },
+
+      finale:{
+        speed:119,
+        stamina:113,
+        power:121,
+        guts:92,
+        wit:105
+      },
+
+      bonus:{
+        speed:"10%",
+        stamina:"10%",
+        power:"10%",
+        guts:"-",
+        wit:"-"
+      },
+
+      aptitude:{
+        surface:{
+          turf:"A",
+          dirt:"G"
+        },
+        
+        distance:{
+          short:"G",
+          mile:"C",
+          medium:"A",
+          long:"B"
+        },
+        
+        strategy:{
+          front:"G",
+          pace:"A",
+          late:"A",
+          end:"D"
+        }
+      }
+    }
+  },
+
   {name: 'Narita Taishin [Nevertheless]', img: 'https://gametora.com/images/umamusume/characters/thumb/chara_stand_1050_105001.png',
     stats:{
       base:{
@@ -5693,7 +5742,7 @@ SCENARIOS
 
       return `
         <div id="sparksSection" class="mt-4">
-          <h4 class="font-semibold mb-2">${t("sparks")}</h4>
+          <h4 class="font-semibold mb-2" data-i18n="sparks">${t("sparks")}</h4>
 
           <div class="spark-row">
             ${blue}
@@ -5703,7 +5752,7 @@ SCENARIOS
             ${pink}
           </div>
 
-          <p class="text-xs text-gray-500 mt-2">
+          <p class="text-xs text-gray-500 mt-2" data-i18n="sparksBased">
             ${t("sparksBased")}
           </p>
         </div>
