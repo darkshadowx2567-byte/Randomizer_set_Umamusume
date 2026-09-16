@@ -249,7 +249,10 @@ color:#eee;
     toggleSelector: "Mostrar / Ocultar Selector de Cartas",
     selectorTitle: "Selecciona las cartas que NO deseas incluir:",
     selectAll: "Seleccionar todas",
-    deselectAll: "Deseleccionar todas"
+    deselectAll: "Deseleccionar todas",
+    noCard: "Sin carta generada",
+    type: "Tipo",
+    borrowed: "Prestada"
   },
 
   en: {
@@ -260,7 +263,10 @@ color:#eee;
     toggleSelector: "Show / Hide Card Selector",
     selectorTitle: "Select the cards you do NOT want to include:",
     selectAll: "Select all",
-    deselectAll: "Deselect all"
+    deselectAll: "Deselect all",
+    noCard: "No card generated",
+    type: "Type",
+    borrowed: "Borrowed"
   }
 };
 
@@ -670,10 +676,10 @@ function loadDisabledCards(){
       slot.id = `slot-${i}`;
       slot.innerHTML = `
         <div class="chosen" id="chosen-${i}">
-          <div class="placeholder" style="color:var(--muted)">Sin carta generada</div>
+          <div class="placeholder" style="color:var(--muted)" data-i18n="noCard">${t("noCard")}</div>
         </div>
-        <label style="display:block;margin-top:8px;font-weight:600">
-  ${i === 6 ? "Slot 6 — Prestada" : `Slot ${i} — Tipo`}
+        <label class="slot-label" data-slot-number="${i}" style="display:block;margin-top:8px;font-weight:600">
+  ${i === 6 ? `Slot 6 — ${t("borrowed")}` : `Slot ${i} — ${t("type")}`}
 </label>
         <select id="type-${i}" data-slot="${i}">
           <option value="Speed">Speed</option>
@@ -999,7 +1005,7 @@ if (available.length === 0) {
     document.getElementById('clearDeckBtn').addEventListener('click', () => {
       for (let i = 1; i <= SLOT_COUNT; i++) {
         const chosenDiv = document.getElementById(`chosen-${i}`);
-        chosenDiv.innerHTML = `<div class="placeholder" style="color:var(--muted)">Sin carta generada</div>`;
+        chosenDiv.innerHTML = `<div class="placeholder" style="color:var(--muted)" data-i18n="noCard">${t("noCard")}</div>`;
       }
     });
 
@@ -1091,6 +1097,15 @@ function applyLanguage() {
                 ? t("deselectAll")
                 : t("selectAll");
     }
+
+    // Actualizar los textos que se generan dinámicamente dentro de los 6 slots.
+    document.querySelectorAll(".slot-label").forEach(label => {
+        const slotNumber = Number(label.dataset.slotNumber);
+        label.textContent =
+            slotNumber === 6
+                ? `Slot 6 — ${t("borrowed")}`
+                : `Slot ${slotNumber} — ${t("type")}`;
+    });
 }
 
 document.getElementById("langBtn").addEventListener("click", () => {
