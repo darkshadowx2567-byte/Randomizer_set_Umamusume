@@ -6685,6 +6685,396 @@ border-color:#6b7280 !important;
     color:#78350f !important;
   }
 
+
+  /* =========================================================
+     RENOVACIÓN VISUAL — Uma Challenge Randomizer
+     Fondo reemplazable: fondo-uma.png
+     No modifica la lógica JavaScript del randomizer.
+     ========================================================= */
+
+  html {
+    min-height: 100%;
+    background: #100e18;
+  }
+
+  body {
+    position: relative;
+    isolation: isolate;
+    min-height: 100vh;
+    background: transparent !important;
+    color: #f7f2ff !important;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background-image: url("fondo-uma.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    transform: scale(1.015);
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, rgba(13, 11, 22, .94) 0%, rgba(17, 14, 29, .78) 48%, rgba(17, 14, 29, .40) 100%),
+      linear-gradient(180deg, rgba(12, 10, 19, .34), rgba(12, 10, 19, .72));
+    transition: background .25s ease;
+  }
+
+  body > .max-w-7xl {
+    position: relative;
+    z-index: 0;
+    width: min(100% - 28px, 1240px);
+    max-width: 1240px;
+    padding: clamp(14px, 3vw, 32px);
+  }
+
+  header {
+    padding: clamp(18px, 3vw, 30px) 16px 22px;
+    margin-bottom: 22px !important;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 24px;
+    background: linear-gradient(135deg, rgba(22, 18, 35, .88), rgba(22, 18, 35, .58));
+    box-shadow: 0 18px 50px rgba(0,0,0,.22);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  header h1 {
+    color: #fff4df;
+    letter-spacing: -.035em;
+    line-height: 1.12;
+    text-shadow: 0 3px 18px rgba(0,0,0,.4);
+  }
+
+  header [data-i18n="subtitle"] {
+    color: #d4cce4 !important;
+    margin-top: 10px;
+  }
+
+  header a,
+  #themeBtn,
+  #langBtn,
+  #generateBtn,
+  #randomUmaBtn,
+  #showUmaSelector,
+  #toggleAllUmas {
+    min-height: 44px;
+    border-radius: 12px !important;
+    font-weight: 700;
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+  }
+
+  header a,
+  #generateBtn,
+  #showUmaSelector {
+    background: linear-gradient(135deg, #f34e9d, #d92d82) !important;
+    color: #fff !important;
+    box-shadow: 0 7px 20px rgba(222, 47, 132, .22);
+  }
+
+  #generateBtn {
+    background: linear-gradient(135deg, #8d7cff, #6657ed) !important;
+  }
+
+  #randomUmaBtn,
+  #themeBtn,
+  #langBtn,
+  #toggleAllUmas {
+    background: rgba(255,255,255,.12) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255,255,255,.18);
+  }
+
+  header a:hover,
+  #themeBtn:hover,
+  #langBtn:hover,
+  #generateBtn:hover,
+  #randomUmaBtn:hover,
+  #showUmaSelector:hover,
+  #toggleAllUmas:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+    box-shadow: 0 9px 22px rgba(0,0,0,.22);
+  }
+
+  main {
+    align-items: start;
+    gap: 20px !important;
+  }
+
+  main > section {
+    min-width: 0;
+    border: 1px solid rgba(255,255,255,.16) !important;
+    border-radius: 22px !important;
+    background: rgba(25, 21, 39, .84) !important;
+    color: #f7f2ff !important;
+    box-shadow: 0 18px 48px rgba(0,0,0,.24) !important;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  main > section:first-child {
+    padding: clamp(16px, 2vw, 22px) !important;
+  }
+
+  main > section:last-child {
+    padding: clamp(18px, 2.5vw, 30px) !important;
+  }
+
+  #resultTitle {
+    color: #fff4df !important;
+    letter-spacing: -.02em;
+  }
+
+  #resultSubtitle,
+  main label,
+  main small,
+  main p,
+  main .text-gray-500,
+  main .text-gray-600 {
+    color: #d2cadd !important;
+  }
+
+  main hr {
+    border-color: rgba(255,255,255,.16);
+  }
+
+  #resultCard {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    border: 1px solid rgba(255,255,255,.16) !important;
+    border-radius: 16px !important;
+    background: linear-gradient(135deg, rgba(37, 31, 56, .94), rgba(24, 22, 39, .90)) !important;
+    color: #f7f2ff !important;
+  }
+
+  #resultCard h3,
+  #resultCard h4,
+  #resultCard strong,
+  #resultCard .text-gray-700,
+  #resultCard .text-gray-800 {
+    color: #fff4df !important;
+  }
+
+  #umaImage {
+    flex-shrink: 0;
+    border: 2px solid rgba(239, 180, 105, .72);
+    border-radius: 16px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,.28);
+  }
+
+  #umaSelector {
+    border-color: rgba(255,255,255,.18) !important;
+    border-radius: 14px !important;
+    background: rgba(12, 10, 20, .45) !important;
+  }
+
+  #umaSelector > * {
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  input[type="checkbox"] {
+    accent-color: #f04b9b;
+  }
+
+  /* El tema oscuro mantiene paneles y textos con buen contraste. */
+  body.darkMode::after {
+    background:
+      linear-gradient(90deg, rgba(8, 7, 14, .96) 0%, rgba(13, 10, 23, .84) 48%, rgba(13, 10, 23, .58) 100%),
+      linear-gradient(180deg, rgba(8, 7, 14, .38), rgba(8, 7, 14, .78));
+  }
+
+  body.darkMode main > section {
+    background: rgba(25, 21, 39, .88) !important;
+    color: #f7f2ff !important;
+  }
+
+  body.darkMode .bg-white,
+  body.darkMode .bg-gray-50,
+  body.darkMode .bg-gray-100,
+  body.darkMode .bg-indigo-100 {
+    background-color: rgba(37, 31, 56, .96) !important;
+    border-color: rgba(255,255,255,.17) !important;
+  }
+
+  body.darkMode .bg-white *,
+  body.darkMode .bg-gray-50 *,
+  body.darkMode .bg-gray-100 *,
+  body.darkMode .bg-indigo-100 * {
+    color: #f7f2ff !important;
+  }
+
+  body.darkMode #resultCard {
+    background: linear-gradient(135deg, rgba(37, 31, 56, .96), rgba(24, 22, 39, .94)) !important;
+  }
+
+  body.darkMode input,
+  body.darkMode select {
+    background-color: #292338 !important;
+    color: #fff !important;
+    border-color: rgba(255,255,255,.22) !important;
+  }
+
+  body.darkMode #randomUmaBtn,
+  body.darkMode #themeBtn,
+  body.darkMode #langBtn,
+  body.darkMode #toggleAllUmas {
+    background: rgba(255,255,255,.10) !important;
+    color: #fff !important;
+  }
+
+  /* El modo claro conserva la ilustración, con superficies claras. */
+  body:not(.darkMode) {
+    color: #211b2b !important;
+  }
+
+  body:not(.darkMode)::after {
+    background:
+      linear-gradient(90deg, rgba(17, 13, 25, .72) 0%, rgba(25, 18, 34, .48) 52%, rgba(25, 18, 34, .20) 100%),
+      linear-gradient(180deg, rgba(255,255,255,.04), rgba(15,10,22,.35));
+  }
+
+  body:not(.darkMode) main > section {
+    background: rgba(255, 250, 255, .93) !important;
+    border-color: rgba(255,255,255,.72) !important;
+    color: #292234 !important;
+  }
+
+  body:not(.darkMode) #resultTitle,
+  body:not(.darkMode) #resultCard h3,
+  body:not(.darkMode) #resultCard h4,
+  body:not(.darkMode) #resultCard strong,
+  body:not(.darkMode) #resultCard .text-gray-700,
+  body:not(.darkMode) #resultCard .text-gray-800 {
+    color: #292234 !important;
+  }
+
+  body:not(.darkMode) #resultSubtitle,
+  body:not(.darkMode) main label,
+  body:not(.darkMode) main small,
+  body:not(.darkMode) main p,
+  body:not(.darkMode) main .text-gray-500,
+  body:not(.darkMode) main .text-gray-600 {
+    color: #5e536a !important;
+  }
+
+  body:not(.darkMode) #resultCard {
+    background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(246,240,250,.96)) !important;
+    border-color: #e1d7eb !important;
+    color: #292234 !important;
+  }
+
+  body:not(.darkMode) #umaSelector {
+    background: rgba(246, 240, 250, .96) !important;
+    border-color: #ded2e8 !important;
+  }
+
+  body:not(.darkMode) #randomUmaBtn,
+  body:not(.darkMode) #themeBtn,
+  body:not(.darkMode) #langBtn,
+  body:not(.darkMode) #toggleAllUmas {
+    background: #eee7f5 !important;
+    color: #3c2e50 !important;
+    border-color: #d8c9e7 !important;
+  }
+
+  body:not(.darkMode) input,
+  body:not(.darkMode) select {
+    color: #292234;
+    border-color: #d7cce1;
+  }
+
+  /* Mantiene el cuadro amarillo del modo difícil legible. */
+  .off-meta-box,
+  body.darkMode .off-meta-box {
+    background: linear-gradient(180deg, #fff3c4 0%, #ffe18a 100%) !important;
+    border: 1px solid #e6a928 !important;
+    color: #70440a !important;
+  }
+
+  .off-meta-box strong,
+  body.darkMode .off-meta-box strong {
+    color: #70440a !important;
+  }
+
+  /* Ajustes de distribución para zoom, ventanas pequeñas y Android. */
+  @media (max-width: 1023px) {
+    main {
+      grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    main > section {
+      grid-column: 1 / -1 !important;
+    }
+  }
+
+  @media (max-width: 640px) {
+    body > .max-w-7xl {
+      width: calc(100% - 12px);
+      padding: 10px 6px 22px;
+    }
+
+    header {
+      padding: 20px 12px !important;
+      border-radius: 18px;
+    }
+
+    header h1 {
+      font-size: clamp(1.65rem, 7vw, 2.2rem) !important;
+      overflow-wrap: anywhere;
+    }
+
+    header a,
+    #themeBtn,
+    #langBtn {
+      margin: 5px 3px 0 !important;
+      padding-left: 12px !important;
+      padding-right: 12px !important;
+    }
+
+    main > section:first-child,
+    main > section:last-child {
+      padding: 14px !important;
+      border-radius: 17px !important;
+    }
+
+    #generateBtn,
+    #randomUmaBtn,
+    #showUmaSelector,
+    #toggleAllUmas {
+      min-width: 0;
+      padding-left: 10px !important;
+      padding-right: 10px !important;
+      overflow-wrap: anywhere;
+    }
+
+    #resultCard {
+      padding: 12px !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      transition-duration: .01ms !important;
+      animation-duration: .01ms !important;
+    }
+  }
+
 </style>
 
 </body>
