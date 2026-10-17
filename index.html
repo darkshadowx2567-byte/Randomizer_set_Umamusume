@@ -6725,10 +6725,11 @@ border-color:#6b7280 !important;
     inset: 0;
     z-index: -1;
     pointer-events: none;
+    /* Sombra decorativa constante: se conserva en ambos temas sin oscurecer más la imagen en modo oscuro. */
     background:
-      linear-gradient(90deg, rgba(13, 11, 22, .94) 0%, rgba(17, 14, 29, .78) 48%, rgba(17, 14, 29, .40) 100%),
-      linear-gradient(180deg, rgba(12, 10, 19, .34), rgba(12, 10, 19, .72));
-    transition: background .25s ease;
+      linear-gradient(90deg, rgba(17, 13, 25, .72) 0%, rgba(25, 18, 34, .48) 52%, rgba(25, 18, 34, .20) 100%),
+      linear-gradient(180deg, rgba(255,255,255,.04), rgba(15,10,22,.35));
+    transition: none;
   }
 
   body > .max-w-7xl {
@@ -6890,10 +6891,12 @@ border-color:#6b7280 !important;
   }
 
   /* El tema oscuro mantiene paneles y textos con buen contraste. */
-  body.darkMode::after {
+  body.darkMode::after,
+  body:not(.darkMode)::after {
+    /* La misma sombra suave se mantiene en ambos temas; el modo oscuro no añade otra capa. */
     background:
-      linear-gradient(90deg, rgba(8, 7, 14, .96) 0%, rgba(13, 10, 23, .84) 48%, rgba(13, 10, 23, .58) 100%),
-      linear-gradient(180deg, rgba(8, 7, 14, .38), rgba(8, 7, 14, .78));
+      linear-gradient(90deg, rgba(17, 13, 25, .72) 0%, rgba(25, 18, 34, .48) 52%, rgba(25, 18, 34, .20) 100%),
+      linear-gradient(180deg, rgba(255,255,255,.04), rgba(15,10,22,.35));
   }
 
   body.darkMode main > section {
@@ -6940,11 +6943,6 @@ border-color:#6b7280 !important;
     color: #211b2b !important;
   }
 
-  body:not(.darkMode)::after {
-    background:
-      linear-gradient(90deg, rgba(17, 13, 25, .72) 0%, rgba(25, 18, 34, .48) 52%, rgba(25, 18, 34, .20) 100%),
-      linear-gradient(180deg, rgba(255,255,255,.04), rgba(15,10,22,.35));
-  }
 
   body:not(.darkMode) main > section {
     background: rgba(255, 250, 255, .93) !important;
@@ -6996,6 +6994,19 @@ border-color:#6b7280 !important;
     border-color: #d7cce1;
   }
 
+
+  /* Las estrellas de las sparks siempre mantienen su color dorado. */
+  .spark-stars,
+  .spark-pill .spark-stars,
+  body.darkMode .spark-stars,
+  body.darkMode .spark-pill .spark-stars,
+  body:not(.darkMode) .spark-stars,
+  body:not(.darkMode) .spark-pill .spark-stars {
+    color: #ffd84a !important;
+    -webkit-text-fill-color: #ffd84a !important;
+    text-shadow: 0 1px 1px rgba(0,0,0,.45) !important;
+  }
+
   /* Mantiene el cuadro amarillo del modo difícil legible. */
   .off-meta-box,
   body.darkMode .off-meta-box {
@@ -7004,9 +7015,33 @@ border-color:#6b7280 !important;
     color: #70440a !important;
   }
 
+  .off-meta-box,
+  .off-meta-box *,
+  body.darkMode .off-meta-box,
+  body.darkMode .off-meta-box * {
+    color: #70440a !important;
+    text-shadow: none !important;
+  }
+
   .off-meta-box strong,
   body.darkMode .off-meta-box strong {
     color: #70440a !important;
+  }
+
+  /* Refuerzo: algunos estilos heredados del tema oscuro también usan
+     -webkit-text-fill-color, por lo que color por sí solo no basta. */
+  #offMetaBox,
+  #offMetaBox *,
+  body.darkMode #offMetaBox,
+  body.darkMode #offMetaBox * {
+    color: #70440a !important;
+    -webkit-text-fill-color: #70440a !important;
+    text-shadow: none !important;
+    opacity: 1;
+  }
+
+  #offMetaBox .opacity-80 {
+    opacity: .85 !important;
   }
 
   /* Ajustes de distribución para zoom, ventanas pequeñas y Android. */
