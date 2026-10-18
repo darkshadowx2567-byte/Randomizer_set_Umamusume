@@ -7,6 +7,6 @@ Eso no es todo, también podrás poner este factor aleatorio con las cartas. Mi 
 
 Aqui te dejo la página para que puedas probarla: https://darkshadowx2567-byte.github.io/Randomizer_set_Umamusume/index.html
 
-Pd: La página de Umas tiene un botón llamado "Soporte", ahí podrás entrar a la página de cartas.
+Pd: La página de Umas tiene un botón llamado "Support Card Deck Randomizer", ahí podrás entrar a la página de cartas.
 
 ¡Suerte en tu entrenamiento futuro Torena!
