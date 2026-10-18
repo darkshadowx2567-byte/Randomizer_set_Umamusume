@@ -7110,7 +7110,206 @@ border-color:#6b7280 !important;
     }
   }
 
+
+
+/* Momento Gold Ship: estilos aislados, no alteran los componentes originales. */
+#goldShipOverlay{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:0;background:rgba(0,0,0,.70);overflow:hidden}
+#goldShipOverlay.is-visible{display:flex}
+#goldShipStage{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:transparent;overflow:hidden}
+#goldShipWheelArea{position:absolute;left:50%;top:50%;width:min(68vmin,450px);aspect-ratio:1;margin:0;transform:translate(-50%,-50%) scale(.02);opacity:0;pointer-events:none;transform-origin:center;will-change:transform,opacity;filter:none}
+#goldShipPointer{position:absolute;z-index:5;top:-2.5%;left:50%;transform:translateX(-50%);width:8%;height:13%;clip-path:polygon(50% 100%,0 22%,10% 0,90% 0,100% 22%);background:linear-gradient(90deg,#9b6410,#fff5a6 28%,#f5c542 54%,#fff0a0 78%,#a96d12);filter:drop-shadow(0 2px 2px #0009)}
+#goldShipPointer:after{content:"";position:absolute;left:24%;top:10%;width:52%;height:38%;border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff,#f7a8d5 36%,#b41c72 78%);border:1px solid #754315}
+#goldShipWheelOuter{position:absolute;inset:0;padding:2.5%;border-radius:50%;background:linear-gradient(135deg,#fff9c8 0%,#d99a20 15%,#fff2a0 30%,#99620d 47%,#ffe78a 63%,#c48618 79%,#fff0a6 91%,#9e6712 100%);box-shadow:0 0 0 2px #5b3b08,0 0 0 5px #e9b83e}
+#goldShipWheel{width:100%;height:100%;border-radius:50%;position:relative;overflow:hidden;border:2px solid #fff0a8;contain:paint;transform:translateZ(0) rotate(0deg);background:conic-gradient(from -22.5deg,#ffe92e 0deg 45deg,#f47b22 45deg 90deg,#ed2448 90deg 135deg,#f52a9c 135deg 180deg,#8138dc 180deg 225deg,#2456f2 225deg 270deg,#39d4ed 270deg 315deg,#20bd58 315deg 360deg);transform:translateZ(0) rotate(0deg);will-change:transform;backface-visibility:hidden}
+#goldShipWheelSvg{position:absolute;inset:0;width:100%;height:100%;z-index:1;overflow:visible}
+#goldShipWheelSvg path{transition:none;stroke:rgba(255,255,255,.92);stroke-width:1.2;vector-effect:non-scaling-stroke}
+#goldShipWheel:before{content:"";position:absolute;z-index:2;inset:0;border-radius:50%;background:radial-gradient(circle at 28% 19%,rgba(255,255,255,.35),transparent 31%),radial-gradient(circle at 70% 76%,rgba(0,0,0,.16),transparent 45%);pointer-events:none}
+#goldShipWheel:after{content:"";position:absolute;z-index:2;inset:0;border-radius:50%;background:radial-gradient(circle,transparent 48%,rgba(255,255,255,.15) 68%,rgba(0,0,0,.16) 100%);pointer-events:none}
+#goldShipHub{position:absolute;z-index:4;left:50%;top:50%;width:17%;aspect-ratio:1;transform:translate(-50%,-50%);border:4px solid #ffe8a1;border-radius:50%;background:radial-gradient(circle at 30% 24%,#fffbd7 0%,#f5d45a 38%,#d79a1a 67%,#77500c 100%);box-shadow:0 2px 7px #0009,inset 0 0 0 2px #fff4b5}
+#goldShipResult{display:none;position:relative;z-index:6;margin:0 auto;width:min(90vw,650px);max-height:80vh;overflow:auto;border:2px solid #f87171;border-radius:16px;padding:18px;background:linear-gradient(135deg,#7f1d1d,#450a0a);text-align:left;box-shadow:0 12px 30px #0007;color:white}
+#goldShipResult.is-visible{display:block;animation:gsResultPop .35s ease-out}
+#goldShipResult h3{font-size:clamp(18px,3vw,25px);font-weight:900;margin:0 0 8px;color:#fff}
+#goldShipResult p{color:#fff1f2;margin:5px 0}
+#goldShipClose{display:none;position:absolute;z-index:7;bottom:20px;left:50%;transform:translateX(-50%);margin:0;background:#e2e8f0;color:#111827;font-weight:800;padding:9px 20px;border-radius:10px}
+@keyframes gsResultPop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@media(max-width:520px){#goldShipWheelArea{width:min(80vmin,370px)}#goldShipWheelOuter{padding:2.8%}#goldShipHub{border-width:3px}}
+@media(prefers-reduced-motion:reduce){#goldShipWheelSvg path{transition:none}}
+
+
+
+
+/* Fix de cambio de tema: las superficies cambian juntas, sin retrasos heredados. */
+body,
+body main > section,
+body #resultCard,
+body #umaSelector,
+body main > section .bg-white,
+body main > section .bg-gray-50,
+body main > section .bg-gray-100,
+body main > section .bg-indigo-100,
+body main input,
+body main select,
+body main textarea,
+body #randomUmaBtn,
+body #themeBtn,
+body #langBtn,
+body #toggleAllUmas {
+  transition-delay: 0s !important;
+  transition-property: background-color, color, border-color, box-shadow !important;
+  transition-duration: 160ms !important;
+  transition-timing-function: ease !important;
+}
+
 </style>
 
+
+
+<!-- Momento Gold Ship: ruleta y resultado del evento, aislados de la interfaz original. -->
+<div id="goldShipOverlay" role="dialog" aria-modal="true" aria-label="Evento de ruleta">
+  <div id="goldShipStage">
+    <div id="goldShipWheelArea" aria-hidden="true">
+      <div id="goldShipPointer"></div>
+      <div id="goldShipWheelOuter"><div id="goldShipWheel"><svg id="goldShipWheelSvg" viewBox="0 0 100 100" aria-hidden="true"></svg></div></div>
+      <div id="goldShipHub"></div>
+    </div>
+    <div id="goldShipResult" aria-live="polite"></div>
+    <button id="goldShipClose" type="button">Cerrar evento</button>
+  </div>
+</div>
+<audio id="goldShipAudio" preload="auto" src="ruleta.mp3"></audio>
+<script>
+(()=>{
+  const colors={
+    red:{label:'Rojo — Momento Gold Ship',hex:'#ed2448'},pink:{label:'Rosa — Momento Haru Urara',hex:'#f52a9c'},green:{label:'Verde — Momento C.B.',hex:'#20bd58'},blue:{label:'Azul — Por definir',hex:'#2456f2'},cyan:{label:'Celeste — Por definir',hex:'#39d4ed'},purple:{label:'Morado — Por definir',hex:'#8138dc'},orange:{label:'Naranja — Por definir',hex:'#f47b22'},yellow:{label:'Amarillo — Por definir',hex:'#ffe12e'}
+  };
+  const order=['yellow','orange','red','pink','purple','blue','cyan','green'];
+
+  // PROBABILIDAD DE CADA COLOR (%).
+  // Puedes cambiar estos números fácilmente. Lo ideal es que sumen 100.
+  // Si no suman 100, el código los normaliza automáticamente manteniendo
+  // las proporciones entre colores.
+  const COLOR_PROBABILITIES={
+    red:15,      // Momento Gold Ship
+    pink:15,     // Momento Haru Urara
+    green:15,    // Momento C.B.
+    blue:15,    // Azul — Por definir
+    cyan:15,    // Celeste — Por definir
+    purple:15,  // Morado — Por definir
+    orange:15,  // Naranja — Por definir
+    yellow:15   // Amarillo — Por definir
+  };
+
+  function chooseColorByProbability(){
+    const total=order.reduce((sum,key)=>sum+Math.max(0,Number(COLOR_PROBABILITIES[key])||0),0);
+    if(total<=0)return order[Math.floor(Math.random()*order.length)];
+    let roll=Math.random()*total;
+    for(const key of order){
+      roll-=Math.max(0,Number(COLOR_PROBABILITIES[key])||0);
+      if(roll<0)return key;
+    }
+    return order[order.length-1];
+  }
+  const overlay=document.getElementById('goldShipOverlay'), wheelArea=document.getElementById('goldShipWheelArea'), wheel=document.getElementById('goldShipWheel'), svg=document.getElementById('goldShipWheelSvg'), audio=document.getElementById('goldShipAudio'), result=document.getElementById('goldShipResult'), close=document.getElementById('goldShipClose');
+  let running=false,rotation=0,timers=[],wheelMotion=null,wheelSpin=null;
+  const clearTimers=()=>{timers.forEach(clearTimeout);timers=[]};
+  function later(fn,ms){const id=setTimeout(fn,ms);timers.push(id);return id;}
+  function makeSlices(){
+    if(svg.childElementCount)return;
+    const NS='http://www.w3.org/2000/svg';
+    order.forEach((key,i)=>{
+      const start=(-112.5+i*45)*Math.PI/180, end=(-112.5+(i+1)*45)*Math.PI/180;
+      const x1=50+50*Math.cos(start),y1=50+50*Math.sin(start),x2=50+50*Math.cos(end),y2=50+50*Math.sin(end);
+      const p=document.createElementNS(NS,'path');p.setAttribute('d',`M 50 50 L ${x1} ${y1} A 50 50 0 0 1 ${x2} ${y2} Z`);p.setAttribute('fill',colors[key].hex);p.dataset.color=key;p.dataset.index=i;svg.appendChild(p);
+    });
+  }
+  function resetSlices(){svg.querySelectorAll('path').forEach(p=>{p.style.transition='none';p.setAttribute('fill',colors[p.dataset.color].hex);});}
+  function recolorSlices(key){
+    const paths=[...svg.querySelectorAll('path')];
+    // Recorrido circular relativo al ganador: empieza en el siguiente segmento
+    // después del color ganador y continúa alrededor de la ruleta hasta el anterior.
+    // Así, si gana rojo, empieza rosa; si gana rosa, empieza morado, etc.
+    const winnerIndex=order.indexOf(key);
+    const sequence=[];
+    for(let step=1;step<order.length;step++){
+      const nextIndex=(winnerIndex+step)%order.length;
+      const path=paths.find(p=>p.dataset.color===order[nextIndex]);
+      if(path)sequence.push(path);
+    }
+    // Los siete segmentos restantes cambian durante el intervalo 0:10–0:12.
+    const interval=2000/sequence.length;
+    sequence.forEach((p,i)=>later(()=>{p.setAttribute('fill',colors[key].hex);},Math.round(i*interval)));
+  }
+  function showEvent(key){
+    const c=colors[key];let title=c.label,body='Este color todavía no tiene una función asignada.';
+    if(key==='red'){
+      const opts=[
+        ()=>{const stat=['Speed','Stamina','Power','Guts','Wit'][Math.floor(Math.random()*5)];return 'Gold Ship te ha bloqueado 4 entrenamientos. Ahora solo puedes entrenar '+stat+'.';},
+        ()=>{const races=5+Math.floor(Math.random()*11);return 'Gold Ship ha tomado el control de tu agenda: necesitas correr muchas carreras. Número de carreras: '+races+'.';},
+        ()=>{const stat=['Speed','Stamina','Power','Guts','Wit'][Math.floor(Math.random()*5)];return 'Se te ha bloqueado un entrenamiento. Entrenamiento bloqueado: '+stat+'.';}
+      ];title='🔴 MOMENTO GOLD SHIP';body=opts[Math.floor(Math.random()*opts.length)]();
+    }else if(key==='pink'){title='🩷 MOMENTO HARU URARA';body='¡Hoy la suerte te sonríe! Puedes saltarte el randomizer de Supports y elegir libremente las cartas que quieras usar.';}
+    else if(key==='green'){title='🟢 MOMENTO C.B.';body='Debes incluir una carta SSR o R de Mr. C.B. de Wit. Reemplaza una de las cartas obtenidas en el randomizer de Supports por la carta correspondiente.';}
+    result.style.borderColor=c.hex;result.style.background=`linear-gradient(135deg,${c.hex},#171923)`;result.innerHTML='<h3></h3><p></p>';result.querySelector('h3').textContent=title;result.querySelector('p').textContent=body;result.classList.add('is-visible');close.style.display='inline-block';
+  }
+  function launch(key){
+    if(running)return;
+    running=true; clearTimers();
+    if(wheelMotion)wheelMotion.cancel();
+    if(wheelSpin)wheelSpin.cancel();
+    makeSlices(); resetSlices();
+    result.classList.remove('is-visible'); result.innerHTML=''; close.style.display='none';
+    overlay.classList.add('is-visible');
+    wheelArea.style.display='block'; wheelArea.style.opacity='0';
+    wheelArea.style.transform='translate(-50%,-50%) scale(.02)';
+
+    // Iniciar audio y animaciones en la misma interacción: el navegador no debe
+    // esperar a que audio.play() resuelva para comenzar la ruleta.
+    audio.pause(); audio.currentTime=0; audio.volume=.9; audio.muted=false;
+    try { const playPromise=audio.play(); if(playPromise&&playPromise.catch)playPromise.catch(()=>{}); } catch(_){}
+
+    const targetRotation={red:270,pink:225,green:45,blue:135,cyan:90,purple:180,orange:315,yellow:0};
+    const targetMod=targetRotation[key]??0;
+    const start=((rotation%360)+360)%360;
+    const finalAngle=rotation+8*360+((targetMod-start+360)%360);
+    const fastAngle=rotation+5*360+180;
+    wheel.style.transform=`translateZ(0) rotate(${rotation}deg)`;
+
+    // Animación total desde el clic: zoom inmediato, giro desde 1 s,
+    // frenado desde 6 s, recolor de 10–12 s y salida exactamente a 15 s.
+    wheelMotion=wheelArea.animate([
+      {opacity:0,transform:'translate(-50%,-50%) scale(.02)',offset:0},
+      {opacity:1,transform:'translate(-50%,-50%) scale(1.08)',offset:.052},
+      {opacity:1,transform:'translate(-50%,-50%) scale(.97)',offset:.064},
+      {opacity:1,transform:'translate(-50%,-50%) scale(1)',offset:.078},
+      {opacity:1,transform:'translate(-50%,-50%) scale(1)',offset:14.48/15},
+      {opacity:1,transform:'translate(-50%,-50%) scale(1.03)',offset:14.58/15},
+      {opacity:0,transform:'translate(-50%,-50%) scale(.02)',offset:1}
+    ],{duration:15000,easing:'linear',fill:'forwards'});
+
+    wheelSpin=wheel.animate([
+      {transform:`translateZ(0) rotate(${rotation}deg)`,offset:0},
+      {transform:`translateZ(0) rotate(${rotation}deg)`,offset:1/9},
+      {transform:`translateZ(0) rotate(${fastAngle}deg)`,offset:6/9,easing:'cubic-bezier(.12,.68,.12,1)'},
+      {transform:`translateZ(0) rotate(${finalAngle}deg)`,offset:1}
+    ],{duration:9000,delay:1000,fill:'forwards',easing:'linear'});
+    wheelSpin.onfinish=()=>{rotation=finalAngle;wheel.style.transform=`translateZ(0) rotate(${rotation}deg)`;};
+
+    later(()=>recolorSlices(key),10000); // start the color wave at exactly 0:10
+    later(()=>{
+      if(!running)return;
+      if(wheelMotion)wheelMotion.cancel();
+      wheelArea.style.opacity='0'; wheelArea.style.transform='translate(-50%,-50%) scale(.02)';
+      wheelArea.style.display='none';
+      audio.pause();
+      showEvent(key); running=false;
+    },15000);
+  }
+  function closeEvent(){clearTimers();running=false;if(wheelMotion)wheelMotion.cancel();if(wheelSpin)wheelSpin.cancel();audio.pause();audio.currentTime=0;overlay.classList.remove('is-visible');result.classList.remove('is-visible');wheelArea.style.display='block';wheelArea.style.opacity='0';wheelArea.style.transform='translate(-50%,-50%) scale(.02)';}
+  close.addEventListener('click',closeEvent);
+  overlay.addEventListener('click',e=>{if(e.target===overlay)closeEvent();});
+  const generate=document.getElementById('generateBtn');if(generate)generate.addEventListener('click',()=>{if(!running&&Math.random()<.05){const key=chooseColorByProbability();later(()=>launch(key),180);}});
+  makeSlices();
+})();
+</script>
 </body>
 </html>
