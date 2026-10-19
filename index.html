@@ -7189,14 +7189,14 @@ body #toggleAllUmas {
   // Si no suman 100, el código los normaliza automáticamente manteniendo
   // las proporciones entre colores.
   const COLOR_PROBABILITIES={
-    red:15,      // Momento Gold Ship
-    pink:15,     // Momento Haru Urara
-    green:15,    // Momento C.B.
-    blue:15,    // Azul — Por definir
-    cyan:15,    // Celeste — Por definir
-    purple:15,  // Morado — Por definir
+    red:5,      // Momento Gold Ship
+    pink:5,     // Momento Haru Urara
+    green:5,    // Momento C.B.
+    blue:20,    // Azul — Por definir
+    cyan:20,    // Celeste — Por definir
+    purple:20,  // Morado — Por definir
     orange:15,  // Naranja — Por definir
-    yellow:15   // Amarillo — Por definir
+    yellow:10   // Amarillo — Por definir
   };
 
   function chooseColorByProbability(){
@@ -7239,14 +7239,31 @@ body #toggleAllUmas {
     const interval=2000/sequence.length;
     sequence.forEach((p,i)=>later(()=>{p.setAttribute('fill',colors[key].hex);},Math.round(i*interval)));
   }
+  // Evita repetir consecutivamente el mismo mensaje rojo o la misma stat afectada.
+  let lastRedMessageIndex=-1;
+  let lastRedStat='';
+  function pickRedStat(){
+    const stats=['Speed','Stamina','Power','Guts','Wit'];
+    const choices=stats.filter(stat=>stat!==lastRedStat);
+    const stat=choices[Math.floor(Math.random()*choices.length)];
+    lastRedStat=stat;
+    return stat;
+  }
+  function pickRedMessageIndex(){
+    const count=3;
+    let choices=Array.from({length:count},(_,i)=>i).filter(i=>i!==lastRedMessageIndex);
+    const index=choices[Math.floor(Math.random()*choices.length)];
+    lastRedMessageIndex=index;
+    return index;
+  }
   function showEvent(key){
     const c=colors[key];let title=c.label,body='Este color todavía no tiene una función asignada.';
     if(key==='red'){
       const opts=[
-        ()=>{const stat=['Speed','Stamina','Power','Guts','Wit'][Math.floor(Math.random()*5)];return 'Gold Ship te ha bloqueado 4 entrenamientos. Ahora solo puedes entrenar '+stat+'.';},
+        ()=>{const stat=pickRedStat();return 'Gold Ship te ha bloqueado 4 entrenamientos. Ahora solo puedes entrenar '+stat+'.';},
         ()=>{const races=5+Math.floor(Math.random()*11);return 'Gold Ship ha tomado el control de tu agenda: necesitas correr muchas carreras. Número de carreras: '+races+'.';},
-        ()=>{const stat=['Speed','Stamina','Power','Guts','Wit'][Math.floor(Math.random()*5)];return 'Se te ha bloqueado un entrenamiento. Entrenamiento bloqueado: '+stat+'.';}
-      ];title='🔴 MOMENTO GOLD SHIP';body=opts[Math.floor(Math.random()*opts.length)]();
+        ()=>{const stat=pickRedStat();return 'Se te ha bloqueado un entrenamiento. Entrenamiento bloqueado: '+stat+'.';}
+      ];title='🔴 MOMENTO GOLD SHIP';body=opts[pickRedMessageIndex()]();
     }else if(key==='pink'){title='🩷 MOMENTO HARU URARA';body='¡Hoy la suerte te sonríe! Puedes saltarte el randomizer de Supports y elegir libremente las cartas que quieras usar.';}
     else if(key==='green'){title='🟢 MOMENTO C.B.';body='Debes incluir una carta SSR o R de Mr. C.B. de Wit. Reemplaza una de las cartas obtenidas en el randomizer de Supports por la carta correspondiente.';}
     result.style.borderColor=c.hex;result.style.background=`linear-gradient(135deg,${c.hex},#171923)`;result.innerHTML='<h3></h3><p></p>';result.querySelector('h3').textContent=title;result.querySelector('p').textContent=body;result.classList.add('is-visible');close.style.display='inline-block';
