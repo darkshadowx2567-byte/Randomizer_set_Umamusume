@@ -7773,13 +7773,25 @@ body #toggleAllUmas {
       const end = html.indexOf('const SLOT_COUNT', start);
       if (start < 0 || end < 0) return;
       const section = html.slice(start,end);
-      const pattern = /\{\s*name\s*:\s*(['"])(.*?)\1\s*,\s*rarity\s*:\s*(['"])(.*?)\3\s*,?\s*img\s*:\s*(['"])(.*?)\5/gs;
+      // Analiza cada objeto de carta por separado. No buscamos propiedades con
+      // una sola regex global porque podría tomar name de una carta y rarity/img
+      // de la siguiente. Las cartas antiguas con `random: 'R'` también cuentan.
+      const objectPattern = /\{([^{}]*)\}/gs;
       const seen = new Set();
-      let match;
-      while ((match = pattern.exec(section)) !== null) {
-        const name = match[2]; if (!name || seen.has(name)) continue; seen.add(name);
+      let objectMatch;
+      while ((objectMatch = objectPattern.exec(section)) !== null) {
+        const cardSource = objectMatch[1];
+        const nameMatch = cardSource.match(/\bname\s*:\s*(['"])(.*?)\1/s);
+        const imgMatch = cardSource.match(/\bimg\s*:\s*(['"])(.*?)\1/s);
+        const rarityMatch = cardSource.match(/\b(?:rarity|random)\s*:\s*(['"])(.*?)\1/s);
+        if (!nameMatch || !imgMatch || !rarityMatch) continue;
+        const name = nameMatch[2].trim();
+        if (!name || seen.has(name)) continue;
+        seen.add(name);
         const key = 'card:' + name;
-        if (!BASELINE_SUPPORT_CARDS.has(name) && !Object.prototype.hasOwnProperty.call(decisions,key)) queue.push({kind:'card',name,key});
+        if (!BASELINE_SUPPORT_CARDS.has(name) && !Object.prototype.hasOwnProperty.call(decisions,key)) {
+          queue.push({kind:'card', name, key});
+        }
       }
     } catch (error) {
       // Si se abre index.html directamente como file://, el navegador bloquea fetch por seguridad.
