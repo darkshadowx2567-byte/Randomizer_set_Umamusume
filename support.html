@@ -125,6 +125,36 @@
     }
     @media(max-width:390px){#grid{min-height:690px}.table-controls{top:55%;width:125px;max-width:23%}#generateBtn{font-size:11px;padding:9px 3px}}
   </style>
+<style id="profileManagerStyles">
+#profileManagerLauncher{position:fixed;right:16px;bottom:16px;z-index:8800;border:1px solid #d8c9e7;border-radius:14px;padding:11px 15px;background:#eee7f5;color:#3c2e50;font-weight:800;box-shadow:0 8px 25px #0002;cursor:pointer}
+#profileManagerDrawer{position:fixed;z-index:8801;right:0;top:0;height:100dvh;width:min(420px,94vw);background:#fffaff;color:#292234;border-left:1px solid #d8c9e7;box-shadow:-16px 0 40px #0002;transform:translateX(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column}
+#profileManagerDrawer.open{transform:translateX(0)}
+#profileManagerDrawer *{box-sizing:border-box}
+.profile-manager-head{display:flex;align-items:center;justify-content:space-between;padding:17px 18px;border-bottom:1px solid #e8def0;gap:12px}
+.profile-manager-head h2{font-size:20px;font-weight:900;margin:0}
+.profile-manager-close{font-size:27px;line-height:1;border-radius:9px;padding:2px 10px;background:#f1eaf7;color:inherit}
+.profile-manager-body{padding:16px;overflow:auto;min-height:0;flex:1}
+.profile-manager-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:15px}
+.profile-manager-tabs button,.profile-manager-primary,.profile-manager-secondary,.profile-manager-list button{border-radius:10px;padding:9px 11px;font-weight:750;border:1px solid #d8c9e7;background:#f3edf8;color:#3c2e50;cursor:pointer}
+.profile-manager-tabs button.active,.profile-manager-primary{background:#7c3aed;border-color:#7c3aed;color:white}
+.profile-manager-create{display:flex;gap:8px;margin-bottom:14px}
+.profile-manager-create input{min-width:0;flex:1;border:1px solid #d8c9e7;border-radius:10px;padding:10px;background:white;color:#241b30}
+.profile-manager-list{display:flex;flex-direction:column;gap:10px}
+.profile-manager-item{border:1px solid #e3d8ed;border-radius:13px;padding:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.profile-manager-item-name{font-weight:850;overflow-wrap:anywhere;flex:1;min-width:100px}
+.profile-manager-item-actions{display:flex;gap:6px;flex-wrap:wrap;width:100%}
+.profile-manager-item-actions button{flex:1;font-size:12px;padding:8px 6px}
+.profile-manager-empty{font-size:13px;opacity:.7;padding:15px 4px;text-align:center}
+#profileImportOverlay{position:fixed;inset:0;z-index:9900;display:none;align-items:center;justify-content:center;padding:18px;background:#17102099}
+#profileImportOverlay.visible{display:flex}
+#profileImportDialog{width:min(420px,100%);padding:22px;border-radius:18px;background:#fffaff;color:#292234;box-shadow:0 20px 70px #0005}
+#profileImportDialog h3{font-size:20px;font-weight:900;margin:0 0 10px}
+#profileImportDialog p{margin:0 0 18px;overflow-wrap:anywhere}
+.profile-import-actions{display:flex;gap:10px}.profile-import-actions button{flex:1;border-radius:10px;padding:10px;font-weight:800}
+body.darkMode #profileManagerDrawer{background:#1c172a;color:#f7f2ff;border-color:#554469}
+body.darkMode .profile-manager-head{border-color:#493b5b}body.darkMode .profile-manager-close,body.darkMode .profile-manager-tabs button,body.darkMode .profile-manager-secondary,body.darkMode .profile-manager-list button{background:#30263f;color:#f7f2ff;border-color:#574768}body.darkMode .profile-manager-tabs button.active,body.darkMode .profile-manager-primary{background:#6d28d9;color:white;border-color:#a78bfa}body.darkMode .profile-manager-item{border-color:#493b5b}body.darkMode .profile-manager-create input{background:#282033;color:#fff;border-color:#574768}body.darkMode #profileImportDialog{background:#1c172a;color:#f7f2ff}
+@media(max-width:600px){#profileManagerLauncher{right:10px;bottom:10px;padding:10px 12px}#profileManagerDrawer{width:min(390px,96vw)}}
+</style>
 </head>
 <body>
   <header class="topbar">
@@ -606,6 +636,16 @@ function loadDisabledCards(){
   if(saved){
     disabledCards=new Set(saved);
   }
+  // Las decisiones tomadas desde index.html se aplican en esta página.
+  try {
+    const decisions = JSON.parse(localStorage.getItem("uma_randomizer_new_entry_decisions_v1") || "{}");
+    Object.entries(decisions).forEach(([key, value]) => {
+      if (!key.startsWith("card:")) return;
+      const name = key.slice(5);
+      if (value === "reject") disabledCards.add(name);
+      else if (value === "keep") disabledCards.delete(name);
+    });
+  } catch {}
 }
 
     // Helper
@@ -656,6 +696,16 @@ function loadDisabledCards(){
 
 // --- Variables para el selector de cartas ---
 let disabledCards = new Set(); // guardará las cartas desactivadas
+
+// Decisiones de nuevas cartas tomadas desde index.html (almacenamiento compartido).
+function getRejectedNewSupportCards(){
+  try {
+    const decisions = JSON.parse(localStorage.getItem("uma_randomizer_new_entry_decisions_v1") || "{}");
+    return new Set(Object.entries(decisions).filter(([key,value]) => key.startsWith("card:") && value === "reject").map(([key]) => key.slice(5)));
+  } catch { return new Set(); }
+}
+function isSupportCardRejected(cardName){ return getRejectedNewSupportCards().has(cardName); }
+
 
 function initCardSelector() {
   const container = document.getElementById("allCardsGrid");
@@ -715,13 +765,13 @@ function initCardSelector() {
     img.style.margin = "4px";
     img.style.cursor = "pointer";
 
-    if (disabledCards.has(card.name)) {
+    if (disabledCards.has(card.name) || isSupportCardRejected(card.name)) {
       img.classList.add("disabled");
       img.style.filter = "grayscale(100%)";
     }
 
     img.addEventListener("click", () => {
-      if (disabledCards.has(card.name)) {
+      if (disabledCards.has(card.name) || isSupportCardRejected(card.name)) {
         disabledCards.delete(card.name);
         img.classList.remove("disabled");
         img.style.filter = "grayscale(0%)";
@@ -804,9 +854,12 @@ function initCardSelector() {
     img.style.width = "80px";
     img.style.margin = "4px";
     img.style.cursor = "pointer";
-    img.style.filter = "grayscale(0)"; // por defecto a color
+    const rejectedByIndex = isSupportCardRejected(card.name);
+    img.style.filter = (disabledCards.has(card.name) || rejectedByIndex) ? "grayscale(100%)" : "grayscale(0)";
+    if (rejectedByIndex) img.classList.add("disabled");
 
     img.addEventListener("click", () => {
+      if (isSupportCardRejected(card.name)) return;
       if (disabledCards.has(card.name)) {
         disabledCards.delete(card.name);
         img.style.filter = "grayscale(0)";
@@ -885,7 +938,7 @@ async function generateAllSlots() {
     // Slot 6 es prestado y no respeta exclusiones; slots 1–5 sí.
     const eligiblePool = i === 6
       ? pool
-      : pool.filter(c => !disabledCards.has(c.name));
+      : pool.filter(c => !disabledCards.has(c.name) && !isSupportCardRejected(c.name));
     const available = eligiblePool.filter(c =>
       !usedCards.has(c.name) && !usedCharacters.has(baseName(c.name))
     );
@@ -1122,5 +1175,109 @@ applyLanguage();
     
   </script>
 
-  </body>
+  <button id="profileManagerLauncher" type="button" aria-expanded="false">👥 <span data-profile-i18n="profiles">Perfiles</span></button>
+<aside id="profileManagerDrawer" aria-label="Gestor de perfiles" aria-hidden="true">
+  <div class="profile-manager-head"><h2 data-profile-i18n="profiles">Perfiles</h2><button class="profile-manager-close" id="profileManagerClose" type="button" aria-label="Cerrar">×</button></div>
+  <div class="profile-manager-body">
+    <div class="profile-manager-tabs"><button id="myProfilesTab" class="active" type="button" data-profile-i18n="myProfiles">Mis perfiles</button><button id="sharedProfilesTab" type="button" data-profile-i18n="sharedProfiles">Compartidos</button></div>
+    <div id="profileCreateRow" class="profile-manager-create"><input id="profileNameInput" maxlength="80" type="text" data-profile-i18n-placeholder="profileNamePlaceholder" placeholder="Nombre del perfil"><button id="saveProfileBtn" class="profile-manager-primary" type="button" data-profile-i18n="saveProfile">Guardar</button></div>
+    <p id="profileManagerHint" style="font-size:12px;opacity:.7;margin:0 0 12px" data-profile-i18n="profileHint">Guarda tus Umas y cartas activadas/desactivadas.</p>
+    <div id="profileManagerList" class="profile-manager-list"></div>
+  </div>
+</aside>
+<div id="profileImportOverlay" role="dialog" aria-modal="true" aria-labelledby="profileImportTitle"><div id="profileImportDialog"><h3 id="profileImportTitle">¿Quieres guardar el perfil de X?</h3><p id="profileImportText"></p><div class="profile-import-actions"><button id="profileImportNo" class="profile-manager-secondary" type="button">No</button><button id="profileImportYes" class="profile-manager-primary" type="button">Sí, guardar</button></div></div></div>
+<script id="profileManagerScript">
+(function(){
+  'use strict';
+  const STORAGE='uma_randomizer_profiles_v1';
+  const SHARED='uma_randomizer_shared_profiles_v1';
+  const DECISIONS='uma_randomizer_new_entry_decisions_v1';
+  const SUPABASE_URL='https://uatpwjkmdjztapftpdpy.supabase.co';
+  const SUPABASE_KEY='sb_publishable_mJnHQi0YoKqVJ2VV7JuxgQ_v9MNXnOj';
+  const BLOCKED='blockedUmas';
+  const DISABLED='support_disabled_cards';
+  const $p=id=>document.getElementById(id);
+  const labels={
+    es:{profiles:'Perfiles',myProfiles:'Mis perfiles',sharedProfiles:'Compartidos',profileNamePlaceholder:'Nombre del perfil',saveProfile:'Guardar',profileHint:'Guarda tus Umas y cartas activadas/desactivadas.',load:'Cargar',share:'Compartir',update:'Actualizar con la selección actual',delete:'Eliminar',emptyMine:'Todavía no tienes perfiles guardados.',emptyShared:'Todavía no tienes perfiles compartidos guardados.',confirmDelete:'¿Eliminar este perfil?',saved:'Perfil guardado.',copied:'Enlace copiado. Compártelo con quien quieras.',copyFail:'No se pudo copiar automáticamente. Copia el enlace que aparece a continuación.',needName:'Escribe un nombre para el perfil.',confirmUpdate:'¿Actualizar este perfil con la selección actual?',updatedShared:'Perfil compartido actualizado.',importTitle:'¿Quieres guardar el perfil de {name}?',importText:'Se guardará en la pestaña Compartidos. Podrás cargarlo o eliminarlo, pero no modificarlo.',yesSave:'Sí, guardar',no:'No',imported:'Perfil compartido guardado.',exists:'Este perfil compartido ya está guardado.'},
+    en:{profiles:'Profiles',myProfiles:'My profiles',sharedProfiles:'Shared',profileNamePlaceholder:'Profile name',saveProfile:'Save',profileHint:'Save your enabled/disabled Umas and support cards.',load:'Load',share:'Share',update:'Update from current selection',delete:'Delete',emptyMine:'You have no saved profiles yet.',emptyShared:'You have no saved shared profiles yet.',confirmDelete:'Delete this profile?',saved:'Profile saved.',copied:'Link copied. Share it with anyone.',copyFail:'Could not copy automatically. Copy the link below.',needName:'Enter a profile name.',confirmUpdate:'Update this profile with the current selection?',updatedShared:'Shared profile updated.',importTitle:'Do you want to save {name}’s profile?',importText:'It will be saved under Shared. You can load or delete it, but not edit it.',yesSave:'Yes, save',no:'No',imported:'Shared profile saved.',exists:'This shared profile is already saved.'}
+  };
+  function lang(){return (localStorage.getItem('language')||document.documentElement.lang||'es').toLowerCase().startsWith('en')?'en':'es'}
+  function t(key){return labels[lang()][key]||labels.es[key]||key}
+  function read(key,fallback){try{const v=JSON.parse(localStorage.getItem(key));return v==null?fallback:v}catch{return fallback}}
+  function write(key,value){localStorage.setItem(key,JSON.stringify(value))}
+  function ownProfiles(){return read(STORAGE,[])}
+  function sharedProfiles(){return read(SHARED,[])}
+  function allCardNames(){try{if(typeof SUPPORT_CARDS==='undefined')return [];const out=[];for(const type of Object.keys(SUPPORT_CARDS))for(const rarity of Object.keys(SUPPORT_CARDS[type]))for(const card of SUPPORT_CARDS[type][rarity]||[])out.push(card.name);return [...new Set(out)]}catch{return []}}
+  function currentBlockedUmas(){try{if(typeof blockedUmas!=='undefined')return [...blockedUmas]}catch{}return read(BLOCKED,[])}
+  function currentDisabledCards(){let result=new Set(read(DISABLED,[]));try{if(typeof disabledCards!=='undefined')for(const n of disabledCards)result.add(n)}catch{};const decisions=read(DECISIONS,{});Object.entries(decisions).forEach(([key,value])=>{if(key.startsWith('card:')&&value==='reject')result.add(key.slice(5))});return [...result]}
+  function snapshot(name){return {id:'profile-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10),name:name.trim(),blockedUmas:currentBlockedUmas(),disabledCards:currentDisabledCards(),decisions:read(DECISIONS,{}),createdAt:new Date().toISOString()}}
+  function refreshVisuals(){
+    try{if(typeof blockedUmas!=='undefined'){const selector=$p('umaSelector');if(selector&&selector.children.length){Array.from(selector.children).forEach((el,i)=>{const uma=typeof UMAS!=='undefined'?UMAS[i]:null;const img=el.querySelector('img');if(uma&&img)img.classList.toggle('grayscale',blockedUmas.has(uma.name))})}}}catch{}
+    try{if(typeof disabledCards!=='undefined'){const grid=$p('allCardsGrid');if(grid)grid.querySelectorAll('img[data-card-name]').forEach(img=>{const off=disabledCards.has(img.dataset.cardName)||rejected(img.dataset.cardName);img.style.filter=off?'grayscale(100%)':'grayscale(0)';img.classList.toggle('disabled',off)})}}catch{}
+    try{if(typeof updateCardList==='function')for(let i=1;i<=6;i++)updateCardList(i)}catch{}
+  }
+  function rejected(name){return read(DECISIONS,{})['card:'+name]==='reject'}
+  function applyProfile(profile){
+    const blocked=new Set(profile.blockedUmas||[]);write(BLOCKED,[...blocked]);
+    try{if(typeof blockedUmas!=='undefined')blockedUmas=blocked}catch{}
+    const disabled=new Set(profile.disabledCards||[]);write(DISABLED,[...disabled]);
+    try{if(typeof disabledCards!=='undefined')disabledCards=disabled}catch{}
+    const decisions={...(profile.decisions||{})};
+    // Las decisiones de nuevas cartas forman parte del perfil y también se reflejan en ambas páginas.
+    allCardNames().forEach(name=>{if(decisions['card:'+name]==='reject')disabled.add(name)});
+    write(DISABLED,[...disabled]);
+    write(DECISIONS,decisions);
+    try{if(typeof disabledCards!=='undefined')disabledCards=disabled}catch{}
+    try{if(typeof saveSelections==='function')saveSelections()}catch{}
+    try{if(typeof saveDisabledCards==='function')saveDisabledCards()}catch{}
+    refreshVisuals();
+    // Si el perfil se carga desde la página de supports, sus elecciones se guardan para que index.html las lea.
+    window.dispatchEvent(new CustomEvent('uma-profile-loaded',{detail:{id:profile.id,name:profile.name}}));
+  }
+  const launcher=$p('profileManagerLauncher'),drawer=$p('profileManagerDrawer');let activeTab='mine';
+  function openDrawer(){drawer.classList.add('open');drawer.setAttribute('aria-hidden','false');launcher.setAttribute('aria-expanded','true');renderList()}
+  function closeDrawer(){drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');launcher.setAttribute('aria-expanded','false')}
+  launcher.addEventListener('click',()=>drawer.classList.contains('open')?closeDrawer():openDrawer());$p('profileManagerClose').addEventListener('click',closeDrawer);
+  function selectTab(tab){activeTab=tab;$p('myProfilesTab').classList.toggle('active',tab==='mine');$p('sharedProfilesTab').classList.toggle('active',tab==='shared');$p('profileCreateRow').style.display=tab==='mine'?'flex':'none';$p('profileManagerHint').style.display=tab==='mine'?'block':'none';renderList()}
+  $p('myProfilesTab').addEventListener('click',()=>selectTab('mine'));$p('sharedProfilesTab').addEventListener('click',()=>selectTab('shared'));
+  function renderList(){
+    const list=$p('profileManagerList');list.innerHTML='';const items=activeTab==='mine'?ownProfiles():sharedProfiles();
+    if(!items.length){const empty=document.createElement('div');empty.className='profile-manager-empty';empty.textContent=t(activeTab==='mine'?'emptyMine':'emptyShared');list.appendChild(empty);return}
+    items.forEach(profile=>{const card=document.createElement('div');card.className='profile-manager-item';const name=document.createElement('div');name.className='profile-manager-item-name';name.textContent=profile.name;card.appendChild(name);const actions=document.createElement('div');actions.className='profile-manager-item-actions';
+      const load=document.createElement('button');load.type='button';load.textContent=t('load');load.addEventListener('click',async()=>{try{let p=profile;if(activeTab==='shared'){p=await fetchSharedProfile(profile.id);if(!p)throw new Error('No se encontró el perfil compartido.');const list=sharedProfiles().map(x=>x.id===profile.id?{...p,id:profile.id}:x);write(SHARED,list)}applyProfile(p);closeDrawer()}catch(e){alert('No se pudo cargar el perfil compartido: '+e.message)}});actions.appendChild(load);
+      if(activeTab==='mine'){const update=document.createElement('button');update.type='button';update.textContent=t('update');update.addEventListener('click',async()=>{if(!window.confirm(t('confirmUpdate')||'Actualizar este perfil con la selección actual?'))return;const updated={...snapshot(profile.name),id:profile.id,createdAt:profile.createdAt||new Date().toISOString(),shareId:profile.shareId,ownerToken:profile.ownerToken};try{if(updated.shareId&&updated.ownerToken){const ok=await rpc('update_shared_profile',{p_id:updated.shareId,p_name:updated.name,p_profile_data:profileData(updated),p_owner_token:updated.ownerToken});if(!ok)throw new Error('Supabase rechazó la actualización.');}write(STORAGE,ownProfiles().map(p=>p.id===profile.id?updated:p));renderList();alert('Perfil actualizado.')}catch(e){alert('No se pudo actualizar el perfil compartido: '+e.message)}});actions.appendChild(update);const share=document.createElement('button');share.type='button';share.textContent=t('share');share.addEventListener('click',()=>shareProfile(profile));actions.appendChild(share)}
+      const del=document.createElement('button');del.type='button';del.textContent=t('delete');del.addEventListener('click',async()=>{if(!window.confirm(t('confirmDelete')))return;try{if(activeTab==='mine'&&profile.shareId&&profile.ownerToken){const ok=await rpc('delete_shared_profile',{p_id:profile.shareId,p_owner_token:profile.ownerToken});if(!ok)throw new Error('Supabase no autorizó eliminar el perfil compartido.')}if(activeTab==='mine')write(STORAGE,ownProfiles().filter(p=>p.id!==profile.id));else write(SHARED,sharedProfiles().filter(p=>p.id!==profile.id));renderList()}catch(e){alert('No se pudo eliminar: '+e.message)}});actions.appendChild(del);card.appendChild(actions);list.appendChild(card);
+    });
+  }
+  $p('saveProfileBtn').addEventListener('click',()=>{const input=$p('profileNameInput');const name=input.value.trim();if(!name){alert(t('needName'));input.focus();return}const profile=snapshot(name);const list=ownProfiles();list.push(profile);write(STORAGE,list);input.value='';renderList();alert(t('saved'))});
+  function profileData(profile){return {blockedUmas:profile.blockedUmas||[],disabledCards:profile.disabledCards||[],decisions:profile.decisions||{},createdAt:profile.createdAt||''}}
+  async function rpc(name,args){const response=await fetch(SUPABASE_URL+'/rest/v1/rpc/'+name,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},body:JSON.stringify(args)});const body=await response.text();if(!response.ok)throw new Error(body||('HTTP '+response.status));try{return JSON.parse(body)}catch{return body}}
+  function randomId(){const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';const bytes=new Uint8Array(8);crypto.getRandomValues(bytes);return [...bytes].map(b=>chars[b%chars.length]).join('')}
+  function randomToken(){const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);return [...bytes].map(b=>b.toString(16).padStart(2,'0')).join('')}
+  async function fetchSharedProfile(id){const result=await rpc('get_shared_profile',{p_id:id});const row=Array.isArray(result)?result[0]:result;if(!row)return null;const data=row.profile_data||{};return {id,name:row.name,...data}}
+  async function shareProfile(profile){
+    try{
+      let shareId=profile.shareId, ownerToken=profile.ownerToken;
+      const data=profileData(profile);
+      if(shareId&&ownerToken){const ok=await rpc('update_shared_profile',{p_id:shareId,p_name:profile.name,p_profile_data:data,p_owner_token:ownerToken});if(!ok)throw new Error('No se pudo actualizar el perfil remoto.');}
+      else {shareId=randomId();ownerToken=randomToken();let ok=await rpc('create_shared_profile',{p_id:shareId,p_name:profile.name,p_profile_data:data,p_owner_token:ownerToken});if(!ok)throw new Error('No se pudo crear el perfil. Pulsa Compartir otra vez para generar otro ID.');}
+      const updated={...profile,shareId,ownerToken};write(STORAGE,ownProfiles().map(p=>p.id===profile.id?updated:p));
+      const url=new URL('index.html',location.href);url.search='';url.hash='';url.searchParams.set('sharedProfile',shareId);const link=url.toString();
+      try{await navigator.clipboard.writeText(link);alert(t('copied')+'\n'+link)}catch{window.prompt(t('copyFail'),link)}
+      renderList();
+    }catch(e){alert('Error al compartir con Supabase: '+e.message)}
+  }
+  const importOverlay=$p('profileImportOverlay');let pendingShared=null;
+  function showImport(profile){pendingShared=profile;$p('profileImportTitle').textContent=t('importTitle').replace('{name}',profile.name||'X');$p('profileImportText').textContent=t('importText');$p('profileImportYes').textContent=t('yesSave');$p('profileImportNo').textContent=t('no');importOverlay.classList.add('visible')}
+  function closeImport(){importOverlay.classList.remove('visible');pendingShared=null;const url=new URL(location.href);url.searchParams.delete('sharedProfile');history.replaceState(null,'',url.toString())}
+  $p('profileImportNo').addEventListener('click',closeImport);
+  $p('profileImportYes').addEventListener('click',()=>{if(!pendingShared)return;const shared=sharedProfiles();const existing=shared.findIndex(p=>p.id===pendingShared.id);if(existing>=0)shared[existing]=pendingShared;else shared.push(pendingShared);write(SHARED,shared);alert(t('imported'));closeImport();if(drawer.classList.contains('open'))renderList()});
+  // Los enlaces contienen solo el ID; los datos se consultan en Supabase.
+  (async()=>{try{const id=new URLSearchParams(location.search).get('sharedProfile');if(id&&/^[A-Za-z0-9]{8}$/.test(id)){const profile=await fetchSharedProfile(id);if(profile&&Array.isArray(profile.blockedUmas)&&Array.isArray(profile.disabledCards))showImport(profile);else console.warn('No se encontró el perfil compartido.')}}catch(error){console.warn('No se pudo consultar el perfil compartido.',error);alert('No se pudo abrir el perfil compartido. Comprueba la configuración de Supabase.')}})();
+  // Mantener los textos en el idioma actual.
+  function translateUI(){document.querySelectorAll('[data-profile-i18n]').forEach(el=>{const key=el.getAttribute('data-profile-i18n');el.textContent=t(key)});document.querySelectorAll('[data-profile-i18n-placeholder]').forEach(el=>{el.placeholder=t(el.getAttribute('data-profile-i18n-placeholder'))})}
+  translateUI();document.getElementById('langBtn')?.addEventListener('click',()=>setTimeout(translateUI,0));
+})();
+</script>
+</body>
 </html>
