@@ -8,6 +8,36 @@
   <link rel="icon" type="image/x-icon" href="logo.png">
   <meta name="description" data-i18n-meta="pageDescription" content="Generador de retos / sets randomizados para Uma Musume (train & supports)." />
   <script src="https://cdn.tailwindcss.com"></script>
+<style id="profileManagerStyles">
+#profileManagerLauncher{position:fixed;right:16px;bottom:16px;z-index:8800;border:1px solid #d8c9e7;border-radius:14px;padding:11px 15px;background:#eee7f5;color:#3c2e50;font-weight:800;box-shadow:0 8px 25px #0002;cursor:pointer}
+#profileManagerDrawer{position:fixed;z-index:8801;right:0;top:0;height:100dvh;width:min(420px,94vw);background:#fffaff;color:#292234;border-left:1px solid #d8c9e7;box-shadow:-16px 0 40px #0002;transform:translateX(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column}
+#profileManagerDrawer.open{transform:translateX(0)}
+#profileManagerDrawer *{box-sizing:border-box}
+.profile-manager-head{display:flex;align-items:center;justify-content:space-between;padding:17px 18px;border-bottom:1px solid #e8def0;gap:12px}
+.profile-manager-head h2{font-size:20px;font-weight:900;margin:0}
+.profile-manager-close{font-size:27px;line-height:1;border-radius:9px;padding:2px 10px;background:#f1eaf7;color:inherit}
+.profile-manager-body{padding:16px;overflow:auto;min-height:0;flex:1}
+.profile-manager-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:15px}
+.profile-manager-tabs button,.profile-manager-primary,.profile-manager-secondary,.profile-manager-list button{border-radius:10px;padding:9px 11px;font-weight:750;border:1px solid #d8c9e7;background:#f3edf8;color:#3c2e50;cursor:pointer}
+.profile-manager-tabs button.active,.profile-manager-primary{background:#7c3aed;border-color:#7c3aed;color:white}
+.profile-manager-create{display:flex;gap:8px;margin-bottom:14px}
+.profile-manager-create input{min-width:0;flex:1;border:1px solid #d8c9e7;border-radius:10px;padding:10px;background:white;color:#241b30}
+.profile-manager-list{display:flex;flex-direction:column;gap:10px}
+.profile-manager-item{border:1px solid #e3d8ed;border-radius:13px;padding:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.profile-manager-item-name{font-weight:850;overflow-wrap:anywhere;flex:1;min-width:100px}
+.profile-manager-item-actions{display:flex;gap:6px;flex-wrap:wrap;width:100%}
+.profile-manager-item-actions button{flex:1;font-size:12px;padding:8px 6px}
+.profile-manager-empty{font-size:13px;opacity:.7;padding:15px 4px;text-align:center}
+#profileImportOverlay{position:fixed;inset:0;z-index:9900;display:none;align-items:center;justify-content:center;padding:18px;background:#17102099}
+#profileImportOverlay.visible{display:flex}
+#profileImportDialog{width:min(420px,100%);padding:22px;border-radius:18px;background:#fffaff;color:#292234;box-shadow:0 20px 70px #0005}
+#profileImportDialog h3{font-size:20px;font-weight:900;margin:0 0 10px}
+#profileImportDialog p{margin:0 0 18px;overflow-wrap:anywhere}
+.profile-import-actions{display:flex;gap:10px}.profile-import-actions button{flex:1;border-radius:10px;padding:10px;font-weight:800}
+body.darkMode #profileManagerDrawer{background:#1c172a;color:#f7f2ff;border-color:#554469}
+body.darkMode .profile-manager-head{border-color:#493b5b}body.darkMode .profile-manager-close,body.darkMode .profile-manager-tabs button,body.darkMode .profile-manager-secondary,body.darkMode .profile-manager-list button{background:#30263f;color:#f7f2ff;border-color:#574768}body.darkMode .profile-manager-tabs button.active,body.darkMode .profile-manager-primary{background:#6d28d9;color:white;border-color:#a78bfa}body.darkMode .profile-manager-item{border-color:#493b5b}body.darkMode .profile-manager-create input{background:#282033;color:#fff;border-color:#574768}body.darkMode #profileImportDialog{background:#1c172a;color:#f7f2ff}
+@media(max-width:600px){#profileManagerLauncher{right:10px;bottom:10px;padding:10px 12px}#profileManagerDrawer{width:min(390px,96vw)}}
+</style>
 </head>
 <body class="bg-gray-100 text-gray-800">
   <div class="max-w-7xl mx-auto p-3 sm:p-6">
@@ -47,16 +77,60 @@
       <section class="lg:col-span-1 bg-white p-4 rounded-2xl shadow">
         <div class="flex gap-2 mb-3">
           <button id="generateBtn" class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Generar</button>
-          <button id="randomUmaBtn"class="bg-gray-200 px-3 py-2 rounded hover:bg-gray-300">Reroll Uma</button>
+          <button id="settingsBtn" class="settings-gear-btn" type="button" aria-label="Configuración" aria-expanded="false" title="Configuración">⚙️</button>
         </div>
 
-        <label class="flex items-center gap-2 mt-2 text-sm cursor-pointer">
-          <input type="checkbox" id="offMetaMode" class="w-4 h-4 accent-pink-500">
-          <span data-i18n="hardMode">Modo difícil: Aptitudes invertidas</span>
-        </label>
-        <p class="text-xs text-gray-500 mt-1">
-          <span data-i18n="hardModeDesc">Recomienda una distancia y estrategia poco favorables para la Uma.</span>
-        </p>
+        <input type="checkbox" id="offMetaMode" class="hidden" aria-hidden="true">
+        <aside id="settingsPanel" class="settings-panel" aria-label="Configuración del generador" hidden>
+          <div class="settings-panel-header">
+            <h3 data-i18n="settingsTitle">Configuración</h3>
+            <button id="closeSettingsBtn" type="button" class="settings-close-btn" aria-label="Cerrar configuración">×</button>
+          </div>
+          <div class="settings-panel-content">
+            <section class="settings-option">
+              <div class="settings-option-copy">
+                <strong data-i18n="hardModeShort">Modo difícil</strong>
+                <p data-i18n="hardModeDesc">Recomienda una distancia y estrategia poco favorables para la Uma.</p>
+              </div>
+              <button id="hardModeToggleBtn" type="button" class="settings-action-btn" aria-pressed="false">Desactivado</button>
+            </section>
+            <section class="settings-option">
+              <div class="settings-option-copy">
+                <strong data-i18n="reroll">Reroll Uma</strong>
+                <p data-i18n="rerollUmaDesc">Cambia solo el personaje.</p>
+              </div>
+              <button id="randomUmaBtn" type="button" class="settings-action-btn">Reroll Uma</button>
+            </section>
+            <section class="settings-option">
+              <div class="settings-option-copy">
+                <strong data-i18n="rerollScenario">Reroll Escenario</strong>
+                <p data-i18n="rerollScenarioDesc">Cambia solo el escenario.</p>
+              </div>
+              <button id="rerollScenarioBtn" type="button" class="settings-action-btn">Cambiar</button>
+            </section>
+            <section class="settings-option">
+              <div class="settings-option-copy">
+                <strong data-i18n="rerollSupports">Reroll Supports</strong>
+                <p data-i18n="rerollSupportsDesc">Cambia la composición sin alterar la Uma, el escenario ni las Sparks.</p>
+              </div>
+              <button id="rerollSupportsBtn" type="button" class="settings-action-btn">Cambiar</button>
+            </section>
+            <section class="settings-option">
+              <div class="settings-option-copy">
+                <strong data-i18n="activateSparks">Activar Sparks</strong>
+                <p data-i18n="activateSparksDesc">Muestra u oculta las Sparks azules y rosas.</p>
+              </div>
+              <button id="sparksToggleBtn" type="button" class="settings-action-btn" aria-pressed="true">Sí</button>
+            </section>
+            <section class="settings-option">
+              <div class="settings-option-copy">
+                <strong data-i18n="rerollSparks">Reroll Sparks</strong>
+                <p data-i18n="rerollSparksDesc">Genera otra combinación de Sparks.</p>
+              </div>
+              <button id="rerollSparksBtn" type="button" class="settings-action-btn">Cambiar</button>
+            </section>
+          </div>
+        </aside>
 
         <!-- Bloque visual de selección de Umas -->
         <hr class="my-3" />
@@ -5591,6 +5665,22 @@ const TRANSLATIONS = {
     generate: "Generar",
     generatePrompt: "Presiona Generar 🎲",
     reroll: "Reroll Uma",
+    settingsTitle: "Configuración",
+    hardModeShort: "Modo difícil",
+    hardModeOn: "Activado",
+    hardModeOff: "Desactivado",
+    rerollUmaDesc: "Cambia solo el personaje.",
+    rerollScenario: "Reroll Escenario",
+    rerollScenarioDesc: "Cambia solo el escenario.",
+    rerollSupports: "Reroll Supports",
+    rerollSupportsDesc: "Cambia la composición sin alterar la Uma, el escenario ni las Sparks.",
+    activateSparks: "Activar Sparks",
+    activateSparksDesc: "Muestra u oculta las Sparks azules y rosas.",
+    rerollSparks: "Reroll Sparks",
+    rerollSparksDesc: "Genera otra combinación de Sparks.",
+    change: "Cambiar",
+    yes: "Sí",
+    no: "No",
     emptyTitle: "Aún no has generado una Uma",
     emptyText: "Presiona <strong>Generar</strong> para comenzar una nueva run.",
     scenario: "Escenario recomendado",
@@ -5636,6 +5726,22 @@ const TRANSLATIONS = {
     generate: "Generate",
     generatePrompt: "Press Generate 🎲",
     reroll: "Reroll Uma",
+    settingsTitle: "Settings",
+    hardModeShort: "Hard mode",
+    hardModeOn: "Enabled",
+    hardModeOff: "Disabled",
+    rerollUmaDesc: "Changes only the character.",
+    rerollScenario: "Reroll Scenario",
+    rerollScenarioDesc: "Changes only the scenario.",
+    rerollSupports: "Reroll Supports",
+    rerollSupportsDesc: "Changes the composition without changing the Uma, scenario, or Sparks.",
+    activateSparks: "Enable Sparks",
+    activateSparksDesc: "Show or hide blue and pink Sparks.",
+    rerollSparks: "Reroll Sparks",
+    rerollSparksDesc: "Generate another Sparks combination.",
+    change: "Change",
+    yes: "Yes",
+    no: "No",
     emptyTitle: "You haven't generated an Uma yet",
     emptyText: "Press <strong>Generate</strong> to start a new run.",
     scenario: "Recommended scenario",
@@ -5692,6 +5798,10 @@ function applyLanguage(){
 
   if($("generateBtn")) $("generateBtn").textContent = t("generate");
   if($("randomUmaBtn")) $("randomUmaBtn").textContent = t("reroll");
+  if($("rerollScenarioBtn")) $("rerollScenarioBtn").textContent = t("change");
+  if($("rerollSupportsBtn")) $("rerollSupportsBtn").textContent = t("change");
+  if($("rerollSparksBtn")) $("rerollSparksBtn").textContent = t("change");
+  updateSettingsButtonLabels();
 
   const langBtn = $("langBtn");
   if(langBtn){
@@ -6170,6 +6280,72 @@ SCENARIOS
 
     // === Generar Run ===
     let currentUma = null;
+    let currentSupports = null;
+    let currentScenario = null;
+    let currentBlueSparks = [];
+    let currentPinkSparks = [];
+    let sparksEnabled = localStorage.getItem("sparksEnabled") !== "false";
+
+    function updateSettingsButtonLabels(){
+      const hardBtn = $("hardModeToggleBtn");
+      if(hardBtn){
+        const enabled = $("offMetaMode")?.checked === true;
+        hardBtn.textContent = enabled ? t("hardModeOn") : t("hardModeOff");
+        hardBtn.classList.toggle("is-active", enabled);
+        hardBtn.setAttribute("aria-pressed", String(enabled));
+      }
+      const sparksBtn = $("sparksToggleBtn");
+      if(sparksBtn){
+        sparksBtn.textContent = sparksEnabled ? t("yes") : t("no");
+        sparksBtn.classList.toggle("is-active", sparksEnabled);
+        sparksBtn.setAttribute("aria-pressed", String(sparksEnabled));
+      }
+    }
+
+    function renderCurrentSupports(){
+      const list = $("supportsList");
+      if(!list || !currentSupports) return;
+      list.innerHTML = '';
+      Object.entries(currentSupports).forEach(([type,count])=>{
+        if(count > 0){
+          const node = document.createElement('div');
+          node.className = 'p-2 border rounded text-center bg-white';
+          node.innerHTML = `<strong>${type}</strong><div class="text-sm text-gray-600">${count}</div>`;
+          list.appendChild(node);
+        }
+      });
+    }
+
+    function renderCurrentSparks(){
+      const existing = $("sparksSection");
+      if(!sparksEnabled){
+        if(existing) existing.remove();
+        return;
+      }
+      const markup = renderSparkPills(currentBlueSparks, currentPinkSparks);
+      if(existing){
+        existing.outerHTML = markup;
+        return;
+      }
+      const result = $("resultCard");
+      if(!result || !currentUma) return;
+      const hardBox = $("offMetaBox");
+      if(hardBox) hardBox.insertAdjacentHTML("beforebegin", markup);
+      else result.insertAdjacentHTML("beforeend", markup);
+    }
+
+    function rerollCurrentSparks(){
+      if(!currentUma || !currentSupports) return;
+      const hard = $("offMetaMode")?.checked === true;
+      if(hard && !currentOffMetaRecommendation){
+        currentOffMetaRecommendation = getOffMetaRecommendation(currentUma);
+      }
+      currentBlueSparks = mergeSparks(generateBlueSparks(currentUma, currentSupports));
+      currentPinkSparks = mergeSparks(hard
+        ? generateOffMetaPinkSparks(currentOffMetaRecommendation)
+        : generatePinkSparks(currentUma));
+      renderCurrentSparks();
+    }
 
 $('generateBtn').addEventListener('click',()=>{
 
@@ -6220,6 +6396,8 @@ availableUmas
 currentUma=uma;
 
 const supports = distributeSupports(6,'simple','free');
+currentSupports = supports;
+currentScenario = getScenario();
 const offMetaMode = document.getElementById('offMetaMode')?.checked === true;
 const offMetaRecommendation = offMetaMode
   ? getOffMetaRecommendation(uma)
@@ -6230,12 +6408,14 @@ currentOffMetaRecommendation = offMetaRecommendation;
 const blueSparks = mergeSparks(
   generateBlueSparks(uma,supports)
 );
+currentBlueSparks = blueSparks;
 
 const pinkSparks = mergeSparks(
   offMetaMode
     ? generateOffMetaPinkSparks(offMetaRecommendation)
     : generatePinkSparks(uma)
 );
+currentPinkSparks = pinkSparks;
 
   document.getElementById("resultCard").innerHTML=`
 
@@ -6268,9 +6448,9 @@ ${uma.name}
 ${t("scenario")}
 </h4>
 
-<div class="text-indigo-700 font-bold">
+<div id="scenarioValue" class="text-indigo-700 font-bold">
 
-🎵 ${getScenario()}
+🎵 ${currentScenario}
 
 </div>
 
@@ -6289,7 +6469,7 @@ ${t("scenario")}
 
 </div>
 
-${renderSparkPills(blueSparks,pinkSparks)}
+${sparksEnabled ? renderSparkPills(blueSparks,pinkSparks) : ""}
 
 ${offMetaMode && offMetaRecommendation ? `
   <div id="offMetaBox" class="off-meta-box mt-3 p-3 rounded-lg">
@@ -6306,17 +6486,7 @@ ${offMetaMode && offMetaRecommendation ? `
 `;
 
 
-const supportsList = $("supportsList");
-supportsList.innerHTML = '';
-
-Object.entries(supports).forEach(([type,count])=>{
-  if(count > 0){
-    const node = document.createElement('div');
-    node.className = 'p-2 border rounded text-center bg-white';
-    node.innerHTML = `<strong>${type}</strong><div class="text-sm text-gray-600">${count}</div>`;
-    supportsList.appendChild(node);
-  }
-});
+renderCurrentSupports();
 
 document.getElementById(
 "umaName"
@@ -6431,74 +6601,83 @@ img.classList.remove("hidden");
 });
 });
 
-    // generar soportes 
-    const supports = distributeSupports(6,'simple','free');
-    const supportsList = $('supportsList');
-    supportsList.innerHTML='';
-    Object.entries(supports).forEach(([k,v])=>{
-      if(v>0){
-        const node=document.createElement('div');
-        node.className='p-2 border rounded text-center bg-white';
-        node.innerHTML=`<strong>${k}</strong>
-        <div class="text-sm text-gray-600"> ${v} </div>`;
-        
-        supportsList.appendChild(node);
+    // === Controles del panel de configuración ===
+    const settingsPanel = $("settingsPanel");
+    const settingsBtn = $("settingsBtn");
+
+    function setSettingsOpen(open){
+      if(!settingsPanel || !settingsBtn) return;
+      settingsPanel.hidden = !open;
+      settingsBtn.setAttribute("aria-expanded", String(open));
+      settingsBtn.classList.toggle("is-open", open);
+    }
+
+    settingsBtn?.addEventListener("click", ()=>setSettingsOpen(settingsPanel.hidden));
+    $("closeSettingsBtn")?.addEventListener("click", ()=>setSettingsOpen(false));
+
+    $("hardModeToggleBtn")?.addEventListener("click", ()=>{
+      const checkbox = $("offMetaMode");
+      checkbox.checked = !checkbox.checked;
+      updateSettingsButtonLabels();
+    });
+
+    // Reroll Uma cambia únicamente el personaje; mantiene escenario, supports y Sparks.
+    $("randomUmaBtn")?.addEventListener("click", ()=>{
+      const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
+      const pool = availableUmas.length ? availableUmas : UMAS;
+      if(!pool.length) return;
+      const u = pickRandom(pool);
+      currentUma = u;
+      const name = $("umaName");
+      const img = $("umaImage");
+      if(name) name.textContent = u.name;
+      if(img){
+        img.src = u.img;
+        img.classList.remove("hidden");
+      }
+      // Actualiza solo los datos de aptitudes del modo difícil para el personaje nuevo.
+      const hard = $("offMetaMode")?.checked === true;
+      currentOffMetaRecommendation = hard ? getOffMetaRecommendation(u) : null;
+      const oldBox = $("offMetaBox");
+      if(oldBox){
+        oldBox.outerHTML = hard ? `
+          <div id="offMetaBox" class="off-meta-box mt-3 p-3 rounded-lg">
+            <strong>${t("hardActive")}</strong>
+            <div class="mt-1">${t("carry")} <strong>${localizeOffMetaValue(currentOffMetaRecommendation.strategyRunName)}</strong>, ${t("distance")} <strong>${localizeOffMetaValue(currentOffMetaRecommendation.distance)}</strong> y ${t("surface")} <strong>${localizeOffMetaValue(currentOffMetaRecommendation.surface)}</strong>.</div>
+            <div class="text-xs mt-1 opacity-80">${t("originalAptitudes")}: ${localizeOffMetaValue(currentOffMetaRecommendation.strategy)} ${currentOffMetaRecommendation.strategyGrade} · ${localizeOffMetaValue(currentOffMetaRecommendation.distance)} ${currentOffMetaRecommendation.distanceGrade} · ${localizeOffMetaValue(currentOffMetaRecommendation.surface)} ${currentOffMetaRecommendation.surfaceGrade}</div>
+          </div>` : '';
       }
     });
 
-        // === Reroll Uma ===
-    $('randomUmaBtn').addEventListener('click', ()=> {
-  const availableUmas = UMAS.filter(u => !blockedUmas.has(u.name));
-  const u = pickRandom(availableUmas.length>0 ? availableUmas : UMAS);
+    $("rerollScenarioBtn")?.addEventListener("click", ()=>{
+      if(!currentScenario) return;
+      const alternatives = SCENARIOS.filter(s => s !== currentScenario);
+      currentScenario = pickRandom(alternatives.length ? alternatives : SCENARIOS);
+      const value = $("scenarioValue");
+      if(value) value.textContent = `🎵 ${currentScenario}`;
+    });
 
-  currentUma = u;
+    $("rerollSupportsBtn")?.addEventListener("click", ()=>{
+      if(!currentUma) return;
+      currentSupports = distributeSupports(6,'simple','free');
+      renderCurrentSupports();
+      // Por diseño, cambiar supports no recalcula las Sparks existentes.
+    });
 
-  $('umaName').textContent = u.name;
-  $('umaImage').src = u.img;
+    $("sparksToggleBtn")?.addEventListener("click", ()=>{
+      sparksEnabled = !sparksEnabled;
+      localStorage.setItem("sparksEnabled", String(sparksEnabled));
+      updateSettingsButtonLabels();
+      if(sparksEnabled) renderCurrentSparks();
+      else $("sparksSection")?.remove();
+    });
 
-  // Recalcular Sparks usando los datos de la nueva Uma
-  const offMetaMode = document.getElementById('offMetaMode')?.checked === true;
-  const offMetaRecommendation = offMetaMode
-    ? getOffMetaRecommendation(u)
-    : null;
+    $("rerollSparksBtn")?.addEventListener("click", ()=>{
+      if(!currentUma) return;
+      rerollCurrentSparks();
+    });
 
-  currentOffMetaRecommendation = offMetaRecommendation;
-
-  const blueSparks = mergeSparks(
-    generateBlueSparks(u, supports)
-  );
-
-  const pinkSparks = mergeSparks(
-    offMetaMode
-      ? generateOffMetaPinkSparks(offMetaRecommendation)
-      : generatePinkSparks(u)
-  );
-
-  const sparksSection = document.getElementById('sparksSection');
-  if(sparksSection){
-    sparksSection.outerHTML = renderSparkPills(blueSparks, pinkSparks);
-  }
-
-  const offMetaBox = document.getElementById('offMetaBox');
-  if(offMetaBox){
-    offMetaBox.outerHTML = offMetaMode ? `
-      <div id="offMetaBox" class="off-meta-box mt-3 p-3 rounded-lg">
-        <strong>${t("hardActive")}</strong>
-        <div class="mt-1">
-          ${t("carry")} <strong>${offMetaRecommendation.strategyRunName}</strong>, ${t("distance")} <strong>${offMetaRecommendation.distance}</strong> y ${t("surface")} <strong>${offMetaRecommendation.surface}</strong>.
-        </div>
-        <div class="text-xs mt-1 opacity-80">
-          ${t("originalAptitudes")}: ${offMetaRecommendation.strategy} ${offMetaRecommendation.strategyGrade} · ${offMetaRecommendation.distance} ${offMetaRecommendation.distanceGrade} · ${offMetaRecommendation.surface} ${offMetaRecommendation.surfaceGrade}
-        </div>
-      </div>
-    ` : '';
-  }
-
-  // Actualizar el cuadro de Modo Difícil usando el idioma actual.
-  if(offMetaMode && currentOffMetaRecommendation){
-    renderOffMetaBox(currentOffMetaRecommendation);
-  }
-});
+    updateSettingsButtonLabels();
 
     // === Inicializar pantalla ===
     document.addEventListener("DOMContentLoaded", ()=>{
@@ -6603,6 +6782,28 @@ class="bg-white rounded-xl p-6 w-[900px] max-w-[95vw] relative">
 </div>
 
 <style>
+  .settings-gear-btn{flex:0 0 44px;min-width:44px;height:42px;border-radius:10px;background:#eee7f5;color:#3c2e50;font-size:21px;border:1px solid #d8c9e7;transition:transform .15s,background .15s}
+  .settings-gear-btn:hover,.settings-gear-btn.is-open{background:#ded0ef;transform:rotate(12deg)}
+  .settings-panel{position:fixed;z-index:9000;right:14px;top:88px;width:340px;max-width:calc(100vw - 24px);max-height:calc(100vh - 104px);overflow:auto;border:1px solid rgba(150,120,180,.45);border-radius:18px;background:rgba(255,250,255,.98);color:#292234;box-shadow:0 18px 45px rgba(20,10,35,.28);backdrop-filter:blur(14px)}
+  .settings-panel[hidden]{display:none!important}
+  .settings-panel-header{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:inherit;border-bottom:1px solid rgba(150,120,180,.25)}
+  .settings-panel-header h3{font-size:18px;font-weight:800;margin:0}
+  .settings-close-btn{font-size:28px;line-height:1;width:34px;height:34px;border-radius:9px;background:rgba(140,110,165,.12)}
+  .settings-panel-content{padding:8px 14px 14px}
+  .settings-option{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid rgba(150,120,180,.18)}
+  .settings-option:last-child{border-bottom:0}
+  .settings-option-copy{min-width:0;flex:1}
+  .settings-option-copy strong{display:block;font-size:14px;font-weight:800}
+  .settings-option-copy p{font-size:11px;line-height:1.35;margin:3px 0 0;opacity:.72}
+  .settings-action-btn{flex:0 0 auto;min-width:88px;padding:8px 10px;border-radius:10px;background:#eee7f5;border:1px solid #d8c9e7;color:#3c2e50;font-size:12px;font-weight:800;white-space:nowrap}
+  .settings-action-btn.is-active{background:#e9d5ff;border-color:#c084fc;color:#6b21a8}
+  body.darkMode .settings-panel{background:rgba(28,23,42,.98);color:#f7f2ff;border-color:rgba(221,190,255,.28)}
+  body.darkMode .settings-panel-header{border-color:rgba(221,190,255,.18)}
+  body.darkMode .settings-option{border-color:rgba(221,190,255,.14)}
+  body.darkMode .settings-action-btn,body.darkMode .settings-close-btn{background:rgba(255,255,255,.10);color:#fff;border-color:rgba(255,255,255,.18)}
+  body.darkMode .settings-action-btn.is-active{background:#5b21b6;color:#fff;border-color:#a78bfa}
+  body.darkMode .settings-gear-btn{background:rgba(255,255,255,.10);color:#fff;border-color:rgba(255,255,255,.18)}
+  @media(max-width:768px){.settings-panel{top:76px;right:8px;width:330px;max-width:calc(100vw - 16px);max-height:calc(100vh - 90px)}.settings-panel-content{padding:6px 12px 10px}.settings-option{padding:10px 0}}
 
   /* ===== Ajustes para móviles ===== */
 
@@ -6782,6 +6983,21 @@ border-color:#6b7280 !important;
   .darkMode .off-meta-box strong{
     color:#78350f !important;
   }
+
+  /* Recuadro de restricciones de la ruleta: aterriza junto al modo difícil. */
+  .roulette-restriction-box{
+    margin-top:12px;padding:12px 14px;border:2px solid var(--roulette-event-color,#8138dc);
+    border-radius:12px;color:#fff;background:linear-gradient(135deg,var(--roulette-event-color,#8138dc),#171923);
+    box-shadow:0 8px 22px rgba(0,0,0,.18);transform-origin:top center;
+    animation:rouletteRestrictionLand .62s cubic-bezier(.18,.82,.25,1.18) both;
+  }
+  .roulette-restriction-box strong{display:block;margin-bottom:4px;color:#fff!important;font-weight:900}
+  @keyframes rouletteRestrictionLand{
+    0%{opacity:0;transform:translateY(-42px) scale(.82);filter:blur(2px)}
+    68%{opacity:1;transform:translateY(4px) scale(1.015);filter:blur(0)}
+    100%{opacity:1;transform:translateY(0) scale(1)}
+  }
+  @media(prefers-reduced-motion:reduce){.roulette-restriction-box{animation:none}}
 
 
   /* =========================================================
@@ -7258,6 +7474,20 @@ body #toggleAllUmas {
   transition-timing-function: ease !important;
 }
 
+
+/* Nuevas Umas/cartas: modal de revisión */
+#newEntryReviewOverlay{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.72);backdrop-filter:blur(5px)}
+#newEntryReviewOverlay.visible{display:flex}
+#newEntryReview{width:min(460px,100%);max-height:min(82vh,720px);overflow:auto;border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:24px;background:var(--panel-bg, #191827);color:var(--text-color, #fff);box-shadow:0 22px 80px rgba(0,0,0,.45);text-align:center}
+#newEntryReview .review-kicker{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
+#newEntryReview h2{font-size:22px;margin:8px 0 10px}
+#newEntryReviewName{font-size:17px;font-weight:700;overflow-wrap:anywhere;margin:16px 0}
+#newEntryReviewHelp{font-size:14px;opacity:.8;line-height:1.5}
+#newEntryReview .review-actions{display:flex;gap:12px;margin-top:22px}
+#newEntryReview button{flex:1;border:0;border-radius:12px;padding:12px 10px;font-weight:700;cursor:pointer}
+#newEntryKeep{background:#2e9d68;color:white}#newEntryReject{background:#b84655;color:white}
+@media(max-width:600px){#newEntryReview{padding:20px 16px;border-radius:16px}#newEntryReview h2{font-size:19px}}
+
 </style>
 
 
@@ -7333,9 +7563,25 @@ body #toggleAllUmas {
       const path=paths.find(p=>p.dataset.color===order[nextIndex]);
       if(path)sequence.push(path);
     }
-    // Los siete segmentos restantes cambian durante el intervalo 0:10–0:12.
-    const interval=2000/sequence.length;
-    sequence.forEach((p,i)=>later(()=>{p.setAttribute('fill',colors[key].hex);},Math.round(i*interval)));
+    // Sincronizar el barrido con el reloj real del audio (0:10–0:12.9),
+    // en vez de depender de setTimeout, que puede retrasarse según el navegador.
+    const startTime=10;
+    const endTime=12.4;
+    const duration=endTime-startTime;
+    const startedAt=performance.now();
+    const frame=()=>{
+      if(!running)return;
+      // Usar el tiempo del audio cuando esté disponible; performance.now es respaldo.
+      const elapsed=audio && Number.isFinite(audio.currentTime) && !audio.paused
+        ? audio.currentTime
+        : (performance.now()-startedAt)/1000+startTime;
+      const progress=Math.max(0,Math.min(1,(elapsed-startTime)/duration));
+      const completed=progress<=0?0:Math.min(sequence.length,Math.ceil(progress*sequence.length));
+      for(let i=0;i<completed;i++) sequence[i].setAttribute('fill',colors[key].hex);
+      if(progress<1) requestAnimationFrame(frame);
+      else sequence.forEach(p=>p.setAttribute('fill',colors[key].hex));
+    };
+    requestAnimationFrame(frame);
   }
   // Evita repetir consecutivamente el mismo mensaje rojo o la misma stat afectada.
   let lastRedMessageIndex=-1;
@@ -7364,8 +7610,38 @@ body #toggleAllUmas {
       ];title='🔴 MOMENTO GOLD SHIP';body=opts[pickRedMessageIndex()]();
     }else if(key==='pink'){title='🩷 MOMENTO HARU URARA';body='¡Hoy la suerte te sonríe! Puedes saltarte el randomizer de Supports y elegir libremente las cartas que quieras usar.';}
     else if(key==='green'){title='🟢 MOMENTO C.B.';body='Debes incluir una carta SSR o R de Mr. C.B. de Wit. Reemplaza una de las cartas obtenidas en el randomizer de Supports por la carta correspondiente.';}
+    else if(key==='purple'){title='🟣 RESTRICCIÓN CHAMPIONS MEETING';body='Entrena esta Uma para la Champions Meeting actual o la próxima. Revisa el recorrido y las condiciones anunciadas por el juego y adapta tu entrenamiento a ellas.';}
     result.style.borderColor=c.hex;result.style.background=`linear-gradient(135deg,${c.hex},#171923)`;result.innerHTML='<h3></h3><p></p>';result.querySelector('h3').textContent=title;result.querySelector('p').textContent=body;result.classList.add('is-visible');close.style.display='inline-block';
+    showPageRestriction(key,title,body,c.hex);
   }
+  function showPageRestriction(key,title,body,hex){
+    // Solo los eventos definidos tienen un recuadro persistente en el resultado.
+    if(!['red','pink','green','purple'].includes(key))return;
+    const card=document.getElementById('resultCard');
+    if(!card)return;
+    document.getElementById('rouletteRestrictionBox')?.remove();
+    const box=document.createElement('div');
+    box.id='rouletteRestrictionBox';
+    box.className='roulette-restriction-box';
+    box.style.setProperty('--roulette-event-color',hex);
+    const heading=document.createElement('strong');
+    heading.textContent=title;
+    const message=document.createElement('div');
+    message.textContent=body;
+    box.append(heading,message);
+
+    // Si el modo difícil está activo, el evento aterriza justo debajo de ese recuadro.
+    const hardBox=document.getElementById('offMetaBox');
+    if(hardBox && hardBox.parentElement===card || hardBox && card.contains(hardBox)){
+      hardBox.insertAdjacentElement('afterend',box);
+    }else{
+      // Sin modo difícil, ocupa la zona equivalente, debajo de las Sparks si existen.
+      const sparks=document.getElementById('sparksSection');
+      if(sparks && card.contains(sparks))sparks.insertAdjacentElement('afterend',box);
+      else card.appendChild(box);
+    }
+  }
+
   function launch(key){
     if(running)return;
     running=true; clearTimers();
@@ -7389,27 +7665,34 @@ body #toggleAllUmas {
     const fastAngle=rotation+5*360+180;
     wheel.style.transform=`translateZ(0) rotate(${rotation}deg)`;
 
-    // Animación total desde el clic: zoom inmediato, giro desde 1 s,
-    // frenado desde 6 s, recolor de 10–12 s y salida exactamente a 15 s.
+    // Tiempos sincronizados con el audio según las mediciones:
+    // zoom 0:00–0:00.7; giro rápido 0:01.1–0:06.4; frenado gradual 0:06.5–0:09.9;
+    // barrido algo más rápido 0:10–0:12.4 para dejar margen a la salida 0:13–0:15;
     wheelMotion=wheelArea.animate([
       {opacity:0,transform:'translate(-50%,-50%) scale(.02)',offset:0},
-      {opacity:1,transform:'translate(-50%,-50%) scale(1.08)',offset:.052},
-      {opacity:1,transform:'translate(-50%,-50%) scale(.97)',offset:.064},
-      {opacity:1,transform:'translate(-50%,-50%) scale(1)',offset:.078},
-      {opacity:1,transform:'translate(-50%,-50%) scale(1)',offset:14.48/15},
-      {opacity:1,transform:'translate(-50%,-50%) scale(1.03)',offset:14.58/15},
-      {opacity:0,transform:'translate(-50%,-50%) scale(.02)',offset:1}
+      {opacity:1,transform:'translate(-50%,-50%) scale(1.08)',offset:.035},
+      {opacity:1,transform:'translate(-50%,-50%) scale(.97)',offset:.04},
+      {opacity:1,transform:'translate(-50%,-50%) scale(1)',offset:.0467},
+      {opacity:1,transform:'translate(-50%,-50%) scale(1)',offset:.0533},
+      {opacity:1,transform:'translate(-50%,-50%) scale(1)',offset:13/15},
+      {opacity:1,transform:'translate(-50%,-50%) scale(1.03)',offset:13.1/15},
+      // La salida final se acelera ligeramente y termina alrededor de 0:14.8.
+      {opacity:0,transform:'translate(-50%,-50%) scale(.02)',offset:14.8/15}
     ],{duration:15000,easing:'linear',fill:'forwards'});
 
     wheelSpin=wheel.animate([
+      // La animación comienza a 0:00.8; giro rápido visible desde 0:01.1.
       {transform:`translateZ(0) rotate(${rotation}deg)`,offset:0},
-      {transform:`translateZ(0) rotate(${rotation}deg)`,offset:1/9},
-      {transform:`translateZ(0) rotate(${fastAngle}deg)`,offset:6/9,easing:'cubic-bezier(.12,.68,.12,1)'},
-      {transform:`translateZ(0) rotate(${finalAngle}deg)`,offset:1}
-    ],{duration:9000,delay:1000,fill:'forwards',easing:'linear'});
+      {transform:`translateZ(0) rotate(${rotation}deg)`,offset:0.3/9.1},
+      // Mantiene velocidad alta hasta 0:06.4.
+      {transform:`translateZ(0) rotate(${fastAngle}deg)`,offset:5.6/9.1},
+      // Desacelera de forma progresiva desde 0:06.5 hasta detenerse cerca de 0:09.9.
+      {transform:`translateZ(0) rotate(${rotation+7*360+((targetMod-start+360)%360)}deg)`,offset:8.1/9.1,easing:'cubic-bezier(.25,.1,.45,1)'},
+      {transform:`translateZ(0) rotate(${finalAngle}deg)`,offset:1,easing:'cubic-bezier(.55,.05,.75,.35)'}
+    ],{duration:9100,delay:800,fill:'forwards',easing:'linear'});
     wheelSpin.onfinish=()=>{rotation=finalAngle;wheel.style.transform=`translateZ(0) rotate(${rotation}deg)`;};
 
-    later(()=>recolorSlices(key),10000); // start the color wave at exactly 0:10
+    later(()=>recolorSlices(key),10000); // barrido de colores sincronizado con el tiempo del audio
     later(()=>{
       if(!running)return;
       if(wheelMotion)wheelMotion.cancel();
@@ -7422,8 +7705,244 @@ body #toggleAllUmas {
   function closeEvent(){clearTimers();running=false;if(wheelMotion)wheelMotion.cancel();if(wheelSpin)wheelSpin.cancel();audio.pause();audio.currentTime=0;overlay.classList.remove('is-visible');result.classList.remove('is-visible');wheelArea.style.display='block';wheelArea.style.opacity='0';wheelArea.style.transform='translate(-50%,-50%) scale(.02)';}
   close.addEventListener('click',closeEvent);
   overlay.addEventListener('click',e=>{if(e.target===overlay)closeEvent();});
-  const generate=document.getElementById('generateBtn');if(generate)generate.addEventListener('click',()=>{if(!running&&Math.random()<.05){const key=chooseColorByProbability();later(()=>launch(key),180);}});
+  const generate=document.getElementById('generateBtn');
+  if(generate) generate.addEventListener('click',()=>{
+    // La restricción anterior pertenece al resultado anterior; limpiar al generar otro.
+    document.getElementById('rouletteRestrictionBox')?.remove();
+    // No activar la ruleta si todas las Umas están bloqueadas.
+    const noAvailableUmas =
+      typeof UMAS !== 'undefined' &&
+      typeof blockedUmas !== 'undefined' &&
+      UMAS.every(uma => blockedUmas.has(uma.name));
+
+    if(noAvailableUmas) return;
+
+    // Mantener la probabilidad y el comportamiento actuales.
+    if(!running && Math.random() < 0.05){
+      const key=chooseColorByProbability();
+      later(()=>launch(key),180);
+    }
+  });
   makeSlices();
+})();
+</script>
+
+<div id="newEntryReviewOverlay" role="dialog" aria-modal="true" aria-labelledby="newEntryReviewTitle">
+  <div id="newEntryReview">
+    <div class="review-kicker" id="newEntryReviewKind">Nueva incorporación</div>
+    <h2 id="newEntryReviewTitle">¿Quieres conservar esta incorporación?</h2>
+    <div id="newEntryReviewName"></div>
+    <p id="newEntryReviewHelp">Si la conservas, podrá aparecer en el randomizer. Si la rechazas, quedará desactivada.</p>
+    <div class="review-actions"><button type="button" id="newEntryKeep">Conservar</button><button type="button" id="newEntryReject">Rechazar</button></div>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  'use strict';
+  const BASELINE_UMAS = new Set(["Special Week [Special Dreamer]", "Special Week [Hopp'n♪Happy Heart]", "Special Week [Ruler of Japan]", "Silence Suzuka [Swift Silence]", "Tokai Teio [Peak Joy]", "Tokai Teio [Beyond the Horizon]", "Maruzensky [Formula R]", "Maruzensky [Hot☆Summer Night]", "Fuji Kiseki [Shooting Star Revue]", "Fuji Kiseki [Succès Étoilé]", "Oguri Cap [Starlight Beat]", "Oguri Cap [Ashen Miracle]", "Gold Ship [Red Strife]", "Gold Ship [RUN! RUIN! LAUNCHER!]", "Vodka [Wild Top Gear]", "Vodka [Fiery Aqua Vitae]", "Daiwa Scarlet [Peak Blue]", "Daiwa Scarlet [Nuit Étoilée de Scarlet]", "Taiki Shuttle [Wild Frontier]", "Taiki Shuttle [Bubblegum☆Memories]", "Grass Wonder [Stone-Piercing Blue]", "Grass Wonder [Saintly Jade Cleric]", "Hishi Amazon [Azure Amazon]", "Mejiro McQueen [Frontline Elegance]", "Mejiro McQueen [End of the Skies]", "Mejiro McQueen [Fair Lady of the Waves]", "El Condor Pasa [El☆Número 1]", "El Condor Pasa [Kukulkan Warrior]", "T.M. Opera O [O Sole Suo!]", "T.M. Opera O [New Year, Same Radiance!]", "Narita Brian [Maverick]", "Narita Brian [Ravenous Wolf]", "Symboli Rudolf [Emperor´s Path]", "Symboli Rudolf [Archer by Moonlight]", "Air Groove [Empress Road]", "Air Groove [Quercus Civilis]", "Agnes Digital [Full-Color Fangirling]", "Agnes Digital [Fanatic♡Jiangshi]", "Seiun Sky [Reeling in the Big One]", "Seiun Sky [Soirée des Chatons]", "Tamamo Cross [Fast as Lightning]", "Tamamo Cross [Raging Thunder]", "Fine Motion [Noble Seamair]", "Fine Motion [Titania]", "Biwa Hayahide [pf. Winning Equation...]", "Biwa Hayahide [Rouge Caroler]", "Mayano Top Gun [Scramble Zone]", "Mayano Top Gun [Sunlight Bouquet]", "Manhattan Cafe [Creeping Shadow]", "Mihono Bourbon [MB-19890425]", "Mihono Bourbon [CODE: ICING]", "Mejiro Ryan [Down the Line]", "Hishi Akebono [Buono☆Alla Moda]", "Yukino Bijin [Darl´n Snowflake]", "Rice Shower [Rosy Dreams]", "Rice Shower [Vampire Makeover!]", "Ines Fujin [Always Electrifying]", "Agnes Tachyon [Tach-nology]", "Admire Vega [Starry Nocturne]", "Inari One [Edomurasaki]", "Inari One [Golden Dream]", "Winning Ticket [Get to Winning!]", "Winning Ticket [Dream Deliverer]", "Air Shakur [unsigned]", "Eishin Flash [Meisterschaft]", "Eishin Flash [Precise Chocolatier]", "Curren Chan [Fille Éclair]", "Curren Chan [Ma Chérie of the New Moon]", "Kawakami Princess [Princess of Pink]", "Gold City [Authentic / 1928]", "Gold City [Autumn Cosmos]", "Sakura Bakushin O [Blossom in Learning]", "Seeking the Pearl [Rocket☆Star]", "Sweep Tosho [Platanus Witch]", "Super Creek [Murmuring Stream]", "Super Creek [Chiffon-Wrapped Mummy]", "Smart Falcon [LOVE☆4EVER]", "Smart Falcon [Twilight Triumph]", "Zenno Rob Roy [Heroic Author]", "Tosen Jordan [Jokester ☆ Vibes]", "Nakayama Festa [Desperate Measures]", "Narita Taishin [Nevertheless]", "Nishino Flower [Layered Petals]", "Haru Urara [Bestest Prize]", "Haru Urara [New Year ♪ New Urara!]", "Bamboo Memory [Iron Ambition]", "Makitanefukukitaru [Rising☆Fortune]", "Matikanefukukitaru [Lucky Tidings]", "Meisho Doto [Turbulent Blue]", "Meisho Doto [Dot-o´-Lantern]", "Mejiro Dober [Off the Line]", "Mejiro Dober [Sapphire Sojourn]", "Nice Nature [Poinsettia Ribbon]", "Nice Nature [Run & Win]", "King Halo [King of Emeralds]", "King Halo [Cheerleader in Noble White]", "Matikanetannhauser [Clippety-Tippety-Clop]", "Mejiro Palmer [Line Breakthrough]", "Satono Diamond [Natural Brilliance]", "Satono Diamond [Jade´s Prosperity]", "Kitasan Black [Gilded Shrine to Glory]", "Kitasan Black [Crane´s Ambition]", "Sakura Chiyono O [Strength in Full Bloom]", "Mejiro Ardan [Crystalline]", "Yaeno Muteki [Blazed Head, Covered Fists]", "Mejiro Bright [Brunissage Line]", "Yamanin Zephyr [Fluttertail Spirit]", "Aston Machan [Flare]", "Copano Rickey [Eightfold☆Fortune]", "Wonder Acute [Butterfly Sting]"]);
+  const BASELINE_SUPPORT_CARDS = new Set(["Silence Susuka [Beyond This Shining Moment]", "Tokai Teio [Dream Big!]", "Gold City [Run (my) way]", "Sakura Bakushin O [Eat Fast! Yum Fast!]", "Nishino Flower [Even the Littlest Bud]", "Biko Pegasus [Double Carrot Punch!]", "Special Week [The Setting Sun And Rising Stars]", "Twin Turbo [Turbo Booooost!]", "Kitasan Black [Fire at My Heels]", "Kawakami Princess [Princess Bride]", "Narita Brian [Two Pieces]", "Sweep Tosho [It´s All Mine!]", "Taiki Shuttle [Hands Up, Crook!]", "Gold Ship [That Time I Became the Strongest]", "Zenno Rob Roy [Magical Heroine]", "Mayano Top Gun [Party Formation]", "Silence Suzuka [Searching for Unseen Sights]", "Matikanefukukitaru [Touching Sleeves Is Good Luck! ♪]", "Tosen Jordan [My Way]", "Narita Top Road [Peachy Silhouette]", "Air Shakur [Mag!c Number]", "Seeking the Pearl [Cheer that Changed the World]", "Agnes Tachyon [Q≠0]", "Maruzensky [Sentimental Flare ♪]", "Daitaku Helios [Sunlit Angel ♪]", "Mejiro Ardan [Hopeful Petals Dancing in the Night]", "Mihono Bourbon [U & Me]", "Eishin Flash [Danke Schön]", "Eishin Flash [5:00 a.m.-Right on Schedelude]", "Narita Taishin [Poolside High Tides]", "King Halo [First-Rate Plan]", "Sweep Tosho [Lamplit Training of a Witch-to-be]", "Shinko Windy [///WARNING GATE///]", "El Condor Pasa [Mud-Caked Compañero]", "Vodka [An Annoying Supervisor]", "Curren Chan [Cozy Cute Memory ♪]", "Silence Suzuka [Tracen Academy]", "Tokai Teio [Tracen Academy]", "Maruzensky [Tracen Academy]", "Taiki Shuttle [Tracen Academy]", "Gold City [Tracen Academy]", "Sakura Bakushin O [Tracen Academy]", "Eishin Flash [Tracen Academy]", "Narita Taishin [Tracen Academy]", "Nishino Flower [Tracen Academy]", "Biko Pegasus [Tracen Academy]", "King Halo [Tracen Academy]", "Sweep Tosho [Tracen Academy]", "Twin Turbo [Tracen Academy]", "Kitasan Black [Tacen Academy]", "Kawakami Princess [Tracen Academy]", "Shinko Windy [Tracen Academy]", "Narita Brian [Tracen Academy]", "Narita Top Road [Tracen Academy]", "Gold Ship [Breakaway Battleship]", "Seiun Sky [Foolproof Plan]", "Tamamo Cross [Split the Sky, White Lightning!]", "Super Creek [Piece of Mind]", "Mejiro McQueen [Your Team Ace]", "Rice Shower [Showered In Joy]", "Satono Diamond [The Will to Overtake]", "Sakura Chiyono O [Peak Sakura Season]", "Nakayama Festa [43, 8, 1]", "Winning Ticket [Full-Blown Tantrum]", "Silence Suzuka [Winning Dream]", "Narita Brian [The Whistling Arrow´s Taunt]", "Manhattan Cafe [My Solo Spun in Spiraling Runs]", "Meisho Doto [Leaping into the Unknown]", "Mejiro Bright [Little by Little]", "Symboli Rudolf [Enchaînement]", "Ikuno Dictus [Beloved Orchid Bouquet]", "Zenno Rob Roy [\"Rhodonite and the Dreamstone\"]", "Manhattan Cafe [It´s on the House]", "Biwa Hayahide [Uchronia Architect]", "Mejiro Palmer [Moonlit Devil ♪]", "Symboli Kris S [A Win Foreshadowed]", "Sakura Laurel [Don´t Stop Anymore!]", "Special Week [Outrunning Misfortune]", "Mayano Top Gun [Cute + Cute = ?]", "Manhattan Cafe [My Solo Drawn to Raindrop Drums]", "Zenno Rob Roy [The Perfect Book for You]", "Tosen Jordan [Turf as Nails]", "Mejiro Ryan [Hot Hearts and Cool Drinks]", "Tokai Teio [Step! Smile! Wink!]", "T.M. Opera O [Mighty Fotografia]", "Gold Ship [Tracen Academy]", "Mejiro McQueen [Tracen Academy]", "T.M. Opera O [Tracen Academy]", "Seiun Sky [Tracen Academy]", "Rice Shower [Tracen Academy]", "Super Creek [Tracen Academy]", "Tamamo Cross [Tracen Academy]", "Mayano Top Gun [Tracen Academy]", "Manhattan Cafe [Tracen Academy]", "Satono Diamond [Tracen Academy]", "Zenno Rob Roy [Tracen Academy]", "Sakura Chiyono O [Tracen Academy]", "Nakayama Festa [Tracen Academy]", "Tosen Jordan [Tracen Academy]", "Mejor Bright [Tracen Academy]", "Symboli Kris S [Tracen Academy]", "Sakura Laurel [Tracen Academy]", "Vodka [Wild Rider]", "El Condor Pasa [Champion´s Passion]", "Smart Falcon [My Umadol Way! ☆]", "Oguri Cap [Get Lost of hugs for Me]", "Yaeno Muteki [Fiery Discipline]", "Winning Ticket [Dreams Do Come True!]", "Rice Shower [Happiness Just around the Bend]", "Bamboo Memory [Head-On Fight!]", "Daiwa Scarlet [Mini☆Vacation]", "King Halo [Tonight, We Waltz]", "Tamamo Cross [Beware! Halloween Night!]", "Daitaku Helios [Make! Some! NOISE!]", "Marvelous Sunday [Dazzling Day in the Snow]", "Admire Vega [Lucky Star in the Sky]", "Agnes Digital [A Fan´s Joy]", "Daiwa Scarlet [Number 1 Outfit]", "Kawakami Princess [Go Go☆Princess!]", "Haru Urara [Sunny Passion ♪]", "Air Groove [Tailwind to My Goals]", "Daiichi Ruby [Ah, Such Majesty]", "Narita Brian [Glad Tidings]", "Grass Wonder [From Icy Blues to Verdant Hues]", "Tanino Gimlet [Welcome to Umayuru]", "Hishi Amazon [Reach to the Top!]", "Agnes Digital [Digitals´s Recharge Station", "Biwa Hayahide [Trial Initiation]", "Mihono Bourbon [Pal-Assisted Training]", "Mejiro Ryan [On and Off the Court]", "Daitaku Helios [Let´s Get This Party Lit!]", "Nishino Flower [Lifting Your Spirits]", "Inari One [Laughing through the Mud]", "Fine Motion [Grma, Ramen ♪]", "Sakura Bakushin O [The Perfect Morning Greeting!]", "Special Week [At the End of the Day]", "Narita Top Road [Stop, Prez!]", "Oguri Cap [Tracen Academy]", "Vodka [Tracen Academy]", "El Condor Pasa [Tracen Academy]", "Hishi Amazon [Tracen Academy]", "Agnes Digital [Tracen Academy]", "Biwa Hayahide [Tracen Academy]", "Mihono Bourbon [Tracen Academy]", "Mejiro Ryan [Tracen Academy]", "Smart Falcon [Tracen Academy]", "Daitaku Helios [Tracen Academy]", "Yaeno Muteki [Tracen Academy]", "Bamboo Memory [Tracen Academy]", "Inari One [Tracen Academy]", "Admire Vega [Tracen Academy]", "Daiichi Ruby [Tracen Academy]", "Tanino Gimlet [Tracen Academy]", "Special Week [The Brightest Star in Japan]", "Grass Wonder [Fairest Fleur]", "Ines Fujin [Watch My Star Fly!]", "Winning Ticket [BNWinner!]", "Haru Urara [Urara´s Day Off!]", "Mejiro Palmer [Go Ahead and Laugh]", "Matikane Tannhauser [Just Keep Going]", "Hishi Akebono [Who Wants the First Bite?]", "Mejiro Ryan [Winning Pitch]", "Ikuno Dictus [Warm Heart, Soft Steps]", "Yukino Bijin [Dancing Light into the Night]", "Sakura Bakushin O [Super! Sonic! Flower Power!]", "Marvelous Sunday [A MORE MARVELOUS WORLD! ☆]", "Bamboo Memory [Make These Feelings Reach You!]", "El Condor Pasa [Twinkle in Your Eyes ∞]", "Special Week [Take Hold of Our Dreams!]", "Sakura Chiyono O [A Good Heart Blossoms to its Fullest!]", "Twin Turbo [TT Ignition!]", "Shinko Windy [Onwards, Demon Queen Lackeys!]", "Yaeno Muteki [Pious Flame, Heavens Scorcher]", "Yamanin Zephyr [To Winds Untraveled]", "Air Groove [Nothing Escapes the Vice Prez]", "Yukino Bijin [City Girl 101]", "Meisho Doto [Fighting for Fortune]", "Nice Nature [It´s Just Water]", "Tamamo Cross [Now Dat´s What I Call Grilled Squid!]", "Seeking the Pearl [The World´s My Oyster]", "Sirius Symboli [The Brightest Star Shines On]", "Admire Vega [Aim for the Brightest]", "Smart Falcon [Almost... an Umadol?! ♡]", "Oguri Cap [I Love You... Dear Food]", "K.S. Miracle [The 3rd Miracle]", "Tsurumaru Tsuyoshi [Go, Go! Tsuyoshi!]", "Special Week [Tracen Academy]", "Grass Wonder [Tracen Academy]", "Winning Ticket [Tracen Academy]", "Haru Urara [Tracen Academy]", "Air Groove [Tracen Academy]", "Yukino Bijin [Tracen Academy]", "Ines Fujin [Tracen Academy]", "Meisho Doto [Tracenm Academy]", "Nice Nature [Tracen Academy]", "Mejiro Palmer [Tracen Academy]", "Matikane Tannhauser [Tracen Academy]", "Seeking the Pearl [Tracen Academy]", "Hishi Akebono [Tracen Academy]", "Sirius Symboli [Tracen Academy]", "K.S. Miracle [Tracen Academy}", "Tsurumaru Tsuyoshi [Tracen Academy]", "Yamanin Zephyr [Tracen Academy]", "Fine Motion [Wave of Gratitude]", "Air Shakur [7 More Centimeters]", "Yukino Bijin [Hometown Cheers]", "Mejiro Dober [My Thoughts, My Desires]", "Nice Nature [Daring to Dream]", "Seiun Sky [Paint the Sky Red]", "Mihono Bourbon [The Ghost Finds Halloween Magic]", "Curren Chan [Cutie Pie with Shining Eyes]", "Narita Taishin [Strict Shopper]", "Nishino Flower [Little Cupcakes, Big Emotions]", "Satono Diamond [Special Dreamers!]", "Sirius Symboli [Escorte Étoile]", "Mr. C.B. [Dear Mr. C.B.]", "Rice Shower [Day I Dreamed Of]", "Matikanetannhauser [Machitan☆Adventure]", "Nakayama Festa [Trusting the Dice]", "Tokai Teio [Teio-Oo-Oo!!!]", "Air Groove [Are You Merry?]", "Sweep Tosho [Capricious Excellence]", "Oguri Cap [Run Forth! Dash On! Ever Forward!]", "Fuji Kiseki [Well, Look Who´s Home]", "Daiwa Scarlet [Nothing Hard Work Can´t Solve!]", "Agnes Tachyon [Experimental Studies on Subject A]", "Marvelous Sunday [A Marvelous ☆ Plan]", "Matikane Fukukitaru [Fate´s Forecast]", "Mejiro Dober [Ignore the Stares]", "Ikuno Dictus [Never Skip Warm-Ups]", "Nice Nature [Messing Around]", "Mejiro Ardan [My Heart Will Go On]", "Ines Fujin [You Earned It!]", "Sweep Tosho [Reckless Witch Training]", "Gold City [Going for Gold]", "Seiun Sky [Bobbing with the Waves]", "Symboli Rudolf [Tracen Academy]", "Daiwa Scarlet [Tracen Academy]", "Fine Motion [Tracen Academy]", "Agnes Tachyon [Tracen Academy]", "Air Shakur [Tracen Academy]", "Marvelous Sunday [Tracen Academy]", "Matikane Fukukitaru [Tracen Academy]", "Mejiro Dober [Tracen Academy]", "Fuji Kiseki [Tracen Academy]", "Ikuno Dictus [Tracen Academy]", "Mejiro Ardan [Tracen Academy]", "Curren Chan [Tracen Academy]", "Mr. C.B. [Tracen Academy]", "Tazuna Hayakawa [Tracen Reception]", "Riko Kashimoto [Planned Perfection]", "Light Hello [From the Ground Up]", "Sasami Anshinzawa [This Might Sting!]", "Aoi Kiryuin [Trainer´s Teamwork]", "Tazuna Hayakawa [Tracen Academy]", "Aoi Kiryuin [Tracen Academy]", "Riko Kashimoto [Tracen Academy]", "Sasami Anshinzawa [Acupuncturist]", "Light Hello [Event Producer]", "Heirs to the Throne [Esteemed and Adored]", "Team Sirius [Passing the Dream On]"]);
+  const KEYS = { decisions:'uma_randomizer_new_entry_decisions_v1', blockedUmas:'blockedUmas', disabledCards:'support_disabled_cards' };
+  const read = (key, fallback) => { try { const value=JSON.parse(localStorage.getItem(key)); return value ?? fallback; } catch { return fallback; } };
+  const decisions = read(KEYS.decisions, {});
+  const overlay = document.getElementById('newEntryReviewOverlay');
+  if (!overlay || !Array.isArray(window.UMAS) && typeof UMAS === 'undefined') return;
+  const nameEl = document.getElementById('newEntryReviewName');
+  const kindEl = document.getElementById('newEntryReviewKind');
+  const titleEl = document.getElementById('newEntryReviewTitle');
+  const helpEl = document.getElementById('newEntryReviewHelp');
+  const keepBtn = document.getElementById('newEntryKeep');
+  const rejectBtn = document.getElementById('newEntryReject');
+  const queue = [];
+  const umaNames = new Set();
+  for (const uma of UMAS) {
+    if (!uma || !uma.name) continue;
+    umaNames.add(uma.name);
+    const key = 'uma:' + uma.name;
+    if (!BASELINE_UMAS.has(uma.name) && !Object.prototype.hasOwnProperty.call(decisions,key)) queue.push({kind:'uma',name:uma.name,key,item:uma});
+  }
+  // La página index no contiene SUPPORT_CARDS: en GitHub Pages/servidor local leemos support.html.
+  // Las cartas del catálogo inicial están en BASELINE_SUPPORT_CARDS, así solo se preguntan las añadidas después.
+  async function addNewCards() {
+    try {
+      const response = await fetch(new URL('support.html', location.href), {cache:'no-store'});
+      if (!response.ok) return;
+      const html = await response.text();
+      const start = html.indexOf('const SUPPORT_CARDS');
+      const end = html.indexOf('const SLOT_COUNT', start);
+      if (start < 0 || end < 0) return;
+      const section = html.slice(start,end);
+      const pattern = /\{\s*name\s*:\s*(['"])(.*?)\1\s*,\s*rarity\s*:\s*(['"])(.*?)\3\s*,?\s*img\s*:\s*(['"])(.*?)\5/gs;
+      const seen = new Set();
+      let match;
+      while ((match = pattern.exec(section)) !== null) {
+        const name = match[2]; if (!name || seen.has(name)) continue; seen.add(name);
+        const key = 'card:' + name;
+        if (!BASELINE_SUPPORT_CARDS.has(name) && !Object.prototype.hasOwnProperty.call(decisions,key)) queue.push({kind:'card',name,key});
+      }
+    } catch (error) {
+      // Si se abre index.html directamente como file://, el navegador bloquea fetch por seguridad.
+      console.info('La detección de cartas nuevas requiere abrir la página mediante un servidor o GitHub Pages.');
+    }
+  }
+  function refreshUmaList() {
+    const list = document.getElementById('umaList') || document.getElementById('umaGrid') || document.getElementById('umaContainer');
+    if (!list) return;
+    list.querySelectorAll('[data-uma-name]').forEach(el => {
+      const name = el.dataset.umaName;
+      const rejected = decisions['uma:' + name] === 'reject';
+      el.classList.toggle('grayscale', rejected);
+      el.style.filter = rejected ? 'grayscale(1)' : '';
+    });
+  }
+  function showNext() {
+    if (!queue.length) { overlay.classList.remove('visible'); return; }
+    const item = queue[0];
+    kindEl.textContent = item.kind === 'uma' ? 'Nueva Uma' : 'Nueva carta de soporte';
+    titleEl.textContent = item.kind === 'uma' ? '¿Quieres conservar esta Uma?' : '¿Quieres conservar esta carta?';
+    nameEl.textContent = item.name;
+    helpEl.textContent = item.kind === 'uma'
+      ? 'Conservarla permite que aparezca en el randomizer. Rechazarla la dejará en blanco y negro y no volverá a salir.'
+      : 'Conservarla permite que aparezca en support.html. Rechazarla la dejará en blanco y negro y se excluirá de la generación.';
+    keepBtn.textContent = 'Conservar'; rejectBtn.textContent = 'Rechazar';
+    overlay.classList.add('visible');
+  }
+  function decide(choice) {
+    const item = queue.shift(); if (!item) return;
+    decisions[item.key] = choice;
+    localStorage.setItem(KEYS.decisions, JSON.stringify(decisions));
+    if (item.kind === 'uma') {
+      const blocked = new Set(read(KEYS.blockedUmas, []));
+      if (choice === 'reject') blocked.add(item.name); else blocked.delete(item.name);
+      // Actualiza también el estado en memoria para que el cambio surta efecto sin recargar.
+      if (typeof blockedUmas !== 'undefined') {
+        if (choice === 'reject') blockedUmas.add(item.name); else blockedUmas.delete(item.name);
+      }
+      const selector = document.getElementById('umaSelector');
+      const umaIndex = UMAS.findIndex(uma => uma.name === item.name);
+      const umaImage = selector && selector.children[umaIndex] ? selector.children[umaIndex].querySelector('img') : null;
+      if (umaImage) umaImage.classList.toggle('grayscale', choice === 'reject');
+      localStorage.setItem(KEYS.blockedUmas, JSON.stringify([...blocked]));
+    } else {
+      const disabled = new Set(read(KEYS.disabledCards, []));
+      if (choice === 'reject') disabled.add(item.name); else disabled.delete(item.name);
+      localStorage.setItem(KEYS.disabledCards, JSON.stringify([...disabled]));
+    }
+    showNext();
+  }
+  keepBtn.addEventListener('click', () => decide('keep'));
+  rejectBtn.addEventListener('click', () => decide('reject'));
+  document.addEventListener('keydown', event => { if (overlay.classList.contains('visible') && event.key === 'Escape') event.preventDefault(); });
+  addNewCards().finally(() => {
+    // Las Umas se encolan primero en el orden de const UMAS; después las cartas en orden de SUPPORT_CARDS.
+    showNext();
+  });
+})();
+</script>
+
+<button id="profileManagerLauncher" type="button" aria-expanded="false">👥 <span data-profile-i18n="profiles">Perfiles</span></button>
+<aside id="profileManagerDrawer" aria-label="Gestor de perfiles" aria-hidden="true">
+  <div class="profile-manager-head"><h2 data-profile-i18n="profiles">Perfiles</h2><button class="profile-manager-close" id="profileManagerClose" type="button" aria-label="Cerrar">×</button></div>
+  <div class="profile-manager-body">
+    <div class="profile-manager-tabs"><button id="myProfilesTab" class="active" type="button" data-profile-i18n="myProfiles">Mis perfiles</button><button id="sharedProfilesTab" type="button" data-profile-i18n="sharedProfiles">Compartidos</button></div>
+    <div id="profileCreateRow" class="profile-manager-create"><input id="profileNameInput" maxlength="80" type="text" data-profile-i18n-placeholder="profileNamePlaceholder" placeholder="Nombre del perfil"><button id="saveProfileBtn" class="profile-manager-primary" type="button" data-profile-i18n="saveProfile">Guardar</button></div>
+    <p id="profileManagerHint" style="font-size:12px;opacity:.7;margin:0 0 12px" data-profile-i18n="profileHint">Guarda tus Umas y cartas activadas/desactivadas.</p>
+    <div id="profileManagerList" class="profile-manager-list"></div>
+  </div>
+</aside>
+<div id="profileImportOverlay" role="dialog" aria-modal="true" aria-labelledby="profileImportTitle"><div id="profileImportDialog"><h3 id="profileImportTitle">¿Quieres guardar el perfil de X?</h3><p id="profileImportText"></p><div class="profile-import-actions"><button id="profileImportNo" class="profile-manager-secondary" type="button">No</button><button id="profileImportYes" class="profile-manager-primary" type="button">Sí, guardar</button></div></div></div>
+<script id="profileManagerScript">
+(function(){
+  'use strict';
+  const STORAGE='uma_randomizer_profiles_v1';
+  const SHARED='uma_randomizer_shared_profiles_v1';
+  const DECISIONS='uma_randomizer_new_entry_decisions_v1';
+  const SUPABASE_URL='https://uatpwjkmdjztapftpdpy.supabase.co';
+  const SUPABASE_KEY='sb_publishable_mJnHQi0YoKqVJ2VV7JuxgQ_v9MNXnOj';
+  const BLOCKED='blockedUmas';
+  const DISABLED='support_disabled_cards';
+  const $p=id=>document.getElementById(id);
+  const labels={
+    es:{profiles:'Perfiles',myProfiles:'Mis perfiles',sharedProfiles:'Compartidos',profileNamePlaceholder:'Nombre del perfil',saveProfile:'Guardar',profileHint:'Guarda tus Umas y cartas activadas/desactivadas.',load:'Cargar',share:'Compartir',update:'Actualizar con la selección actual',delete:'Eliminar',emptyMine:'Todavía no tienes perfiles guardados.',emptyShared:'Todavía no tienes perfiles compartidos guardados.',confirmDelete:'¿Eliminar este perfil?',saved:'Perfil guardado.',copied:'Enlace copiado. Compártelo con quien quieras.',copyFail:'No se pudo copiar automáticamente. Copia el enlace que aparece a continuación.',needName:'Escribe un nombre para el perfil.',confirmUpdate:'¿Actualizar este perfil con la selección actual?',updatedShared:'Perfil compartido actualizado.',importTitle:'¿Quieres guardar el perfil de {name}?',importText:'Se guardará en la pestaña Compartidos. Podrás cargarlo o eliminarlo, pero no modificarlo.',yesSave:'Sí, guardar',no:'No',imported:'Perfil compartido guardado.',exists:'Este perfil compartido ya está guardado.'},
+    en:{profiles:'Profiles',myProfiles:'My profiles',sharedProfiles:'Shared',profileNamePlaceholder:'Profile name',saveProfile:'Save',profileHint:'Save your enabled/disabled Umas and support cards.',load:'Load',share:'Share',update:'Update from current selection',delete:'Delete',emptyMine:'You have no saved profiles yet.',emptyShared:'You have no saved shared profiles yet.',confirmDelete:'Delete this profile?',saved:'Profile saved.',copied:'Link copied. Share it with anyone.',copyFail:'Could not copy automatically. Copy the link below.',needName:'Enter a profile name.',confirmUpdate:'Update this profile with the current selection?',updatedShared:'Shared profile updated.',importTitle:'Do you want to save {name}’s profile?',importText:'It will be saved under Shared. You can load or delete it, but not edit it.',yesSave:'Yes, save',no:'No',imported:'Shared profile saved.',exists:'This shared profile is already saved.'}
+  };
+  function lang(){return (localStorage.getItem('language')||document.documentElement.lang||'es').toLowerCase().startsWith('en')?'en':'es'}
+  function t(key){return labels[lang()][key]||labels.es[key]||key}
+  function read(key,fallback){try{const v=JSON.parse(localStorage.getItem(key));return v==null?fallback:v}catch{return fallback}}
+  function write(key,value){localStorage.setItem(key,JSON.stringify(value))}
+  function ownProfiles(){return read(STORAGE,[])}
+  function sharedProfiles(){return read(SHARED,[])}
+  function allCardNames(){try{if(typeof SUPPORT_CARDS==='undefined')return [];const out=[];for(const type of Object.keys(SUPPORT_CARDS))for(const rarity of Object.keys(SUPPORT_CARDS[type]))for(const card of SUPPORT_CARDS[type][rarity]||[])out.push(card.name);return [...new Set(out)]}catch{return []}}
+  function currentBlockedUmas(){try{if(typeof blockedUmas!=='undefined')return [...blockedUmas]}catch{}return read(BLOCKED,[])}
+  function currentDisabledCards(){let result=new Set(read(DISABLED,[]));try{if(typeof disabledCards!=='undefined')for(const n of disabledCards)result.add(n)}catch{};const decisions=read(DECISIONS,{});Object.entries(decisions).forEach(([key,value])=>{if(key.startsWith('card:')&&value==='reject')result.add(key.slice(5))});return [...result]}
+  function snapshot(name){return {id:'profile-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10),name:name.trim(),blockedUmas:currentBlockedUmas(),disabledCards:currentDisabledCards(),decisions:read(DECISIONS,{}),createdAt:new Date().toISOString()}}
+  function refreshVisuals(){
+    try{if(typeof blockedUmas!=='undefined'){const selector=$p('umaSelector');if(selector&&selector.children.length){Array.from(selector.children).forEach((el,i)=>{const uma=typeof UMAS!=='undefined'?UMAS[i]:null;const img=el.querySelector('img');if(uma&&img)img.classList.toggle('grayscale',blockedUmas.has(uma.name))})}}}catch{}
+    try{if(typeof disabledCards!=='undefined'){const grid=$p('allCardsGrid');if(grid)grid.querySelectorAll('img[data-card-name]').forEach(img=>{const off=disabledCards.has(img.dataset.cardName)||rejected(img.dataset.cardName);img.style.filter=off?'grayscale(100%)':'grayscale(0)';img.classList.toggle('disabled',off)})}}catch{}
+    try{if(typeof updateCardList==='function')for(let i=1;i<=6;i++)updateCardList(i)}catch{}
+  }
+  function rejected(name){return read(DECISIONS,{})['card:'+name]==='reject'}
+  function applyProfile(profile){
+    const blocked=new Set(profile.blockedUmas||[]);write(BLOCKED,[...blocked]);
+    try{if(typeof blockedUmas!=='undefined')blockedUmas=blocked}catch{}
+    const disabled=new Set(profile.disabledCards||[]);write(DISABLED,[...disabled]);
+    try{if(typeof disabledCards!=='undefined')disabledCards=disabled}catch{}
+    const decisions={...(profile.decisions||{})};
+    // Las decisiones de nuevas cartas forman parte del perfil y también se reflejan en ambas páginas.
+    allCardNames().forEach(name=>{if(decisions['card:'+name]==='reject')disabled.add(name)});
+    write(DISABLED,[...disabled]);
+    write(DECISIONS,decisions);
+    try{if(typeof disabledCards!=='undefined')disabledCards=disabled}catch{}
+    try{if(typeof saveSelections==='function')saveSelections()}catch{}
+    try{if(typeof saveDisabledCards==='function')saveDisabledCards()}catch{}
+    refreshVisuals();
+    // Si el perfil se carga desde la página de supports, sus elecciones se guardan para que index.html las lea.
+    window.dispatchEvent(new CustomEvent('uma-profile-loaded',{detail:{id:profile.id,name:profile.name}}));
+  }
+  const launcher=$p('profileManagerLauncher'),drawer=$p('profileManagerDrawer');let activeTab='mine';
+  function openDrawer(){drawer.classList.add('open');drawer.setAttribute('aria-hidden','false');launcher.setAttribute('aria-expanded','true');renderList()}
+  function closeDrawer(){drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');launcher.setAttribute('aria-expanded','false')}
+  launcher.addEventListener('click',()=>drawer.classList.contains('open')?closeDrawer():openDrawer());$p('profileManagerClose').addEventListener('click',closeDrawer);
+  function selectTab(tab){activeTab=tab;$p('myProfilesTab').classList.toggle('active',tab==='mine');$p('sharedProfilesTab').classList.toggle('active',tab==='shared');$p('profileCreateRow').style.display=tab==='mine'?'flex':'none';$p('profileManagerHint').style.display=tab==='mine'?'block':'none';renderList()}
+  $p('myProfilesTab').addEventListener('click',()=>selectTab('mine'));$p('sharedProfilesTab').addEventListener('click',()=>selectTab('shared'));
+  function renderList(){
+    const list=$p('profileManagerList');list.innerHTML='';const items=activeTab==='mine'?ownProfiles():sharedProfiles();
+    if(!items.length){const empty=document.createElement('div');empty.className='profile-manager-empty';empty.textContent=t(activeTab==='mine'?'emptyMine':'emptyShared');list.appendChild(empty);return}
+    items.forEach(profile=>{const card=document.createElement('div');card.className='profile-manager-item';const name=document.createElement('div');name.className='profile-manager-item-name';name.textContent=profile.name;card.appendChild(name);const actions=document.createElement('div');actions.className='profile-manager-item-actions';
+      const load=document.createElement('button');load.type='button';load.textContent=t('load');load.addEventListener('click',async()=>{try{let p=profile;if(activeTab==='shared'){p=await fetchSharedProfile(profile.id);if(!p)throw new Error('No se encontró el perfil compartido.');const list=sharedProfiles().map(x=>x.id===profile.id?{...p,id:profile.id}:x);write(SHARED,list)}applyProfile(p);closeDrawer()}catch(e){alert('No se pudo cargar el perfil compartido: '+e.message)}});actions.appendChild(load);
+      if(activeTab==='mine'){const update=document.createElement('button');update.type='button';update.textContent=t('update');update.addEventListener('click',async()=>{if(!window.confirm(t('confirmUpdate')||'Actualizar este perfil con la selección actual?'))return;const updated={...snapshot(profile.name),id:profile.id,createdAt:profile.createdAt||new Date().toISOString(),shareId:profile.shareId,ownerToken:profile.ownerToken};try{if(updated.shareId&&updated.ownerToken){const ok=await rpc('update_shared_profile',{p_id:updated.shareId,p_name:updated.name,p_profile_data:profileData(updated),p_owner_token:updated.ownerToken});if(!ok)throw new Error('Supabase rechazó la actualización.');}write(STORAGE,ownProfiles().map(p=>p.id===profile.id?updated:p));renderList();alert('Perfil actualizado.')}catch(e){alert('No se pudo actualizar el perfil compartido: '+e.message)}});actions.appendChild(update);const share=document.createElement('button');share.type='button';share.textContent=t('share');share.addEventListener('click',()=>shareProfile(profile));actions.appendChild(share)}
+      const del=document.createElement('button');del.type='button';del.textContent=t('delete');del.addEventListener('click',async()=>{if(!window.confirm(t('confirmDelete')))return;try{if(activeTab==='mine'&&profile.shareId&&profile.ownerToken){const ok=await rpc('delete_shared_profile',{p_id:profile.shareId,p_owner_token:profile.ownerToken});if(!ok)throw new Error('Supabase no autorizó eliminar el perfil compartido.')}if(activeTab==='mine')write(STORAGE,ownProfiles().filter(p=>p.id!==profile.id));else write(SHARED,sharedProfiles().filter(p=>p.id!==profile.id));renderList()}catch(e){alert('No se pudo eliminar: '+e.message)}});actions.appendChild(del);card.appendChild(actions);list.appendChild(card);
+    });
+  }
+  $p('saveProfileBtn').addEventListener('click',()=>{const input=$p('profileNameInput');const name=input.value.trim();if(!name){alert(t('needName'));input.focus();return}const profile=snapshot(name);const list=ownProfiles();list.push(profile);write(STORAGE,list);input.value='';renderList();alert(t('saved'))});
+  function profileData(profile){return {blockedUmas:profile.blockedUmas||[],disabledCards:profile.disabledCards||[],decisions:profile.decisions||{},createdAt:profile.createdAt||''}}
+  async function rpc(name,args){const response=await fetch(SUPABASE_URL+'/rest/v1/rpc/'+name,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},body:JSON.stringify(args)});const body=await response.text();if(!response.ok)throw new Error(body||('HTTP '+response.status));try{return JSON.parse(body)}catch{return body}}
+  function randomId(){const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';const bytes=new Uint8Array(8);crypto.getRandomValues(bytes);return [...bytes].map(b=>chars[b%chars.length]).join('')}
+  function randomToken(){const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);return [...bytes].map(b=>b.toString(16).padStart(2,'0')).join('')}
+  async function fetchSharedProfile(id){const result=await rpc('get_shared_profile',{p_id:id});const row=Array.isArray(result)?result[0]:result;if(!row)return null;const data=row.profile_data||{};return {id,name:row.name,...data}}
+  async function shareProfile(profile){
+    try{
+      let shareId=profile.shareId, ownerToken=profile.ownerToken;
+      const data=profileData(profile);
+      if(shareId&&ownerToken){const ok=await rpc('update_shared_profile',{p_id:shareId,p_name:profile.name,p_profile_data:data,p_owner_token:ownerToken});if(!ok)throw new Error('No se pudo actualizar el perfil remoto.');}
+      else {shareId=randomId();ownerToken=randomToken();let ok=await rpc('create_shared_profile',{p_id:shareId,p_name:profile.name,p_profile_data:data,p_owner_token:ownerToken});if(!ok)throw new Error('No se pudo crear el perfil. Pulsa Compartir otra vez para generar otro ID.');}
+      const updated={...profile,shareId,ownerToken};write(STORAGE,ownProfiles().map(p=>p.id===profile.id?updated:p));
+      const url=new URL('index.html',location.href);url.search='';url.hash='';url.searchParams.set('sharedProfile',shareId);const link=url.toString();
+      try{await navigator.clipboard.writeText(link);alert(t('copied')+'\n'+link)}catch{window.prompt(t('copyFail'),link)}
+      renderList();
+    }catch(e){alert('Error al compartir con Supabase: '+e.message)}
+  }
+  const importOverlay=$p('profileImportOverlay');let pendingShared=null;
+  function showImport(profile){pendingShared=profile;$p('profileImportTitle').textContent=t('importTitle').replace('{name}',profile.name||'X');$p('profileImportText').textContent=t('importText');$p('profileImportYes').textContent=t('yesSave');$p('profileImportNo').textContent=t('no');importOverlay.classList.add('visible')}
+  function closeImport(){importOverlay.classList.remove('visible');pendingShared=null;const url=new URL(location.href);url.searchParams.delete('sharedProfile');history.replaceState(null,'',url.toString())}
+  $p('profileImportNo').addEventListener('click',closeImport);
+  $p('profileImportYes').addEventListener('click',()=>{if(!pendingShared)return;const shared=sharedProfiles();const existing=shared.findIndex(p=>p.id===pendingShared.id);if(existing>=0)shared[existing]=pendingShared;else shared.push(pendingShared);write(SHARED,shared);alert(t('imported'));closeImport();if(drawer.classList.contains('open'))renderList()});
+  // Los enlaces contienen solo el ID; los datos se consultan en Supabase.
+  (async()=>{try{const id=new URLSearchParams(location.search).get('sharedProfile');if(id&&/^[A-Za-z0-9]{8}$/.test(id)){const profile=await fetchSharedProfile(id);if(profile&&Array.isArray(profile.blockedUmas)&&Array.isArray(profile.disabledCards))showImport(profile);else console.warn('No se encontró el perfil compartido.')}}catch(error){console.warn('No se pudo consultar el perfil compartido.',error);alert('No se pudo abrir el perfil compartido. Comprueba la configuración de Supabase.')}})();
+  // Mantener los textos en el idioma actual.
+  function translateUI(){document.querySelectorAll('[data-profile-i18n]').forEach(el=>{const key=el.getAttribute('data-profile-i18n');el.textContent=t(key)});document.querySelectorAll('[data-profile-i18n-placeholder]').forEach(el=>{el.placeholder=t(el.getAttribute('data-profile-i18n-placeholder'))})}
+  translateUI();document.getElementById('langBtn')?.addEventListener('click',()=>setTimeout(translateUI,0));
 })();
 </script>
 </body>
